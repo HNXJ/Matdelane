@@ -1,0 +1,20 @@
+# Matnwb lib
+matnwb/
+
+# Data files
+*.nwb
+*.mat
+*.zip
+*.rar
+*.txt
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.avi
+*.svg
+*.eps
+*.ai
+*.bmp
+*.json
