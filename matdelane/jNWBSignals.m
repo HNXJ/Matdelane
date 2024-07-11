@@ -1,4 +1,4 @@
-function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
+function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalMode)
 
     if ~exist('probe', 'var')
 
@@ -15,6 +15,12 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
     if ~exist('t_post_ms', 'var')
 
         t_post_ms = 4000;
+
+    end
+
+    if ~exist('mode', 'var')
+
+        signalMode = "lfp";
 
     end
 
@@ -55,24 +61,19 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
 
     try
     
-        sig = nwb.processing.get("convolved_spike_train").nwbdatainterface.get("convolved_spike_train_data").data;
+        sig = nwb.acquisition.get("probe_" + num2str(probe) + "_" + signalMode).electricalseries.get("probe_" + num2str(probe) + "_" + signalMode + "_data").data;
 
     catch
 
-        disp("->Kilosort2.0: Single unit neurons were not detected in this probe.");
+        disp("->MATNWB: Problem with this file while loading the signal mode : " + signalMode);
         signalList = {};
         return;
 
     end
     
-    goodUnits = nwb.units.vectordata.get("quality").data(:);
-    chidUnits = nwb.units.vectordata.get("peak_channel_id").data(:) >= probe*128 & nwb.units.vectordata.get("peak_channel_id").data(:) < (probe+1)*128;
+    Nchannel = sig.dims(1);
     stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
-        
-    goodUnits = (goodUnits & chidUnits);
-    NgoodUnits = sum(goodUnits);
-    NgoodUnitsID = find(goodUnits == 1);
 
     for block = blocklist'
     
@@ -80,13 +81,13 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
             
             b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 1);
             b = find(b);
-            temp_signals = zeros(numel(b), NgoodUnits, t_pre_ms + t_post_ms);
+            temp_signals = zeros(numel(b), Nchannel, t_pre_ms + t_post_ms);
             cnt = 0;
 
             for i = b'
 
                 cnt = cnt + 1;
-                temp_signals(cnt, :, :) = sig(NgoodUnitsID, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
+                temp_signals(cnt, :, :) = sig(:, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
 
             end
 

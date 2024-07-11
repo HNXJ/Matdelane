@@ -1,8 +1,8 @@
-function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
+function signalList = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_ms)
 
-    if ~exist('probe', 'var')
+    if ~exist('laser', 'var')
 
-        probe = 0;
+        laser = 0;
 
     end
 
@@ -39,10 +39,6 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
     signalList = cell(1, 1);
     jNWBTaskDetails(nwb, task);
 
-    probeLabel = ['probe', char(65 + probe)];
-    areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
-    disp(['Area(s): ', areaName]);
-
     blocks = nwb.intervals.get(task).vectordata.get("task_block_number").data(:);
     correct = nwb.intervals.get(task).vectordata.get("correct").data(:);
     conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
@@ -55,38 +51,32 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
 
     try
     
-        sig = nwb.processing.get("convolved_spike_train").nwbdatainterface.get("convolved_spike_train_data").data;
+        sig = nwb.acquisition.get("laser_" + num2str(laser) + "_tracking").timeseries.get("laser_" + num2str(laser) + "_tracking_data").data;
 
     catch
 
-        disp("->Kilosort2.0: Single unit neurons were not detected in this probe.");
+        disp("->OPTRODE: Specified laser " + num2str(laser) + " not found in this file.");
         signalList = {};
         return;
 
     end
     
-    goodUnits = nwb.units.vectordata.get("quality").data(:);
-    chidUnits = nwb.units.vectordata.get("peak_channel_id").data(:) >= probe*128 & nwb.units.vectordata.get("peak_channel_id").data(:) < (probe+1)*128;
     stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
-        
-    goodUnits = (goodUnits & chidUnits);
-    NgoodUnits = sum(goodUnits);
-    NgoodUnitsID = find(goodUnits == 1);
 
     for block = blocklist'
     
         for condition = conditionlist'
             
-            b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 1);
+            b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 2);
             b = find(b);
-            temp_signals = zeros(numel(b), NgoodUnits, t_pre_ms + t_post_ms);
+            temp_signals = zeros(numel(b), t_pre_ms + t_post_ms);
             cnt = 0;
 
             for i = b'
 
                 cnt = cnt + 1;
-                temp_signals(cnt, :, :) = sig(NgoodUnitsID, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
+                temp_signals(cnt, :) = sig(stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
 
             end
 
