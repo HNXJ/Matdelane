@@ -32,7 +32,8 @@ function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalM
             task_warning = task_warning + " \n--->" + string(tasks{i});
         end
 
-        warning(sprintf(task_warning));
+        wtx = sprintf(task_warning);
+        warning(wtx);
         signalList = {};
         return;
 
