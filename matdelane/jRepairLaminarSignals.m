@@ -7,7 +7,7 @@ y = jRepairLaminarSignals(x, cw, tw, method)
 x : Signal (<N x M> numeric matrix, N-channels with length M)
 cw : Mean kernel rows (channel-widnow)
 tw : Mean kernel columns (time-window)
-method : Core operation function (""
+method : Core operation function ("interp1")
  
 >Output args
 y : Repaired signal (<N x M> numeric matrix)

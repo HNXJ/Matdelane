@@ -6,10 +6,22 @@ function signalList = jOGLOUnits(nwb, probe)
 
     end
 
-    jOGLOTaskDetails(nwb);
+    % jOGLOTaskDetails(nwb);
 
     probeLabel = ['probe', char(65 + probe)];
-    areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
+
+    try
+
+        areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
+
+    catch
+
+        signalList = struct();
+        signalList.area = 'null';
+        return;
+
+    end
+
     disp(['Area(s): ', areaName]);
 
     blocks = nwb.intervals.get("omission_glo_passive").vectordata.get("task_block_number").data(:);

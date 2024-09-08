@@ -76,26 +76,22 @@ function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalM
     stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
 
-    for block = blocklist'
-    
-        for condition = conditionlist'
+    for condition = conditionlist'
             
-            b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 1);
-            b = find(b);
-            temp_signals = zeros(numel(b), Nchannel, t_pre_ms + t_post_ms);
-            cnt = 0;
+        b = (conditions == condition) & (correct == 1) & (stims == 1);
+        b = find(b);
+        temp_signals = zeros(numel(b), Nchannel, t_pre_ms + t_post_ms);
+        cnt = 0;
 
-            for i = b'
+        for i = b'
 
-                cnt = cnt + 1;
-                temp_signals(cnt, :, :) = sig(:, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
-
-            end
-
-            signalList{block, condition} = temp_signals;
+            cnt = cnt + 1;
+            temp_signals(cnt, :, :) = sig(:, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
 
         end
-    
+
+        signalList{condition} = temp_signals;
+
     end
 
     disp("_");

@@ -25,7 +25,6 @@ function jNWBTaskDetails(nwb, taskname)
     end
 
     info_text = info_text + sprintf("\n->Total trials: %d\n", sum(x4));
-    disp("-->Move task event validation done.");
     disp(info_text);
 
 end

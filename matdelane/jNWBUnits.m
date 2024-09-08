@@ -1,10 +1,4 @@
-function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
-
-    if ~exist('probe', 'var')
-
-        probe = 0;
-
-    end
+function [signalListL, signalList] = jNWBUnits(nwb, task, t_pre_ms, t_post_ms)
 
     if ~exist('t_pre_ms', 'var')
 
@@ -26,7 +20,7 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
             task_warning = task_warning + " \n--->" + string(tasks{i});
         end
 
-        warning(sprintf(task_warning));
+        warning(task_warning);
         signalList = {};
         return;
 
@@ -36,22 +30,41 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
 
     end
 
-    signalList = cell(1, 1);
-    jNWBTaskDetails(nwb, task);
+    signalListL = cell(1, 1);
+    probeCount = length(nwb.general_extracellular_ephys.keys());
+    
+    areaN = 0;
+    goodUnits = find(nwb.units.vectordata.get("quality").data(:) == 1);
+    chidUnits = nwb.units.vectordata.get("peak_channel_id").data(goodUnits);
 
-    probeLabel = ['probe', char(65 + probe)];
-    areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
-    disp(['Area(s): ', areaName]);
+    for i = 1:probeCount
+        
+        probeLabel = ['probe', char(65 + i-1)];
+        areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
+        areas = strsplit(areaName, ',');
+        areaCount = length(areas);
 
-    blocks = nwb.intervals.get(task).vectordata.get("task_block_number").data(:);
+        channelW = 128/areaCount;
+        
+        for j = 1:areaCount
+
+            k = areas{j};
+            area = k(~isspace(k));
+            channelL = ceil(channelW*(j-1)) + (i-1)*128 + 1;
+            channelR = ceil(channelW*j) + (i-1)*128;
+           
+            areaN = areaN + 1;  
+            signalListL{areaN}.ids = find(chidUnits > channelL & chidUnits < channelR);
+            signalListL{areaN}.name = area;      
+
+        end
+
+    end
+
     correct = nwb.intervals.get(task).vectordata.get("correct").data(:);
     conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
     stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
-
-    blocklist = unique(blocks);
     conditionlist = unique(conditions);
-    
-    N = size(blocks, 1);
 
     try
     
@@ -60,42 +73,37 @@ function signalList = jNWBUnits(nwb, probe, task, t_pre_ms, t_post_ms)
     catch
 
         disp("->Kilosort2.0: Single unit neurons were not detected in this probe.");
-        signalList = {};
         return;
 
     end
     
-    goodUnits = nwb.units.vectordata.get("quality").data(:);
-    chidUnits = nwb.units.vectordata.get("peak_channel_id").data(:) >= probe*128 & nwb.units.vectordata.get("peak_channel_id").data(:) < (probe+1)*128;
     stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
+    disp(num2str(areaN) + " areas identified.");
+    signalList = cell(size(conditionlist));
+
+    NgoodUnitsID = goodUnits;
+    NgoodUnits = numel(NgoodUnitsID);
+
+    for condition = conditionlist'
         
-    goodUnits = (goodUnits & chidUnits);
-    NgoodUnits = sum(goodUnits);
-    NgoodUnitsID = find(goodUnits == 1);
+        b = (conditions == condition) & (correct == 1) & (stims == 2);
+        b = find(b);
+        temp_signals = zeros(numel(b), NgoodUnits, t_pre_ms + t_post_ms);
+        cnt = 0;
 
-    for block = blocklist'
-    
-        for condition = conditionlist'
-            
-            b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 1);
-            b = find(b);
-            temp_signals = zeros(numel(b), NgoodUnits, t_pre_ms + t_post_ms);
-            cnt = 0;
+        for i = b'
 
-            for i = b'
-
-                cnt = cnt + 1;
-                temp_signals(cnt, :, :) = sig(NgoodUnitsID, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
-
-            end
-
-            signalList{block, condition} = temp_signals;
+            cnt = cnt + 1;
+            temp_signals(cnt, :, :) = sig(NgoodUnitsID, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
 
         end
-    
+
+        signalList{condition} = temp_signals;
+        fprintf("%d ", condition);
+
     end
 
-    disp("_");
+    fprintf("\nDone.");
 
 end
