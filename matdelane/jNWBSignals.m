@@ -55,10 +55,7 @@ function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalM
     conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
     stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
 
-    blocklist = unique(blocks);
     conditionlist = unique(conditions);
-    
-    N = size(blocks, 1);
 
     try
     

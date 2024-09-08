@@ -80,7 +80,7 @@ function [signalListL, signalList] = jNWBUnits(nwb, task, t_pre_ms, t_post_ms)
     stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
     disp(num2str(areaN) + " areas identified.");
-    signalList = cell(size(conditionlist));
+    signalList = cell(1, numel(conditionlist));
 
     NgoodUnitsID = goodUnits;
     NgoodUnits = numel(NgoodUnitsID);
@@ -104,6 +104,6 @@ function [signalListL, signalList] = jNWBUnits(nwb, task, t_pre_ms, t_post_ms)
 
     end
 
-    fprintf("\nDone.");
+    fprintf("\nDone.\n");
 
 end
