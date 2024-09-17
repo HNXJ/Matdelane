@@ -20,7 +20,7 @@ y : Median-filtered signal (<N x M> numeric matrix)
     y(1, :) = x(1, :);
     y(n, :) = x(n, :);
     
-    parfor i = 1:n
+    for i = 1:n
 
         if i <= cw
 
