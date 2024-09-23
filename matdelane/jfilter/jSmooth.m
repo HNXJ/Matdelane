@@ -5,7 +5,7 @@ function y = jSmooth(x, w)
 
     if d == 2
 
-        bl = mean(x(:, 1:1000), 2);
+        bl = mean(x(:, 1:500), 2);
         n1 = size(x, 1);
 
         parfor ik = 1:n1
@@ -16,7 +16,7 @@ function y = jSmooth(x, w)
 
     elseif d == 3
         
-        bl = mean(x(:, :, 1:1000), 3);
+        bl = mean(x(:, :, 1:500), 3);
         n1 = size(x, 1);
         n2 = size(x, 2);
 
@@ -29,7 +29,7 @@ function y = jSmooth(x, w)
             end
 
         end
-        
+
     end
 
 end
