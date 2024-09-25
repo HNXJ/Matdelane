@@ -1,8 +1,20 @@
-function signalList = jOGLOSignals(nwb, probe, signalMode)
+function [signalListL, signalList] = jOGLOSignals(nwb, task, t_pre_ms, t_post_ms, probeId, signalMode)
 
-    if ~exist('probe', 'var')
+    if ~exist('t_pre_ms', 'var')
 
-        probe = 0;
+        t_pre_ms = 1000;
+
+    end
+
+    if ~exist('t_post_ms', 'var')
+
+        t_post_ms = 4000;
+
+    end
+
+    if ~exist('probeId', 'var')
+
+        probeId = 0;
 
     end
 
@@ -12,183 +24,88 @@ function signalList = jOGLOSignals(nwb, probe, signalMode)
 
     end
 
-    jOGLOTaskDetails(nwb);
+    if ~exist('task', 'var')
 
-    probeLabel = ['probe', char(65 + probe)];
+        tasks = nwb.intervals.keys();
+        task_warning = "->Enter an specific task name from this file. \n-->This file contains these tasks : ";
+        for i = 1:numel(tasks)
+            task_warning = task_warning + " \n--->" + string(tasks{i});
+        end
+
+        warning(task_warning);
+        signalList = {};
+        return;
+
+    else
+
+        task = string(task);
+
+    end
+
+    signalListL = cell(1, 1);
+    areaN = 0;
+
+    probeLabel = ['probe', char(65 + probeId)];
     areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
-    disp(['Area(s): ', areaName]);
-    disp("Type: " + signalMode);
+    areas = strsplit(areaName, ',');
+    areaCount = length(areas);
 
-    blocks = nwb.intervals.get("omission_glo_passive").vectordata.get("task_block_number").data(:);
-    correct = nwb.intervals.get("omission_glo_passive").vectordata.get("correct").data(:);
-    omission = nwb.intervals.get("omission_glo_passive").vectordata.get("is_omission").data(:);
-    stims = nwb.intervals.get("omission_glo_passive").vectordata.get("stimulus_number").data(:);
+    channelW = 128/areaCount;
     
-    N = size(blocks, 1);
-    sig = nwb.acquisition.get("probe_" + num2str(probe) + "_" + signalMode).electricalseries.get("probe_" + num2str(probe) + "_" + signalMode + "_data").data(:, :);
-    stime = nwb.intervals.get("omission_glo_passive").start_time.data(:);
+    for j = 1:areaCount
+
+        k = areas{j};
+        area = k(~isspace(k));
+        areaN = areaN + 1;  
+
+        signalListL{areaN}.ids = j*channelW;
+        signalListL{areaN}.name = area;      
+        signalListL{areaN}.session = nwb.identifier;
+
+    end
+
+    correct = nwb.intervals.get(task).vectordata.get("correct").data(:);
+    conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
+    stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
+
+    try
+    
+        sig = nwb.acquisition.get("probe_" + num2str(probeId) + "_" + signalMode).electricalseries.get("probe_" + num2str(probeId) + "_" + signalMode + "_data").data;
+
+    catch
+
+        disp("->LFP not found.");
+        signalList = {};
+        return;
+
+    end
+    
+    stime = nwb.intervals.get(task).start_time.data(:);
     stimeind = floor(stime*1000);
-    
-    b2l = (blocks == 2) & (correct == 1) & (isnan(omission)) & (stims == 3);
-    b2o2 = (blocks == 2) & (correct == 1) & (omission == 1) & (stims == 3);
-    b2o3 = (blocks == 2) & (correct == 1) & (omission == 1) & (stims == 4);
-    b2o4 = (blocks == 2) & (correct == 1) & (omission == 1) & (stims == 5);
-    
-    b4l = (blocks == 4) & (correct == 1) & (isnan(omission)) & (stims == 3);
-    b4o2 = (blocks == 4) & (correct == 1) & (omission == 1) & (stims == 3);
-    b4o3 = (blocks == 4) & (correct == 1) & (omission == 1) & (stims == 4);
-    b4o4 = (blocks == 4) & (correct == 1) & (omission == 1) & (stims == 5);
-    
-    b5l = (blocks == 5) & (correct == 1) & (isnan(omission)) & (stims == 3);
-    b5o2 = (blocks == 5) & (correct == 1) & (omission == 1) & (stims == 3);
-    b5o3 = (blocks == 5) & (correct == 1) & (omission == 1) & (stims == 4);
-    b5o4 = (blocks == 5) & (correct == 1) & (omission == 1) & (stims == 5);
-    
-    goodUnits = ones(1, size(sig, 1));
-    NgoodUnits = sum(goodUnits);
-    NgoodUnitsID = find(goodUnits == 1);
+    disp(num2str(areaN) + " areas identified.");
 
-    sigsb2l = zeros(sum(b2l), NgoodUnits, 6000);
-    sigsb2o2 = zeros(sum(b2o2), NgoodUnits, 6000);
-    sigsb2o3 = zeros(sum(b2o3), NgoodUnits, 6000);
-    sigsb2o4 = zeros(sum(b2o4), NgoodUnits, 6000);
-    
-    sigsb4l = zeros(sum(b4l), NgoodUnits, 6000);
-    sigsb4o2 = zeros(sum(b4o2), NgoodUnits, 6000);
-    sigsb4o3 = zeros(sum(b4o3), NgoodUnits, 6000);
-    sigsb4o4 = zeros(sum(b4o4), NgoodUnits, 6000);
-    
-    sigsb5l = zeros(sum(b5l), NgoodUnits, 6000);
-    sigsb5o2 = zeros(sum(b5o2), NgoodUnits, 6000);
-    sigsb5o3 = zeros(sum(b5o3), NgoodUnits, 6000);
-    sigsb5o4 = zeros(sum(b5o4), NgoodUnits, 6000);
-    
-    cntl = 0;
-    cnto2 = 0;
-    cnto3 = 0;
-    cnto4 = 0;
-    
-    for i = 1:N
-    
-        if b2l(i)
-    
-            cntl = cntl + 1;
-            sigsb2l(cntl, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b2o2(i)
-    
-            cnto2 = cnto2 + 1;
-            sigsb2o2(cnto2, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b2o3(i)
-    
-            cnto3 = cnto3 + 1;
-            sigsb2o3(cnto3, :, :) = sig(NgoodUnitsID, stimeind(i-2) - 1000 + 1:stimeind(i-2) + 5000);
-    
-        elseif b2o4(i)
-    
-            cnto4 = cnto4 + 1;
-            sigsb2o4(cnto4, :, :) = sig(NgoodUnitsID, stimeind(i-3) - 1000 + 1:stimeind(i-3) + 5000);
-    
-        end
-    
-        if mod(i, 2000) == 1
-            fprintf(num2str(i) + "-");
-        end
-    
-    end
-    
-    disp("_");
+    conditionlist = [0, 2, 3, 4, 5, 7, 8, 9, 10, 26, 34, 42, 50];
+    signalList = cell(1, numel(conditionlist) - 1);
 
-    cntl = 0;
-    cnto2 = 0;
-    cnto3 = 0;
-    cnto4 = 0;
-    
-    for i = 1:N
-    
-        if b4l(i)
-    
-            cntl = cntl + 1;
-            sigsb4l(cntl, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b4o2(i)
-    
-            cnto2 = cnto2 + 1;
-            sigsb4o2(cnto2, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b4o3(i)
-    
-            cnto3 = cnto3 + 1;
-            sigsb4o3(cnto3, :, :) = sig(NgoodUnitsID, stimeind(i-2) - 1000 + 1:stimeind(i-2) + 5000);
-    
-        elseif b4o4(i)
-    
-            cnto4 = cnto4 + 1;
-            sigsb4o4(cnto4, :, :) = sig(NgoodUnitsID, stimeind(i-3) - 1000 + 1:stimeind(i-3) + 5000);
-    
+    for k = 2:numel(conditionlist)
+        
+        b = (conditions <= conditionlist(k)) & (conditions > conditionlist(k-1)) & (correct == 1) & (stims == 2);
+        b = find(b);
+        temp_signals = zeros(numel(b), 128, t_pre_ms + t_post_ms);
+        cnt = 0;
+
+        for i = b'
+
+            cnt = cnt + 1;
+            temp_signals(cnt, :, :) = sig(1:128, stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
+
         end
-    
-        if mod(i, 2000) == 1
-            fprintf(num2str(i) + "-");
-        end
-    
+
+        signalList{k-1} = temp_signals;
+        fprintf("%d ", k-1);
+
     end
 
-    disp("_");
-
-    cntl = 0;
-    cnto2 = 0;
-    cnto3 = 0;
-    cnto4 = 0;
-    
-    for i = 1:N
-    
-        if b5l(i)
-    
-            cntl = cntl + 1;
-            sigsb5l(cntl, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b5o2(i)
-    
-            cnto2 = cnto2 + 1;
-            sigsb5o2(cnto2, :, :) = sig(NgoodUnitsID, stimeind(i-1) - 1000 + 1:stimeind(i-1) + 5000);
-    
-        elseif b5o3(i)
-    
-            cnto3 = cnto3 + 1;
-            sigsb5o3(cnto3, :, :) = sig(NgoodUnitsID, stimeind(i-2) - 1000 + 1:stimeind(i-2) + 5000);
-    
-        elseif b5o4(i)
-    
-            cnto4 = cnto4 + 1;
-            sigsb5o4(cnto4, :, :) = sig(NgoodUnitsID, stimeind(i-3) - 1000 + 1:stimeind(i-3) + 5000);
-    
-        end
-    
-        if mod(i, 2000) == 1
-            fprintf(num2str(i) + "-");
-        end
-    
-    end
-
-    disp("_");
-
-    signalList = struct();
-
-    signalList.sigsb2l = sigsb2l;
-    signalList.sigsb2o2 = sigsb2o2;
-    signalList.sigsb2o3 = sigsb2o3;
-    signalList.sigsb2o4 = sigsb2o4;
-    
-    signalList.sigsb4l = sigsb4l;
-    signalList.sigsb4o2 = sigsb4o2;
-    signalList.sigsb4o3 = sigsb4o3;
-    signalList.sigsb4o4 = sigsb4o4;
-    
-    signalList.sigsb5l = sigsb5l;
-    signalList.sigsb5o2 = sigsb5o2;
-    signalList.sigsb5o3 = sigsb5o3;
-    signalList.sigsb5o4 = sigsb5o4;
+    fprintf("\nDone.\n");
 
 end
