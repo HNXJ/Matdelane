@@ -1,4 +1,4 @@
-function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms)
+function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms, convFlag)
 
     if ~exist('t_pre_ms', 'var')
 
@@ -9,6 +9,12 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms)
     if ~exist('t_post_ms', 'var')
 
         t_post_ms = 4000;
+
+    end
+
+    if ~exist('convFlag', 'var')
+
+        convFlag = 1;
 
     end
 
@@ -67,7 +73,15 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms)
 
     try
     
-        sig = nwb.processing.get("convolved_spike_train").nwbdatainterface.get("convolved_spike_train_data").data;
+        if convFlag
+        
+            sig = nwb.processing.get("convolved_spike_train").nwbdatainterface.get("convolved_spike_train_data").data;
+
+        else
+
+            sig = nwb.processing.get("spike_train").nwbdatainterface.get("spike_train_data").data;
+
+        end
 
     catch
 
