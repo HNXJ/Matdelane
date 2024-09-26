@@ -1,7 +1,7 @@
 function ysignal = jSignalArrayFT(xsignal, channelTag)
 
-    Fs = 1000; % Sampling rate in Hz
-    Ls = size(xsignal, 3); % Length of signal
+    Fs = 1000;
+    Ls = size(xsignal, 3);
     
     nChannels = size(xsignal, 2);
     nTrials = size(xsignal, 1);
@@ -21,6 +21,6 @@ function ysignal = jSignalArrayFT(xsignal, channelTag)
     
     end
     
-    ysignal = ft_checkdata(ysignal, 'datatype', 'raw', 'feedback', 'yes');
+    % ysignal = ft_checkdata(ysignal, 'datatype', 'raw', 'feedback', 'yes');
 
 end
