@@ -5,7 +5,8 @@ function y = jSmooth(x, w)
 
     if d == 2
 
-        bl = mean(x(:, 1:500), 2);
+        M = floor(size(x, 2)/10);
+        bl = mean(x(:, 1:M), 2);
         n1 = size(x, 1);
 
         parfor ik = 1:n1

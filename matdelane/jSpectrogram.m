@@ -1,4 +1,4 @@
-function [y, t, f] = jSpectrogram(X, fs, fmax, freqW, timeW, overlap, fcnt, tcnt, smoothKernel, plotFlag)
+function [y, t, f] = jSpectrogram(X, fs, fmax, freqW, timeW, overlap, fcnt, tcnt, smoothKernel, plotFlag, logFlag)
 
 %{
 
@@ -74,13 +74,19 @@ f : Frequency bins (<1 x fcnt> numeric array)
 
     if ~exist('smoothKernel', 'var')
 
-        smoothKernel = 5;
+        smoothKernel = 10;
 
     end
 
     if ~exist('plotFlag', 'var')
 
-        plotFlag = 1;
+        plotFlag = 0;
+
+    end
+
+    if ~exist('logFlag', 'var')
+
+        logFlag = 1;
 
     end
 
@@ -102,7 +108,7 @@ f : Frequency bins (<1 x fcnt> numeric array)
             tempT = exp(-abs(linspace(-1.0, 1.0, kernelSize).^2));
             tempX = conv(tempX, tempT/sum(tempT), "same");
             tempF = jSpectrum(tempX, fs, fmax, fB, 0);
-            y(i, j, :) = tempF;
+            y(i, j, :) = smooth(tempF, 10);
 
         end
 
@@ -112,16 +118,37 @@ f : Frequency bins (<1 x fcnt> numeric array)
     f = linspace(0, fmax, fB);
     sG = squeeze(mean(y, 1));
     y = sG';
+    y(:, 1:50) = y(:, mod(0:14, 10)+6);
+    yx = mean(y(:, 1:20), 2);
+
+    for i = 1:size(y, 2)
+
+        y(:, i) = y(:, i) ./ yx;
+
+    end
+
+
+    % y(:, 1:25) = 1;
 
     if plotFlag
 
+        % if logFlag
+        % 
+        %     y = log(y);
+        % 
+        % end
+
         figure('Position', [0, 0, 1700, 1400]);
         subplot(1, 1, 1);
-        imagesc(y, "XData", t, "YData", f);
+        imagesc(y-1, "XData", t, "YData", f);
+        clim([-0.4 0.4]);
         
         xlabel("Time (ms)");
         ylabel("Freq (Hz)");
-        colormap("jet");
+        % colormap("jet");
+        colorbar();
+        set(gca,'YDir','normal');
+
         sgtitle("Spectrogram");
 
     end
