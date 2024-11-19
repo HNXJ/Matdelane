@@ -1,24 +1,21 @@
-function [phi, frq] = jInstantSpectrum(x, Fs, phaseSmooth)
+function [phi, frq] = jInstantSpectrum(x, Fs, psmooth)
 
     % x : 1-D signal
     % Fs : Sampling rate
     % phaseSmooth (opt) : width of phase smoothing kernel
 
-    if ~exist("phaseSmooth", "var")
+    if ~exist("psmooth", "var")
 
-        phaseSmooth = 20;
+        psmooth = 20;
 
     end
 
-    x = smooth(x, 10);
-
-    N = length(x);
+    x = smooth(x, psmooth);
     dT = 2*pi / Fs;
 
     hx = hilbert(x);
     sa = x + 1i*hx;
     phi = phase(sa);
-    % phi = smooth(phi, phaseSmooth);
     frq = diff(phi)/(dT);
     frq(1) = frq(2);
     frq(end) = frq(end-1);
