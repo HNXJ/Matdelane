@@ -37,17 +37,19 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
     end
 
     signalList = cell(1, 1);
-    jNWBTaskDetails(nwb, task);
+%     jNWBTaskDetails(nwb, task);
 
-    blocks = nwb.intervals.get(task).vectordata.get("task_block_number").data(:);
-    correct = nwb.intervals.get(task).vectordata.get("correct").data(:);
-    conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
-    stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
+%     blocks = nwb.intervals.get(task).vectordata.get("task_block_number").data(:);
+%     correct = nwb.intervals.get(task).vectordata.get("correct").data(:);
+%     conditions = nwb.intervals.get(task).vectordata.get("task_condition_number").data(:);
+%     stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
 
-    blocklist = unique(blocks);
+    [metadata.stimeind, metadata.conditions] = jNWBLaserDecode(nwb);
+    metadata.epoch_time = [-t_pre_ms:t_post_ms];
+
+    blocklist = [1]; %optotag is always block 1
     conditionlist = unique(conditions);
     
-    N = size(blocks, 1);
 
     try
     
@@ -61,14 +63,12 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
 
     end
     
-    stime = nwb.intervals.get(task).start_time.data(:);
-    stimeind = floor(stime*1000);
 
     for block = blocklist'
     
         for condition = conditionlist'
             
-            b = (blocks == block) & (conditions == condition) & (correct == 1) & (stims == 2);
+            b = (blocks == block) & (conditions == condition) & (stims == 2);
             b = find(b);
             temp_signals = zeros(numel(b), t_pre_ms + t_post_ms);
             cnt = 0;
@@ -76,7 +76,7 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
             for i = b'
 
                 cnt = cnt + 1;
-                temp_signals(cnt, :) = sig(stimeind(i) - t_pre_ms + 1:stimeind(i) + t_post_ms);
+                temp_signals(cnt, :) = sig(metadata.stimeind(i) - t_pre_ms + 1:metadata.stimeind(i) + t_post_ms);
 
             end
 
