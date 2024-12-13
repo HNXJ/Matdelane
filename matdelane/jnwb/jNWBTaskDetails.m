@@ -1,5 +1,43 @@
 function jNWBTaskDetails(nwb, taskname)
 
+    if ~exist('taskname', 'var')
+    
+        tasks = nwb.intervals.keys();
+        task_warning = "->Enter an specific task name from this file. \n-->This file contains these tasks : ";
+        for i = 1:numel(tasks)
+            task_warning = task_warning + " \n--->" + string(tasks{i});
+        end
+
+        wtx = sprintf(task_warning);
+        warning(wtx);
+        signalList = {};
+        return;
+
+    else
+
+        taskname = string(taskname);
+        
+        try
+        
+            correct = nwb.intervals.get(taskname);
+
+        catch
+
+            tasks = nwb.intervals.keys();
+            task_warning = "->Enter an specific task name from this file. \n-->This file contains these tasks : ";
+            for i = 1:numel(tasks)
+                task_warning = task_warning + " \n--->" + string(tasks{i});
+            end
+    
+            wtx = sprintf(task_warning);
+            warning(wtx);
+            signalList = {};
+            return;
+
+        end
+    
+    end
+
     info_text = "";
     
     correct = nwb.intervals.get(taskname).vectordata.get("correct").data(:);
