@@ -1,4 +1,4 @@
-function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalMode)
+function [probeInfo, signalList] = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalMode)
 
     if ~exist('probe', 'var')
 
@@ -35,11 +35,32 @@ function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalM
         wtx = sprintf(task_warning);
         warning(wtx);
         signalList = {};
+        probeInfo = "Null";
         return;
 
     else
 
         task = string(task);
+
+        try
+        
+            correct = nwb.intervals.get(task);
+
+        catch
+
+            tasks = nwb.intervals.keys();
+            task_warning = "->Enter an specific task name from this file. \n-->This file contains these tasks : ";
+            for i = 1:numel(tasks)
+                task_warning = task_warning + " \n--->" + string(tasks{i});
+            end
+    
+            wtx = sprintf(task_warning);
+            warning(wtx);
+            signalList = {};
+            probeInfo = "Null";
+            return;
+
+        end
 
     end
 
@@ -49,6 +70,7 @@ function signalList = jNWBSignals(nwb, probe, task, t_pre_ms, t_post_ms, signalM
     probeLabel = ['probe', char(65 + probe)];
     areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
     disp(['Area(s): ', areaName]);
+    probeInfo = areaName;
 
     blocks = nwb.intervals.get(task).vectordata.get("task_block_number").data(:);
     correct = nwb.intervals.get(task).vectordata.get("correct").data(:);

@@ -21,12 +21,33 @@ function [signalListL, signalList] = jNWBUnits(nwb, task, t_pre_ms, t_post_ms)
         end
 
         warning(task_warning);
+        signalListL = {};
         signalList = {};
         return;
 
     else
 
         task = string(task);
+
+        try
+        
+            correct = nwb.intervals.get(task);
+
+        catch
+
+            tasks = nwb.intervals.keys();
+            task_warning = "->Enter an specific task name from this file. \n-->This file contains these tasks : ";
+            for i = 1:numel(tasks)
+                task_warning = task_warning + " \n--->" + string(tasks{i});
+            end
+    
+            wtx = sprintf(task_warning);
+            warning(wtx);
+            signalList = {};
+            signalListL = {};
+            return;
+
+        end
 
     end
 
