@@ -1,4 +1,4 @@
-function signalList = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_ms)
+function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_ms)
 
     if ~exist('laser', 'var')
 
