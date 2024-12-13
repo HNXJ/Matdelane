@@ -48,7 +48,7 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
     metadata.epoch_time = [-t_pre_ms:t_post_ms];
 
     blocklist = [1]; %optotag is always block 1
-    conditionlist = unique(conditions);
+    conditionlist = unique(metadata.conditions);
     
 
     try
@@ -66,14 +66,14 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
 
     for block = blocklist'
     
-        for condition = conditionlist'
+        for condition = conditionlist
             
-            b = (blocks == block) & (conditions == condition) & (stims == 2);
+            b = (metadata.conditions == condition) ;
             b = find(b);
             temp_signals = zeros(numel(b), t_pre_ms + t_post_ms);
             cnt = 0;
 
-            for i = b'
+            for i = b
 
                 cnt = cnt + 1;
                 temp_signals(cnt, :) = sig(metadata.stimeind(i) - t_pre_ms + 1:metadata.stimeind(i) + t_post_ms);

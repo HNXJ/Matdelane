@@ -45,9 +45,10 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
 %     stims = nwb.intervals.get(task).vectordata.get("stimulus_number").data(:);
 
     [metadata.stimeind, metadata.conditions] = jNWBLaserDecode(nwb);
+    metadata.epoch_time = [-t_pre_ms:t_post_ms];
 
     blocklist = [1]; %optotag is always block 1
-    conditionlist = unique(conditions);
+    conditionlist = unique(metadata.conditions);
     
 
     try
@@ -65,9 +66,9 @@ function [metadata, signalList] = jNWBLaser(nwb, laser, task, t_pre_ms, t_post_m
 
     for block = blocklist'
     
-        for condition = conditionlist'
+        for condition = conditionlist
             
-            b = (blocks == block) & (conditions == condition) & (stims == 2);
+            b = (metadata.conditions == condition) ;
             b = find(b);
             temp_signals = zeros(numel(b), t_pre_ms + t_post_ms);
             cnt = 0;
