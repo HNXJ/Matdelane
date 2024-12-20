@@ -1,6 +1,7 @@
 # Matnwb lib
 matnwb/
 flipv2/
+drc/
 
 # Data files
 *.nwb
