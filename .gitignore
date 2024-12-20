@@ -1,5 +1,6 @@
 # Matnwb lib
 matnwb/
+flipv2/
 
 # Data files
 *.nwb
