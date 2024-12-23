@@ -18,7 +18,7 @@ function [probeInfo, signalList] = jNWBSignals(nwb, probe, task, t_pre_ms, t_pos
 
     end
 
-    if ~exist('mode', 'var')
+    if ~exist('signalMode', 'var')
 
         signalMode = "lfp";
 
