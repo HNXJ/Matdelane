@@ -43,6 +43,18 @@ function [signalListL, signalList] = jOGLOSignals(nwb, task, t_pre_ms, t_post_ms
     end
 
     signalListL = cell(1, 1);
+
+    try
+
+        rfdata = jReceptiveFieldIdx(nwb, probeId + 1);
+
+    catch
+
+        warning("->No RF-task exists in this NWB file.");
+        rfdata = zeros([128, 4]);
+
+    end
+
     areaN = 0;
 
     probeLabel = ['probe', char(65 + probeId)];
@@ -58,9 +70,10 @@ function [signalListL, signalList] = jOGLOSignals(nwb, task, t_pre_ms, t_post_ms
         area = k(~isspace(k));
         areaN = areaN + 1;  
 
-        signalListL{areaN}.ids = ((j-1)*channelW)+1:j*channelW;
+        signalListL{areaN}.ids = ceil(((j-1)*channelW)+1:j*channelW);
         signalListL{areaN}.name = area;      
         signalListL{areaN}.session = nwb.identifier;
+        signalListL{areaN}.rfdata = rfdata(signalListL{areaN}.ids, :);
 
     end
 
