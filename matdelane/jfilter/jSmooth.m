@@ -17,7 +17,7 @@ function y = jSmooth(x, w)
 
     elseif d == 3
         
-        bl = mean(x(:, :, 1:500), 3);
+        bl = mean(x(:, :, 1:50), 3);
         n1 = size(x, 1);
         n2 = size(x, 2);
 
