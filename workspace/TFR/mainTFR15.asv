@@ -14,30 +14,30 @@ nwbFiles = {dir(nwbPath).name};
 nwbFiles = nwbFiles(endsWith(nwbFiles, ".nwb"));
 disp("Toolbox setup done.");
 
-%% Ses: sub-C31o_ses-230816 (Probes A,B,C)
+%% Ses: sub-V198o_ses-230720 (Probes A,B)
 
 %% Probe A (PFC, laminar)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{2};
+nwbFile = nwbPath + nwbFiles{15};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
 layeridlabel = ["deep", "mid", "sup"];
-areainf = "PFC/";
+areainf = "V3d/V3a/";
 
 condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
-%% E.1: Load LFP probeA PFC
+%% E.1: Load LFP probeA V1/V2
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
 disp(c{1}.session);
 
 %% E1.1: MUAe plots
 
-[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0, "muae");
+[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0, "muae");
 disp(cm{1}.session);
 
 condid = 12;
@@ -46,7 +46,7 @@ figure;
 imxm = squeeze(mean(xm{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -57,7 +57,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -67,13 +67,19 @@ channel_in_layer = struct();
 channel_in_layer.deep = 21:81;
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:112, 114:2:128];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+
+channel_in_layer2 = struct();
+channel_in_layer2.deep = 21:81;
+channel_in_layer2.mid = 82:86;
+channel_in_layer2.sup = [87:112, 114:2:128];
+goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 jLFPprobeINFO(x{1}(:, goodch, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
+jVFLIP(x{1}(:, 1:32, :));
 
 %% E.4: TFR calculations all trials; PFC
 
@@ -89,9 +95,9 @@ pgx = cell(12, 3);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
     
     TR = size(xG1d, 1);
 
@@ -501,15 +507,16 @@ leakage = 0.85;
 freqres = 5.0;
 overlap = 95;
 
+channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
 pgx = cell(12, 3);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
     
     TR = size(xG1d, 1);
 
@@ -925,15 +932,16 @@ leakage = 0.85;
 freqres = 5.0;
 overlap = 95;
 
+channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
 pgx = cell(12, 3);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
     
     TR = size(xG1d, 1);
 

@@ -100,7 +100,7 @@ function [signalListL, signalList] = jOGLOSignals(nwb, task, t_pre_ms, t_post_ms
     conditionlist = [0, 2, 3, 4, 5, 7, 8, 9, 10, 26, 34, 42, 50];
     signalList = cell(1, numel(conditionlist) - 1);
 
-    for k = 2:numel(conditionlist)
+    parfor k = 2:numel(conditionlist)
         
         b = (conditions <= conditionlist(k)) & (conditions > conditionlist(k-1)) & (correct == 1) & (stims == 2);
         b = find(b);

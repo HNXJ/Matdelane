@@ -20,6 +20,12 @@ function jLFPprobeINFO(x)
     subplot(2, 2, 4);
     imxcorr = mean(corr(corrx), 1);
     stem(imxcorr);
+    hold("on");
+
+    % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+    % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+    % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+    
     xlabel("Channel");
     ylabel("Spearman deviation index");
     title("Channel grand corr. (corr of corr)");

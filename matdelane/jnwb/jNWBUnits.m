@@ -106,7 +106,7 @@ function [signalListL, signalList] = jNWBUnits(nwb, task, t_pre_ms, t_post_ms)
     NgoodUnitsID = goodUnits;
     NgoodUnits = numel(NgoodUnitsID);
 
-    for condition = conditionlist'
+    parfor condition = conditionlist'
         
         b = (conditions == condition) & (correct == 1) & (stims == 2);
         b = find(b);

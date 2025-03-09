@@ -14,13 +14,13 @@ nwbFiles = {dir(nwbPath).name};
 nwbFiles = nwbFiles(endsWith(nwbFiles, ".nwb"));
 disp("Toolbox setup done.");
 
-%% Ses: sub-C31o_ses-230816 (Probes A,B,C)
+%% Ses: sub-V198o_ses-230712 (Probes A,B,C)
 
 %% Probe A (PFC, laminar)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{2};
+nwbFile = nwbPath + nwbFiles{10};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
