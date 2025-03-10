@@ -85,19 +85,21 @@ overlap = 95;
 channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
     xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
     xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
     xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -109,7 +111,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -121,6 +126,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
@@ -504,19 +510,21 @@ overlap = 95;
 channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
     xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
     xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
     xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -528,7 +536,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -540,6 +551,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
@@ -929,19 +941,21 @@ overlap = 95;
 channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
     xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
     xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
     xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -953,7 +967,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -965,6 +982,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
