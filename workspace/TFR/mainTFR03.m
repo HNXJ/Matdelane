@@ -16,7 +16,7 @@ disp("Toolbox setup done.");
 
 %% Ses: sub-C31o_ses-230818 (Probes A,B,C)
 
-%% Probe A (PFC, laminar)
+%% Probe A (PFC, semi-laminar)
 
 %% E.0: Load NWB
 
@@ -446,7 +446,7 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% Probe B (TEO/FST)
 
-%% E.1: Load LFP probeB  V4-MT
+%% E.1: Load LFP probeB  TEO/FST
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1);
 disp(c{1}.session);
@@ -457,7 +457,7 @@ areainf = "TEO/FST";
 [cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1, "muae");
 disp(cm2{1}.session);
 
-condid = 12;
+condid = 9;
 figure;
 
 imxm = squeeze(mean(xm2{condid}, 1));
@@ -905,24 +905,24 @@ legend;
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct(); % MT
-channel_in_layer.deep = [46:107, 109:115];
-channel_in_layer.mid = 41:45;
-channel_in_layer.sup = 1:40;
-goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = 1:11;
+channel_in_layer.mid = 12:17;
+channel_in_layer.sup = 18:37;
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % MST
-channel_in_layer2.sup = 81:100;
-channel_in_layer2.mid = 101:105;
-channel_in_layer2.deep = [106:107, 109:128];
-goodch2 = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2.sup = 77:97;
+channel_in_layer2.mid = 98:103;
+channel_in_layer2.deep = [104:107, 109:128];
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
-% jLFPprobeINFO(x{1}(:, goodch2, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer2.goodch, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
-% jVFLIP(x{1}(:, goodch2, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, :));
+jVFLIP(x{1}(:, channel_in_layer2.goodch, :));
 
 %% E.4: TFR calculations all trials; MT/MST
 

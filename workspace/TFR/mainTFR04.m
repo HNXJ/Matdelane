@@ -16,7 +16,7 @@ disp("Toolbox setup done.");
 
 %% Ses: sub-C31o_ses-230823 (Probes A,B,C)
 
-%% Probe A (PFC, laminar)
+%% Probe A (FEF, laminar, seems like alpha/beta carry omission info positionally)
 
 %% E.0: Load NWB
 
@@ -24,13 +24,13 @@ nwbFile = nwbPath + nwbFiles{4};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
-layeridlabel = ["deep", "mid", "sup"];
-areainf = "PFC/";
+layeridlabel = ["deep", "mid", "sup", "all"];
+areainf = "FEF/";
 
 condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
-%% E.1: Load LFP probeA PFC
+%% E.1: Load LFP probeA FEF
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0);
 disp(c{1}.session);
@@ -64,16 +64,16 @@ legend;
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct();
-channel_in_layer.deep = 21:81;
-channel_in_layer.mid = 82:86;
-channel_in_layer.sup = [87:112, 114:2:128];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.sup = 32:57;
+channel_in_layer.mid = 58:64;
+channel_in_layer.deep = 65:112;
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.4: TFR calculations all trials; PFC
 
@@ -226,8 +226,8 @@ legend;
 
 %% E.7: Band PEV
 
-layerid = 1;
-condinf = [1, 5];
+layerid = 4;
+condinf = [9, 11];
 
 layerinf = layeridlabel(layerid) + " layer";
 expvars = cell(1, 5);
@@ -416,7 +416,7 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
+sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf3);
 
 %% E.14: PEV plot RX
 
@@ -442,7 +442,7 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
+sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf4);
 
 %% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
