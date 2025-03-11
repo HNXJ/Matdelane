@@ -444,13 +444,13 @@ end
 
 sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf4);
 
-%% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
+%% Probe B (MT/MST, It seems to be majorly MT due to strong gamma response)
 
-%% E.1: Load LFP probeB  V4-MT
+%% E.1: Load LFP probeB  MT/MST
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1);
 disp(c{1}.session);
-areainf = "V4/MT";
+areainf = "MT/MST";
 
 %% E1.1: MUAe plots
 
@@ -484,21 +484,21 @@ channel_in_layer = struct();
 channel_in_layer.deep = 1:27;
 channel_in_layer.mid = 29:2:35;
 channel_in_layer.sup = [36:44, 46:60];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct();
 channel_in_layer2.deep = 81:128;
 channel_in_layer2.mid = 76:80;
 channel_in_layer2.sup = [61:64, 66:75];
-goodch2 = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
-jLFPprobeINFO(x{1}(:, goodch2, :));
+jLFPprobeINFO(x{1}(:, [31:2:63, 67:2:91, 93:2:128], :));
+% jLFPprobeINFO(x{1}(:, goodch2, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
-jVFLIP(x{1}(:, goodch2, :));
+jVFLIP(x{1}(:, [21:128], :));
+% jVFLIP(x{1}(:, :, :));
 
 %% E.4: TFR calculations all trials; V4
 
