@@ -1,23 +1,23 @@
-function jLFPprobeINFO(x)
+function jLFPprobeINFO(x, chx)
 
     imglfp1 = squeeze(mean(x, 1));
 
     figure;
     subplot(4, 1, 1);
-    imagesc(imglfp1);
+    imagesc(imglfp1, "YData", chx);
     xlabel("Time (ms)");
     ylabel("Channel");
     title("LFP average by trial");
 
-    imglfp2 = jMeanFilt2(imglfp1, 3, 10);
+    imglfp2 = smoothdata2(imglfp1, "gaussian", {10, 20});
     imgcsd1 = (-imglfp2(1:end-2, :) + 2*imglfp2(2:end-1, :) - imglfp2(3:end, :));
-    imgcsd1 = jMeanFilt2(imgcsd1, 3, 10);
-    imgcsd1 = (imgcsd1 - mean(imgcsd1, "all")) / std(imgcsd1(:));
+    imgcsd1 =  smoothdata2(imgcsd1, "gaussian", {7, 20});
+    % imgcsd1 = (imgcsd1);
 
     subplot(4, 1, 2);
-    imagesc(imgcsd1);
+    imagesc(imgcsd1, "YData", chx);
     xlabel("Time (ms)");
-    ylabel("Channel");clim([-1 1]);
+    ylabel("Channel");%clim([-1 1]);
     title("CSD average by trial");
 
     corrx = corr(imglfp1', "Type", "Spearman");
