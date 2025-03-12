@@ -32,12 +32,12 @@ condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
 
 %% E.1: Load LFP probeA PFC
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
 disp(c{1}.session);
 
 %% E1.1: MUAe plots
 
-[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0, "muae");
+[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0, "muae");
 disp(cm{1}.session);
 
 condid = 12;
@@ -46,7 +46,7 @@ figure;
 imxm = squeeze(mean(xm{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 5000), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -57,7 +57,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -442,13 +442,13 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% E.1: Load LFP probeB  V4-MT
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1);
 disp(c{1}.session);
 areainf = "V4/MT";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -457,7 +457,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 5000), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -468,7 +468,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -867,13 +867,13 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% E.1: Load LFP probeC  V1
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2);
 disp(c{1}.session);
 areainf = "V1";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -882,7 +882,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 5000), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -893,7 +893,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 

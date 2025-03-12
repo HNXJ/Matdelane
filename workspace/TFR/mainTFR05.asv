@@ -14,23 +14,23 @@ nwbFiles = {dir(nwbPath).name};
 nwbFiles = nwbFiles(endsWith(nwbFiles, ".nwb"));
 disp("Toolbox setup done.");
 
-%% Ses: sub-C31o_ses-230823 (Probes A,B,C)
+%% Ses: sub-C31o_ses-230825 (Probes A,B,C)
 
-%% Probe A (FEF, laminar, seems like alpha/beta carry omission info positionally)
+%% Probe A (PFC, laminar)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{4};
+nwbFile = nwbPath + nwbFiles{5};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
 layeridlabel = ["deep", "mid", "sup", "all"];
-areainf = "FEF/";
+areainf = "PFC/";
 
 condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
-%% E.1: Load LFP probeA FEF
+%% E.1: Load LFP probeA PFC (Sup-Deep PFC1, Deep of PFC2, parital coverage of the second area)
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
 disp(c{1}.session);
@@ -64,9 +64,9 @@ legend;
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct();
-channel_in_layer.sup = 32:57;
-channel_in_layer.mid = 58:64;
-channel_in_layer.deep = 65:112;
+channel_in_layer.deep = [48:65, 67:111, 112:2:128];
+channel_in_layer.mid = 43:47;
+channel_in_layer.sup = [17:38, 39:42];
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
@@ -140,7 +140,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -226,8 +226,8 @@ legend;
 
 %% E.7: Band PEV
 
-layerid = 4;
-condinf = [2, 10];
+layerid = 1;
+condinf = [1, 5];
 
 layerinf = layeridlabel(layerid) + " layer";
 expvars = cell(1, 5);
@@ -416,7 +416,7 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf3);
+sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
 
 %% E.14: PEV plot RX
 
@@ -442,11 +442,11 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf4);
+sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
 
-%% Probe B (MT/MST, It seems to be majorly MT due to strong gamma response)
+%% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
-%% E.1: Load LFP probeB  MT/MST
+%% E.1: Load LFP probeB  MT/MST (Deep-Sup Sup-Deep)
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1);
 disp(c{1}.session);
@@ -480,25 +480,27 @@ legend;
 
 %% E.2: Channel and layer identification
 
-channel_in_layer = struct();
-channel_in_layer.deep = 77:2:128;
-channel_in_layer.mid = 67:2:75;
-channel_in_layer.sup = 31:2:63;
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer = struct(); % MT
+channel_in_layer.deep = 1:31;
+channel_in_layer.mid = 32:35;
+channel_in_layer.sup = 36:54;
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
-channel_in_layer2 = struct();
-channel_in_layer2.deep = 81:128;
-channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [61:64, 66:75];
+channel_in_layer2 = struct(); % MST
+channel_in_layer2.deep = [91:111, 112:2:128];
+channel_in_layer2.mid = 85:90;
+channel_in_layer2.sup = 55:84;
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer2.goodch, :));
+
 % jLFPprobeINFO(x{1}(:, :, :));
 
 %% E.3: Evaluate vFLIP
 
 jVFLIP(x{1}(:, channel_in_layer.goodch, 1:400));
-% jVFLIP(x{1}(:, :, :));
+% jVFLIP(x{1}(:, channel_in_layer2.goodch, 1:400));
 
 %% E.4: TFR calculations all trials; V4
 
@@ -594,9 +596,9 @@ condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
 layeridlabel = ["deep", "mid", "sup"];
-areainf = "MT/";
+areainf = "V4/";
 
-tcond1 = 10;
+tcond1 = 9;
 layerid = 1;
 
 figure;
@@ -847,7 +849,7 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf3);
+sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
 
 %% E.14: PEV plot RX
 
@@ -873,7 +875,7 @@ for fband = 1:5
 
 end
 
-sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf4);
+sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(freqres) + "Hz/ovlrp=." + num2str(overlap) + " " + layerinf2);
 
 %% Probe C (V1/V2, It seems that it consists only of one area, to be identified, highly foveal)
 
@@ -912,24 +914,24 @@ legend;
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct(); % V1
-channel_in_layer.deep = [45:49, 51, 53:74];
-channel_in_layer.mid = 39:43;
-channel_in_layer.sup = 21:38;
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = [46:107, 109:115];
+channel_in_layer.mid = 41:45;
+channel_in_layer.sup = 1:40;
+goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-channel_in_layer2 = struct(); % V2
-channel_in_layer2.sup = 109:121;
-channel_in_layer2.mid = 104:107;
-channel_in_layer2.deep = 79:103;
-channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
+% channel_in_layer2 = struct(); % V2
+% channel_in_layer2.sup = 81:100;
+% channel_in_layer2.mid = 101:105;
+% channel_in_layer2.deep = [106:107, 109:128];
+% goodch2 = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
-jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
-jLFPprobeINFO(x{1}(:, channel_in_layer2.goodch, :));
+jLFPprobeINFO(x{1}(:, goodch, :));
+% jLFPprobeINFO(x{1}(:, goodch2, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, channel_in_layer.goodch, :));
-jVFLIP(x{1}(:, channel_in_layer2.goodch, :));
+jVFLIP(x{1}(:, goodch, :));
+% jVFLIP(x{1}(:, goodch2, :));
 
 %% E.4: TFR calculations all trials; V1
 
@@ -1026,7 +1028,7 @@ condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
 
 layeridlabel = ["deep", "mid", "sup"];
 
-tcond1 = 12;
+tcond1 = 8;
 layerid = 1;
 
 figure;
@@ -1150,9 +1152,9 @@ expvars2 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -1179,9 +1181,9 @@ expvars3 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -1208,9 +1210,9 @@ expvars4 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -1230,7 +1232,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = tmap([tbands{2}, tbands{3}]);
+ntmap = tmap(tbands{2});
 
 for fband = 1:5
 
@@ -1245,7 +1247,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(1000);xlim([0 2000]);
+    xline(500);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 
@@ -1256,7 +1258,7 @@ sgtitle("Area:" + areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 %% E.13: PEV plot BX
 
 figure;
-ntmap = tmap([tbands{2}, tbands{3}]);
+ntmap = tmap(tbands{2});
 
 for fband = 1:5
 
@@ -1271,7 +1273,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(1000);xlim([0 2000]);
+    xline(500);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 
@@ -1282,7 +1284,7 @@ sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 %% E.14: PEV plot RX
 
 figure;
-ntmap = tmap([tbands{2}, tbands{3}]);
+ntmap = tmap(tbands{2});
 
 for fband = 1:5
 
@@ -1297,7 +1299,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(1000);xlim([0 2000]);
+    xline(500);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 

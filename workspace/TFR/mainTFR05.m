@@ -24,20 +24,20 @@ nwbFile = nwbPath + nwbFiles{5};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
-layeridlabel = ["deep", "mid", "sup"];
+layeridlabel = ["deep", "mid", "sup", "all"];
 areainf = "PFC/";
 
 condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
-%% E.1: Load LFP probeA PFC
+%% E.1: Load LFP probeA PFC (Sup-Deep PFC1, Deep of PFC2, parital coverage of the second area)
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
 disp(c{1}.session);
 
 %% E1.1: MUAe plots
 
-[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0, "muae");
+[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0, "muae");
 disp(cm{1}.session);
 
 condid = 12;
@@ -46,7 +46,7 @@ figure;
 imxm = squeeze(mean(xm{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -57,23 +57,23 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct();
-channel_in_layer.deep = 21:81;
-channel_in_layer.mid = 82:86;
-channel_in_layer.sup = [87:112, 114:2:128];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.deep = [48:65, 67:111, 112:2:128];
+channel_in_layer.mid = 43:47;
+channel_in_layer.sup = [17:38, 39:42];
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.4: TFR calculations all trials; PFC
 
@@ -140,7 +140,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -165,8 +165,8 @@ fbands{5} = find(fmap > 80, 1):find(fmap >= max(fmap), 1);
 
 %% E.6: Visualize TFR
 
-tcond1 = 1;
-layerid = 1;
+tcond1 = 9;
+layerid = 4;
 
 figure;
 subplot(2, 1, 1);
@@ -446,15 +446,15 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
-%% E.1: Load LFP probeB  V4-MT
+%% E.1: Load LFP probeB  MT/MST (Deep-Sup Sup-Deep)
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1);
 disp(c{1}.session);
-areainf = "V4/MT";
+areainf = "MT/MST";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -463,7 +463,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -474,31 +474,33 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
 %% E.2: Channel and layer identification
 
-channel_in_layer = struct();
-channel_in_layer.deep = 1:27;
-channel_in_layer.mid = 29:2:35;
-channel_in_layer.sup = [36:44, 46:60];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer = struct(); % MT
+channel_in_layer.sup = 15:29;
+channel_in_layer.mid = 30:33;
+channel_in_layer.deep = [34:39, 41:60];
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-channel_in_layer2 = struct();
-channel_in_layer2.deep = 81:128;
-channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [61:64, 66:75];
-goodch2 = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2 = struct(); % MST
+channel_in_layer2.deep = [91:111, 112:2:128];
+channel_in_layer2.mid = 85:90;
+channel_in_layer2.sup = 55:84;
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
-jLFPprobeINFO(x{1}(:, goodch2, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer2.goodch, :));
+
+% jLFPprobeINFO(x{1}(:, :, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
-jVFLIP(x{1}(:, goodch2, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, 1:400));
+% jVFLIP(x{1}(:, channel_in_layer2.goodch, 1:400));
 
 %% E.4: TFR calculations all trials; V4
 
@@ -879,13 +881,13 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% E.1: Load LFP probeC  V1
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2);
 disp(c{1}.session);
 areainf = "V1";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -894,7 +896,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -905,7 +907,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 

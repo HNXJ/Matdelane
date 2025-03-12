@@ -3,12 +3,23 @@ function jLFPprobeINFO(x)
     imglfp1 = squeeze(mean(x, 1));
 
     figure;
-    subplot(2, 1, 1);
+    subplot(4, 1, 1);
     imagesc(imglfp1);
     xlabel("Time (ms)");
     ylabel("Channel");
     title("LFP average by trial");
-    
+
+    imglfp2 = jMeanFilt2(imglfp1, 3, 10);
+    imgcsd1 = (-imglfp2(1:end-2, :) + 2*imglfp2(2:end-1, :) - imglfp2(3:end, :));
+    imgcsd1 = jMeanFilt2(imgcsd1, 3, 10);
+    imgcsd1 = (imgcsd1 - mean(imgcsd1, "all")) / std(imgcsd1(:));
+
+    subplot(4, 1, 2);
+    imagesc(imgcsd1);
+    xlabel("Time (ms)");
+    ylabel("Channel");clim([-1 1]);
+    title("CSD average by trial");
+
     corrx = corr(imglfp1', "Type", "Spearman");
     subplot(2, 2, 3);
     imagesc(corrx);
