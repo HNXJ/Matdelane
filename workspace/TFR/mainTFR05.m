@@ -565,11 +565,11 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
-tbands{5} = find(tmap > 3093, 1):length(tmap);
+tbands{5} = find(tmap > 3093, 1):find(tmap > 4093, 1);
 
 nt_temp = length(tbands{5});
 
@@ -912,24 +912,24 @@ legend;
 %% E.2: Channel and layer identification
 
 channel_in_layer = struct(); % V1
-channel_in_layer.deep = [46:107, 109:115];
-channel_in_layer.mid = 41:45;
-channel_in_layer.sup = 1:40;
-goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = [26:43, 45:48, 49:2:55];
+channel_in_layer.mid = 21:25;
+channel_in_layer.sup = 1:20;
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-% channel_in_layer2 = struct(); % V2
-% channel_in_layer2.sup = 81:100;
-% channel_in_layer2.mid = 101:105;
-% channel_in_layer2.deep = [106:107, 109:128];
-% goodch2 = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2 = struct(); % V2
+channel_in_layer2.sup = [105:107, 109:128];
+channel_in_layer2.mid = 101:104;
+channel_in_layer2.deep = 70:100;
+channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
-% jLFPprobeINFO(x{1}(:, goodch2, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :), channel_in_layer.goodch);
+jLFPprobeINFO(x{1}(:, channel_in_layer2.goodch, :), channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
-% jVFLIP(x{1}(:, goodch2, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, :));
+jVFLIP(x{1}(:, channel_in_layer2.goodch, :));
 
 %% E.4: TFR calculations all trials; V1
 
@@ -996,7 +996,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);

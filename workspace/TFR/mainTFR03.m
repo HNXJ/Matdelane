@@ -140,7 +140,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -558,7 +558,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -989,7 +989,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);

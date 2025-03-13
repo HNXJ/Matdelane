@@ -140,7 +140,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -165,8 +165,10 @@ fbands{5} = find(fmap > 80, 1):find(fmap >= max(fmap), 1);
 
 %% E.6: Visualize TFR
 
-tcond1 = 9;
+tcond1 = 11;
 layerid = 4;
+tbaseline3 = tbands{3}(end-15:end-10);
+txlims = [tmap(tbands{3}(1)) tmap(tbands{4}(end))];
 
 figure;
 subplot(2, 1, 1);
@@ -174,13 +176,13 @@ tfr1 = squeeze(mean(pgx{tcond1, layerid}, 1));
 
 for ik = 1:size(tfr1, 1)
 
-    tfr1(ik, :) = tfr1(ik, :) / mean(tfr1(ik, tbands{1}));
+    tfr1(ik, :) = tfr1(ik, :) / mean(tfr1(ik, tbaseline3));
 
 end
 
 imagesc(10*log10(tfr1), "XData", tmap, "YData", fmap);
 % ylim([0 20])
-xlim([tmap(1) tmap(end)]);
+xlim(txlims);
 set(gca, "YDir", "normal");
 hold("on");
 xline(0);
@@ -197,18 +199,19 @@ for fband = 1:5
     yline(fmap(fbands{fband}(1)), "Color", [1 0 0]);
 
 end
-xlabel("Time (ms)");
 
+xlabel("Time (ms)");
 subplot(2, 1, 2);
 
 for fband = 1:5
 
     tfr1 = squeeze(mean(pgx{tcond1, layerid}(:, fbands{fband}, :), 1));
     tfr1 = squeeze(mean(tfr1, 1));
-    tfr1 = tfr1 / mean(tfr1(tbands{1}));
+    tfr1 = smooth(tfr1, 20);
+    tfr1 = tfr1 / mean(tfr1(tbaseline3));
     plot(tmap, 10*log10(tfr1), "DisplayName", fbandlabels(fband), "LineWidth", 2);
     % ylim([0 20])
-    xlim([tmap(1) tmap(end)]);
+    xlim(txlims);
     hold("on");
     xline(0, HandleVisibility="off");
     xline(1031, HandleVisibility="off");
@@ -243,7 +246,7 @@ for fband = 1:5
     data = zeros(N1+N2, nF, nT);
     data(1:N1, :, :) = x1;
     data(N1+1:N1+N2, :, :) = x2;
-    % data = jSmooth(data, 50);
+    data = jSmooth(data, 50);
     
     groupIDs = [ones(1, N1), ones(1, N2)*2];
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -281,7 +284,7 @@ sgtitle("Area:" + areainf + " " + condinflabel(condinf(1)) + "-vs-" + condinflab
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [2, 3, 4];
 
 layerinf2 = layeridlabel(layerid) + " layer";
@@ -289,9 +292,9 @@ expvars2 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -310,7 +313,7 @@ end
 
 %% E.10: Omission PEV (Positional, BX2/BX3/BX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [6, 7, 8];
 
 layerinf3 = layeridlabel(layerid) + " layer";
@@ -318,9 +321,9 @@ expvars3 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -339,7 +342,7 @@ end
 
 %% E.11: Omission PEV (Positional, RX2/RX3/RX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [10, 11, 12];
 
 layerinf4 = layeridlabel(layerid) + " layer";
@@ -347,9 +350,9 @@ expvars4 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, tbands{3}); % S2d2
-    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, tbands{4}); % S3d3
-    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, tbands{5}); % S4d4
+    x1 = pgx{condinf(1), layerid}(:, fbands{fband}, [tbands{2}, tbands{3}]); % S2d2
+    x2 = pgx{condinf(2), layerid}(:, fbands{fband}, [tbands{3}, tbands{4}]); % S3d3
+    x3 = pgx{condinf(3), layerid}(:, fbands{fband}, [tbands{4}, tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -359,6 +362,8 @@ for fband = 1:5
     data(1:N1, :, :) = x1;
     data(N1+1:N1+N2, :, :) = x2;
     data(N1+N2+1:N1+N2+N3, :, :) = x3;
+
+    data = jSmooth(data, 50);
     
     groupIDs = [ones(1, N1), ones(1, N2)*2, ones(1, N3)*3];
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -369,7 +374,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = tmap(tbands{2});
+ntmap = tmap([tbands{2}, tbands{3}]);
 
 for fband = 1:5
 
@@ -384,7 +389,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(500);
+    xline(1000);xlim([0 2000]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 
@@ -395,7 +400,7 @@ sgtitle("Area:" + areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 %% E.13: PEV plot BX
 
 figure;
-ntmap = tmap(tbands{2});
+ntmap = tmap([tbands{2}, tbands{3}]);
 
 for fband = 1:5
 
@@ -410,7 +415,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(500);
+    xline(1000);xlim([0 2000]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 
@@ -421,7 +426,7 @@ sgtitle("Area:" + areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 %% E.14: PEV plot RX
 
 figure;
-ntmap = tmap(tbands{2});
+ntmap = tmap([tbands{2}, tbands{3}]);
 
 for fband = 1:5
 
@@ -436,7 +441,7 @@ for fband = 1:5
     plot(ntmap, stx, "Color", cl);
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
-    xline(500);
+    xline(1000);xlim([0 2000]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(fbandlabels(fband));
 
@@ -557,7 +562,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -988,7 +993,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
