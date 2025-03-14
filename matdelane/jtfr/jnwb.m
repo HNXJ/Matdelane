@@ -299,7 +299,7 @@ classdef jnwb < handle
 
         function jLFPprobeINFO(obj, chx)
 
-            imglfp1 = squeeze(mean(obj.x{1}, 1));
+            imglfp1 = squeeze(mean(obj.x{1}(:, chx, :), 1));
         
             figure;
             subplot(4, 1, 1);
