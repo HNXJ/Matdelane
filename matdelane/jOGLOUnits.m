@@ -47,14 +47,15 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms, 
         
         probeLabel = ['probe', char(65 + i-1)];
         areaName = nwb.general_extracellular_ephys.get(probeLabel).location{1};
-        areas = strsplit(areaName, ',');
-        areaCount = length(areas);
+        % areas = strsplit(areaName, ',');
+        % areaCount = length(areas);
+        areaCount = 1;
 
         channelW = 128/areaCount;
         
         for j = 1:areaCount
 
-            k = areas{j};
+            k = areaName;
             area = k(~isspace(k));
             channelL = ceil(channelW*(j-1)) + (i-1)*128 + 1;
             channelR = ceil(channelW*j) + (i-1)*128;
@@ -100,7 +101,7 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms, 
     conditionlist = [0, 2, 3, 4, 5, 7, 8, 9, 10, 26, 34, 42, 50];
     signalList = cell(1, numel(conditionlist) - 1);
 
-    for k = 2:numel(conditionlist)
+    parfor k = 2:numel(conditionlist)
         
         b = (conditions <= conditionlist(k)) & (conditions > conditionlist(k-1)) & (correct == 1) & (stims == 2);
         b = find(b);

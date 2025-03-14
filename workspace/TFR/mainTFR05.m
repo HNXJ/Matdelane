@@ -30,6 +30,10 @@ areainf = "PFC/";
 condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
     "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
 
+%% E.0.1: jNWB object
+
+q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
+
 %% E.1: Load LFP probeA PFC (Sup-Deep PFC1, Deep of PFC2, parital coverage of the second area)
 
 [c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4250, 0);
@@ -55,6 +59,32 @@ xline(2062, HandleVisibility="off");
 xline(3093, HandleVisibility="off");
 
 title("MUAenv/Zsc/" + condinflabel(condid));
+xlabel("Time (ms)");
+ylabel("Z-score");
+xlim([-500 4250]);
+
+legend;
+
+%% E1.2: SUA plots
+
+[cs, xs] = jOGLOUnits(nwb, "omission_glo_passive", 500, 4250, 0);
+disp(cs{1});
+
+condid = 9;
+figure;
+
+imxm = squeeze(mean(xs{condid}, 1));
+imxm = squeeze(mean(imxm, 1));
+imxm = (imxm - mean(imxm)) / std(imxm);
+plot(linspace(-500, 4250, 4750), imxm, "DisplayName", areainf);
+
+hold("on");
+xline(0, HandleVisibility="off");
+xline(1031, HandleVisibility="off");
+xline(2062, HandleVisibility="off");
+xline(3093, HandleVisibility="off");
+
+title("SUA/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
 xlim([-500 4250]);
