@@ -24,6 +24,8 @@ function [signalListL, signalList] = jOGLOSignals(nwb, task, t_pre_ms, t_post_ms
 
     end
 
+    disp("->Signal mode : " + signalMode);
+
     if ~exist('task', 'var')
 
         tasks = nwb.intervals.keys();
