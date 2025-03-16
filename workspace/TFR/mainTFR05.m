@@ -52,11 +52,11 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFR(channel_in_layer);
+pgx = q1.jCalcTFR(channel_in_layer);
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, q1.tbands{1}(end-5:end));
+q1.jTFRplot(pgx, 9, 4, q1.tbands{1}(end-5:end));
 
 %% E.7: Band PEV
 

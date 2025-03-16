@@ -69,7 +69,7 @@ classdef jnwb < handle
 
         end
 
-        function jCalcTFR(obj, channel_in_layer)
+        function pgx = jCalcTFR(obj, channel_in_layer)
 
             obj.freqlims = [0 200];
             obj.leakage = 0.85;
@@ -81,7 +81,7 @@ classdef jnwb < handle
             [p1, obj.fmap, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "OverlapPercent", obj.overlap, "FrequencyResolution", obj.freqres, "Leakage", obj.leakage);
             obj.tmap = (t1 - obj.tpre/1000)*1000;% TFR Kaiser's time window offset shift = t(1)*2
             
-            obj.pgx = cell(12, 4);
+            pgx = cell(12, 4);
             
             for ik = 1:12
                 
@@ -119,10 +119,10 @@ classdef jnwb < handle
                 
                 end
             
-                obj.pgx{ik, 1} = pgxcd;
-                obj.pgx{ik, 2} = pgxcm;
-                obj.pgx{ik, 3} = pgxcs;
-                obj.pgx{ik, 4} = pgxcf;
+                pgx{ik, 1} = pgxcd;
+                pgx{ik, 2} = pgxcm;
+                pgx{ik, 3} = pgxcs;
+                pgx{ik, 4} = pgxcf;
             
                 disp(" >cond : " + num2str(ik));
             
@@ -224,7 +224,7 @@ classdef jnwb < handle
 
         end
 
-        function jTFRplot(obj, tcond1, layerid, tbaseline, txlims)
+        function jTFRplot(obj, pgx, tcond1, layerid, tbaseline, txlims)
 
             if ~exist("tbaseline", "var")
             
@@ -240,7 +240,7 @@ classdef jnwb < handle
             
             figure;
             subplot(2, 1, 1);
-            tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
+            tfr1 = squeeze(mean(pgx{tcond1, layerid}, 1));
             
             for ik = 1:size(tfr1, 1)
             
@@ -273,7 +273,7 @@ classdef jnwb < handle
             
             for fband = 1:5
             
-                tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
+                tfr1 = squeeze(mean(pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
                 tfr1 = squeeze(mean(tfr1, 1));
                 tfr1 = smooth(tfr1, 20);
                 tfr1 = tfr1 / mean(tfr1(tbaseline));
