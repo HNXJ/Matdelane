@@ -1,6 +1,6 @@
 classdef jnwb < handle
 
-    % JNWB: Time-Frequency analysis on signals; Passive omission task
+    % JNWB: Passive omission task
     %  LFP, SPK (SUA and MUA)
     
     properties
@@ -57,102 +57,33 @@ classdef jnwb < handle
 
             [obj.c, obj.x] = jOGLOSignals(nwb, "omission_glo_passive", tpre, tpost, probeid, "lfp");
             [obj.cm, obj.xm] = jOGLOSignals(nwb, "omission_glo_passive", tpre, tpost, probeid, "muae");
-            [obj.cs, obj.xs] = jOGLOUnits(nwb, "omission_glo_passive", tpre, tpost, convFlag);
+            % [obj.cs, obj.xs] = jOGLOUnits(nwb, "omission_glo_passive", tpre, tpost, convFlag);
 
             obj.tmapsignal = linspace(-obj.tpre, obj.tpost, size(obj.x{1}, 3));
+
+        end
+
+        function obj = jCalcTFRs(obj, channel_in_layer)
+
+            [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+
+            obj.pgx = pgxt;
+            obj.freqlims = xinfo.freqlims;
+            obj.leakage = xinfo.leakage;
+
+            obj.freqres = xinfo.freqres;
+            obj.overlap = xinfo.overlap;
+            obj.fmap = xinfo.fmap;
+
+            obj.tmap = xinfo.tmap;
+            obj.tbands = xinfo.tbands;
+            obj.fbands = xinfo.fbands;
 
         end
 
         function obj = tmapsignalset(obj)
 
             obj.tmapsignal = linspace(-obj.tpre, obj.tpost, size(obj.x{1}, 3));
-
-        end
-
-        function pgx = jCalcTFR(obj, channel_in_layer)
-
-            obj.freqlims = [0 200];
-            obj.leakage = 0.85;
-            obj.freqres = 5.0;
-            obj.overlap = 95;
-            
-            channel_in_layer_selected = channel_in_layer;
-            y = squeeze(mean(mean(obj.x{1}, 1), 2));
-            [p1, obj.fmap, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "OverlapPercent", obj.overlap, "FrequencyResolution", obj.freqres, "Leakage", obj.leakage);
-            obj.tmap = (t1 - obj.tpre/1000)*1000;% TFR Kaiser's time window offset shift = t(1)*2
-            
-            pgx = cell(12, 4);
-            
-            for ik = 1:12
-                
-                xG1d = squeeze(mean(obj.x{ik}(:, channel_in_layer_selected.deep, :), 2));
-                xG1m = squeeze(mean(obj.x{ik}(:, channel_in_layer_selected.mid, :), 2));
-                xG1s = squeeze(mean(obj.x{ik}(:, channel_in_layer_selected.sup, :), 2));
-                xG1f = squeeze(mean(obj.x{ik}(:, channel_in_layer_selected.goodch, :), 2));
-                
-                TR = size(xG1d, 1);
-            
-                pgxcd = zeros([TR, size(p1)]);
-                pgxcm = zeros([TR, size(p1)]);
-                pgxcs = zeros([TR, size(p1)]);
-                pgxcf = zeros([TR, size(p1)]);
-                
-                parfor jk = 1:TR % trials
-                
-                    [p1temp, ~, ~] = pspectrum(squeeze(xG1d(jk, :)), 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "FrequencyResolution", obj.freqres, "OverlapPercent", obj.overlap, "Leakage", obj.leakage);
-                    pgxcd(jk, :, :) = p1temp;
-                
-                    [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "FrequencyResolution", obj.freqres, "OverlapPercent", obj.overlap, "Leakage", obj.leakage);
-                    pgxcm(jk, :, :) = p1temp;
-                
-                    [p1temp, ~, ~] = pspectrum(squeeze(xG1s(jk, :)), 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "FrequencyResolution", obj.freqres, "OverlapPercent", obj.overlap, "Leakage", obj.leakage);
-                    pgxcs(jk, :, :) = p1temp;
-                     
-                    [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", obj.freqlims, "FrequencyResolution", obj.freqres, "OverlapPercent", obj.overlap, "Leakage", obj.leakage);
-                    pgxcf(jk, :, :) = p1temp;
-            
-                    if mod(jk, 20) == 0
-            
-                        fprintf(num2str(jk));
-            
-                    end
-                
-                end
-            
-                pgx{ik, 1} = pgxcd;
-                pgx{ik, 2} = pgxcm;
-                pgx{ik, 3} = pgxcs;
-                pgx{ik, 4} = pgxcf;
-            
-                disp(" >cond : " + num2str(ik));
-            
-            end
-
-            obj.tbands = cell(1, 5);
-            obj.tbands{1} = find(obj.tmap > -250, 1):find(obj.tmap > -50, 1);
-            obj.tbands{2} = find(obj.tmap > 0, 1):find(obj.tmap > 1000, 1);
-            obj.tbands{3} = find(obj.tmap > 1031, 1):find(obj.tmap > 2031, 1);
-            obj.tbands{4} = find(obj.tmap > 2062, 1):find(obj.tmap > 3062, 1);
-            obj.tbands{5} = find(obj.tmap > 3093, 1):find(obj.tmap > 4093, 1);
-            
-            nt_temp = length(obj.tbands{3});
-            
-            for ik = 2:5
-            
-                obj.tbands{ik} = obj.tbands{ik}(1:nt_temp);
-            
-            end
-
-            
-            obj.fbands = cell(1, 5);
-            
-            obj.fbands{1} = find(obj.fmap > 2, 1):find(obj.fmap > 7, 1);
-            obj.fbands{2} = find(obj.fmap > 8, 1):find(obj.fmap > 12, 1);
-            obj.fbands{3} = find(obj.fmap > 14, 1):find(obj.fmap > 30, 1);
-            obj.fbands{4} = find(obj.fmap > 32, 1):find(obj.fmap > 80, 1);
-            obj.fbands{5} = find(obj.fmap > 80, 1):find(obj.fmap >= max(obj.fmap), 1);
-
-            return;
 
         end
 
@@ -224,7 +155,7 @@ classdef jnwb < handle
 
         end
 
-        function jTFRplot(obj, pgx, tcond1, layerid, tbaseline, txlims)
+        function jTFRplot(obj, tcond1, layerid, tbaseline, txlims)
 
             if ~exist("tbaseline", "var")
             
@@ -240,7 +171,7 @@ classdef jnwb < handle
             
             figure;
             subplot(2, 1, 1);
-            tfr1 = squeeze(mean(pgx{tcond1, layerid}, 1));
+            tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
             
             for ik = 1:size(tfr1, 1)
             
@@ -273,9 +204,9 @@ classdef jnwb < handle
             
             for fband = 1:5
             
-                tfr1 = squeeze(mean(pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
+                tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
                 tfr1 = squeeze(mean(tfr1, 1));
-                tfr1 = smooth(tfr1, 20);
+                tfr1 = smooth(tfr1, 10);
                 tfr1 = tfr1 / mean(tfr1(tbaseline));
                 plot(obj.tmap, 10*log10(tfr1), "DisplayName", obj.fbandlabels(fband), "LineWidth", 2);
                 % ylim([0 20])
@@ -342,9 +273,74 @@ classdef jnwb < handle
             
         end
 
-        function flipObj = jVFLIP(obj, xch)
+        function [expvars, layerinf] = jCalcPEV(obj, layerid, condinf)
+            
+            layerinf = obj.layeridlabel(layerid) + " layer";
+            expvars = cell(1, 5);
+            
+            for fband = 1:5
+            
+                x1 = obj.pgx{condinf(1), layerid}(:, obj.fbands{fband}, :);
+                x2 = obj.pgx{condinf(2), layerid}(:, obj.fbands{fband}, :);
+                
+                [N1, nF, nT] = size(x1);
+                N2 = size(x2, 1);
+                
+                data = zeros(N1+N2, nF, nT);
+                data(1:N1, :, :) = x1;
+                data(N1+1:N1+N2, :, :) = x2;
+                % data = jSmooth(data, 50);
+                
+                groupIDs = [ones(1, N1), ones(1, N2)*2];
+                [expv, ~, ~, ~, ~] = jPEV(data, groupIDs, 1);
+                expvars{fband} = squeeze(expv)*100;
+            
+            end
 
-            data = permute(obj.x{1}(:, xch, :), [2, 3, 1]);
+        end
+
+        function jPEVplot(obj, expvars, layerinf, condinf)
+
+            figure;
+            
+            for fband = 1:5
+            
+                subplot(5, 1, fband);
+                yt = mean(expvars{fband}, 1);
+                yt = yt - min(yt);
+                st = std(expvars{fband}) / sqrt(size(expvars{fband}, 1));
+                plot(obj.tmap, yt);hold("on");
+                stx = smooth(yt + 2*st, 2);stx(stx<0) = 0;
+                sty = smooth(yt - 2*st, 2);sty(sty<0) = 0;
+                cl = [0.9 0.7 0.7];
+                plot(obj.tmap, stx, "Color", cl);
+                plot(obj.tmap, sty, "Color", cl);
+                patch([obj.tmap', obj.tmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
+                xline(0);
+                xline(1031);
+                xline(2062);
+                xline(3093);
+                xlabel("Time(ms)");ylabel("PEV(%)");
+                title(obj.fbandlabels(fband));
+            
+            end
+            
+            sgtitle("Area:" + obj.areainf + " " + obj.condinflabel(condinf(1)) + "-vs-" + obj.condinflabel(condinf(2)) + " PEV/TFR/+-2SEM/fRes=" + num2str(obj.freqres) + "Hz/ovlrp=." + num2str(obj.overlap) + " " + layerinf);
+
+        end
+
+        function flipObj = jVFLIP(obj, xch, txlim)
+
+            if ~exist('txlim', 'var')
+
+                data = permute(obj.x{1}(:, xch, :), [2, 3, 1]);
+
+            else
+
+                data = permute(obj.x{1}(:, xch, txlim), [2, 3, 1]);
+
+            end
+            
             flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.04, 'plot_result', true);
         
         end

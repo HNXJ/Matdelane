@@ -21,6 +21,38 @@ disp("Toolbox setup done.");
 %% E.0: Load NWB
 
 nwbFile = nwbPath + nwbFiles{2};
+
+%% E.0.1: jNWB object
+
+q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
+
+%% E.0.2: MUA plot
+
+q1.jMUAplot(9, [1000 3000]);
+
+%% E.0.3: SUA plot
+
+q1.jSUAplot(9, [100 4000], 100:120);
+
+%% E.1: Channel and layer specs
+
+channel_in_layer = struct();
+channel_in_layer.deep = 21:81;
+channel_in_layer.mid = 82:86;
+channel_in_layer.sup = [87:112, 114:2:128];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+
+%% E.2: LFP info plot
+
+q1.jLFPprobeINFO(channel_in_layer.goodch);
+
+%% E.3: Evaluate vFLIP
+
+q1.jVFLIP(channel_in_layer.goodch);
+
+%% E.0: Load NWB
+
+nwbFile = nwbPath + nwbFiles{2};
 nwb = nwbRead(nwbFile);
 disp(length(nwb.general_extracellular_ephys.keys()));
 
@@ -32,12 +64,12 @@ condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
 
 %% E.1: Load LFP probeA PFC
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
 disp(c{1}.session);
 
 %% E1.1: MUAe plots
 
-[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 0, "muae");
+[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0, "muae");
 disp(cm{1}.session);
 
 condid = 12;
@@ -46,7 +78,7 @@ figure;
 imxm = squeeze(mean(xm{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -57,7 +89,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -67,13 +99,13 @@ channel_in_layer = struct();
 channel_in_layer.deep = 21:81;
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:112, 114:2:128];
-goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
-jLFPprobeINFO(x{1}(:, goodch, :));
+jLFPprobeINFO(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.3: Evaluate vFLIP
 
-jVFLIP(x{1}(:, goodch, :));
+jVFLIP(x{1}(:, channel_in_layer.goodch, :));
 
 %% E.4: TFR calculations all trials; PFC
 
@@ -85,19 +117,21 @@ overlap = 95;
 channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -109,7 +143,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -121,6 +158,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
@@ -134,7 +172,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -440,15 +478,53 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
+%% E.0: Load NWB
+
+nwbFile = nwbPath + nwbFiles{2};
+
+%% E.0.1: jNWB object
+
+q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 0);
+
+%% E.0.2: MUA plot
+
+q2.jMUAplot(9, [1000 3000]);
+
+%% E.0.3: SUA plot
+
+q2.jSUAplot(9, [100 4000], 100:120);
+
+%% E.1: Channel and layer specs
+
+channel_in_layer = struct();
+channel_in_layer.deep = 1:27;
+channel_in_layer.mid = 29:2:35;
+channel_in_layer.sup = [36:44, 46:60];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+
+channel_in_layer2 = struct();
+channel_in_layer2.deep = 81:128;
+channel_in_layer2.mid = 76:80;
+channel_in_layer2.sup = [61:64, 66:75];
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+
+%% E.2: LFP info plot
+
+q2.jLFPprobeINFO(channel_in_layer2.goodch);
+
+%% E.3: Evaluate vFLIP
+
+q2.jVFLIP(channel_in_layer2.goodch);
+
 %% E.1: Load LFP probeB  V4-MT
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1);
 disp(c{1}.session);
 areainf = "V4/MT";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 1, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 1, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -457,7 +533,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -468,7 +544,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -501,21 +577,24 @@ leakage = 0.85;
 freqres = 5.0;
 overlap = 95;
 
+channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -527,7 +606,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -539,6 +621,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
@@ -552,7 +635,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
@@ -864,15 +947,53 @@ sgtitle("Area:" + areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(fre
 
 %% Probe C (V1/V2, It seems that it consists only of one area, to be identified, highly foveal)
 
+%% E.0: Load NWB
+
+nwbFile = nwbPath + nwbFiles{2};
+
+%% E.0.1: jNWB object
+
+q3 = jnwb(nwbFile, "V1-V2/", 500, 4250, 2, 0);
+
+%% E.0.2: MUA plot
+
+q3.jMUAplot(9, [1000 3000]);
+
+%% E.0.3: SUA plot
+
+q3.jSUAplot(9, [100 4000], 100:120);
+
+%% E.1: Channel and layer specs
+
+channel_in_layer = struct();
+channel_in_layer.deep = 1:27;
+channel_in_layer.mid = 29:2:35;
+channel_in_layer.sup = [36:44, 46:60];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+
+channel_in_layer2 = struct();
+channel_in_layer2.deep = 81:128;
+channel_in_layer2.mid = 76:80;
+channel_in_layer2.sup = [61:64, 66:75];
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+
+%% E.2: LFP info plot
+
+q3.jLFPprobeINFO(channel_in_layer.goodch);
+
+%% E.3: Evaluate vFLIP
+
+q3.jVFLIP(channel_in_layer.goodch);
+
 %% E.1: Load LFP probeC  V1
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2);
+[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2);
 disp(c{1}.session);
 areainf = "V1";
 
 %% E1.1: MUAe plots
 
-[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4500, 2, "muae");
+[cm2, xm2] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 2, "muae");
 disp(cm2{1}.session);
 
 condid = 12;
@@ -881,7 +1002,7 @@ figure;
 imxm = squeeze(mean(xm2{condid}, 1));
 imxm = squeeze(mean(imxm, 1));
 imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4500, 5000), imxm, "DisplayName", areainf);
+plot(linspace(-500, 4000, 4500), imxm, "DisplayName", areainf);
 
 hold("on");
 xline(0, HandleVisibility="off");
@@ -892,7 +1013,7 @@ xline(3093, HandleVisibility="off");
 title("MUAenv/Zsc/" + condinflabel(condid));
 xlabel("Time (ms)");
 ylabel("Z-score");
-xlim([-500 4500]);
+xlim([-500 4000]);
 
 legend;
 
@@ -925,21 +1046,24 @@ leakage = 0.85;
 freqres = 5.0;
 overlap = 95;
 
+channel_in_layer_selected = channel_in_layer;
 y = squeeze(mean(mean(x{1}, 1), 2));
 [p1, f1, t1] = pspectrum(y, 1000, "spectrogram", "FrequencyLimits", freqlims, "OverlapPercent", overlap, "FrequencyResolution", freqres, "Leakage", leakage);
-pgx = cell(12, 3);
+pgx = cell(12, 4);
 
 for ik = 1:12
     
-    xG1d = squeeze(mean(x{ik}(:, channel_in_layer.deep, :), 2));
-    xG1m = squeeze(mean(x{ik}(:, channel_in_layer.mid, :), 2));
-    xG1s = squeeze(mean(x{ik}(:, channel_in_layer.sup, :), 2));
+    xG1d = squeeze(mean(x{ik}(:, channel_in_layer_selected.deep, :), 2));
+    xG1m = squeeze(mean(x{ik}(:, channel_in_layer_selected.mid, :), 2));
+    xG1s = squeeze(mean(x{ik}(:, channel_in_layer_selected.sup, :), 2));
+    xG1f = squeeze(mean(x{ik}(:, channel_in_layer_selected.goodch, :), 2));
     
     TR = size(xG1d, 1);
 
     pgxcd = zeros([TR, size(p1)]);
     pgxcm = zeros([TR, size(p1)]);
     pgxcs = zeros([TR, size(p1)]);
+    pgxcf = zeros([TR, size(p1)]);
     
     parfor jk = 1:TR % trials
     
@@ -951,7 +1075,10 @@ for ik = 1:12
     
         [p1temp, ~, ~] = pspectrum(squeeze(xG1m(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
         pgxcs(jk, :, :) = p1temp;
-    
+         
+        [p1temp, ~, ~] = pspectrum(squeeze(xG1f(jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+        pgxcf(jk, :, :) = p1temp;
+
         if mod(jk, 20) == 0
 
             fprintf(num2str(jk));
@@ -963,6 +1090,7 @@ for ik = 1:12
     pgx{ik, 1} = pgxcd;
     pgx{ik, 2} = pgxcm;
     pgx{ik, 3} = pgxcs;
+    pgx{ik, 4} = pgxcf;
 
     disp(" >cond : " + num2str(ik));
 
@@ -976,7 +1104,7 @@ tmap = (t1 - 0.500)*1000;% TFR Kaiser's time window offset shift = t(1)*2
 tbands = cell(1, 5);
 tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
 
-tbands{1} = 1:find(tmap > -50, 1);
+tbands{1} = find(tmap > -250, 1):find(tmap > -50, 1);
 tbands{2} = find(tmap > 0, 1):find(tmap > 1000, 1);
 tbands{3} = find(tmap > 1031, 1):find(tmap > 2031, 1);
 tbands{4} = find(tmap > 2062, 1):find(tmap > 3062, 1);
