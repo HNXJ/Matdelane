@@ -57,9 +57,9 @@ classdef jnwb < handle
 
             [obj.c, obj.x] = jOGLOSignals(nwb, "omission_glo_passive", tpre, tpost, probeid, "lfp");
             [obj.cm, obj.xm] = jOGLOSignals(nwb, "omission_glo_passive", tpre, tpost, probeid, "muae");
-            % [obj.cs, obj.xs] = jOGLOUnits(nwb, "omission_glo_passive", tpre, tpost, convFlag);
+            [obj.cs, obj.xs] = jOGLOUnits(nwb, "omission_glo_passive", tpre, tpost, convFlag);
 
-            obj.tmapsignal = linspace(-obj.tpre, obj.tpost, size(obj.x{1}, 3));
+            obj.tmapsignal = linspace(-obj.tpre, obj.tpost, size(obj.xm{1}, 3));
 
         end
 
@@ -115,6 +115,44 @@ classdef jnwb < handle
             xlim(timewindow);
             
             legend;
+
+        end
+
+        function jMUAplotAll(obj, timewindow)
+
+            if ~exist("timewindow", "var")
+
+                obj.tmapsignalset();
+                timewindow = [obj.tmapsignal(1), obj.tmapsignal(end)];
+
+            end
+
+            figure;
+            
+            for condid = 1:12
+
+                imxm = squeeze(mean(obj.xm{condid}, 1));
+                imxm = squeeze(mean(imxm, 1));
+                imxm = (imxm - mean(imxm)) / std(imxm);
+                subplot(3, 4, condid);
+                plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
+                
+                hold("on");
+                xline(0, HandleVisibility="off");
+                xline(1031, HandleVisibility="off");
+                xline(2062, HandleVisibility="off");
+                xline(3093, HandleVisibility="off");
+                
+                title("MUAenv/Zsc/" + obj.condinflabel(condid));
+                xlabel("Time (ms)");
+                ylabel("Z-score");
+                xlim(timewindow);
+                
+                legend;
+
+            end
+
+            sgtitle(obj.nwbFile);
 
         end
 
@@ -292,6 +330,35 @@ classdef jnwb < handle
                 % data = jSmooth(data, 50);
                 
                 groupIDs = [ones(1, N1), ones(1, N2)*2];
+                [expv, ~, ~, ~, ~] = jPEV(data, groupIDs, 1);
+                expvars{fband} = squeeze(expv)*100;
+            
+            end
+
+        end
+
+        function [expvars, layerinf] = jCalcPEVs(obj, layerid, condinf)
+            
+            layerinf = obj.layeridlabel(layerid) + " layer";
+            expvars = cell(1, 5);
+            
+            for fband = 1:5
+            
+                x1 = obj.pgx{condinf(1), layerid}(:, obj.fbands{fband}, :);
+                x2 = obj.pgx{condinf(2), layerid}(:, obj.fbands{fband}, :);
+                x3 = obj.pgx{condinf(3), layerid}(:, obj.fbands{fband}, :);
+                
+                [N1, nF, nT] = size(x1);
+                N2 = size(x2, 1);
+                N3 = size(x3, 1);
+                
+                data = zeros(N1+N2, nF, nT);
+                data(1:N1, :, :) = x1;
+                data(N1+1:N1+N2, :, :) = x2;
+                data(N1+N2+1:N1+N2+N3, :, :) = x3;
+                % data = jSmooth(data, 50);
+                
+                groupIDs = [ones(1, N1), ones(1, N2)*2, ones(1, N3)*3];
                 [expv, ~, ~, ~, ~] = jPEV(data, groupIDs, 1);
                 expvars{fband} = squeeze(expv)*100;
             

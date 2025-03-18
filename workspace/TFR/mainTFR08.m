@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(7, [-500 4000]);
 
 %% E.0.3: SUA plot
 

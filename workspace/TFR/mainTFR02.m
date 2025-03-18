@@ -247,11 +247,12 @@ q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+% q2.jMUAplot(11, [-400 4200]);
+q2.jMUAplotAll([-400 4200]);
 
 %% E.0.3: SUA plot
 
-q2.jSUAplot(9, [100 4000], 100:120);
+q2.jSUAplot(7, [100 4000], 100:120);
 
 %% E.1: Channel and layer specs
 
@@ -502,7 +503,7 @@ q3.jCalcTFRs(channel_in_layer);
 
 %% E.5: Visualize TFR
 
-q3.jTFRplot(9, 4, q3.tbands{1}(end-10:end));
+q3.jTFRplot(12, 4, q3.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
@@ -681,4 +682,18 @@ end
 
 sgtitle("Area:" + q3.areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(q3.freqres) + "Hz/ovlrp=." + num2str(q3.overlap) + " " + layerinf4);
 
+%% TESTBENCH
+
+% nwbFile = nwbPath + nwbFiles{14};
+% 
+% %% E.0.1: jNWB object
+% 
+% q2 = jnwb(nwbFile, "-/", 500, 4250, 0, 0, 0);
+% 
+% %% E.0.2: MUA plot
+% 
+% % q2.jMUAplot(11, [-400 4200]);
+% q2.jMUAplotAll([-400 4000]);
+
 %%
+

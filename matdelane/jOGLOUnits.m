@@ -99,11 +99,21 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms, 
     NgoodUnitsID = goodUnits;
     NgoodUnits = numel(NgoodUnitsID);
     conditionlist = [0, 2, 3, 4, 5, 7, 8, 9, 10, 26, 34, 42, 50];
+    
+    conditionlist_rrxr = 37:2:42;
+    conditionlist_rrrx = [36:2:42, 43:50];
     signalList = cell(1, numel(conditionlist) - 1);
 
     parfor k = 2:numel(conditionlist)
         
-        b = (conditions <= conditionlist(k)) & (conditions > conditionlist(k-1)) & (correct == 1) & (stims == 2);
+        if k ~= 12
+            b = (conditions <= conditionlist(k)) & (conditions > conditionlist(k-1)) & (correct == 1) & (stims == 2);
+        elseif k == 12
+            b = (ismember(conditions, conditionlist_rrxr)) & (correct == 1) & (stims == 2);
+        else
+            b = (ismember(conditions, conditionlist_rrrx)) & (correct == 1) & (stims == 2);
+        end
+        
         b = find(b);
         temp_signals = zeros(numel(b), NgoodUnits, t_pre_ms + t_post_ms);
         cnt = 0;

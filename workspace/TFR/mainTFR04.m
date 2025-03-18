@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "FEF/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(10, [-400 4000]);
 
 %% E.0.3: SUA plot
 
@@ -56,7 +56,10 @@ q1.jCalcTFRs(channel_in_layer);
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+q1.jTFRplot(9, 4, q1.tbands{1}(end-10:end));
+q1.jTFRplot(10, 4, q1.tbands{1}(end-10:end));
+q1.jTFRplot(11, 4, q1.tbands{1}(end-10:end));
+q1.jTFRplot(12, 4, q1.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
@@ -247,7 +250,7 @@ q2 = jnwb(nwbFile, "MT-MST/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+q2.jMUAplot(2, [-400 4200]);
 
 %% E.0.3: SUA plot
 
