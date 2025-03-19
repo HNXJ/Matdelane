@@ -284,7 +284,7 @@ q2.jCalcTFRs(channel_in_layer);
 
 %% E.5: Visualize TFR
 
-q2.jTFRplot(12, 4, q2.tbands{1}(end-10:end));
+q2.jTFRplot(7, 4, q2.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 

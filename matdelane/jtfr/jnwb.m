@@ -1,6 +1,6 @@
 classdef jnwb < handle
 
-    % JNWB: Passive omission task
+    % JNWB: Passive omission task handler
     %  LFP, SPK (SUA and MUA)
     
     properties
