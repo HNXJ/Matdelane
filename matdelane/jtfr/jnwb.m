@@ -63,9 +63,23 @@ classdef jnwb < handle
 
         end
 
-        function obj = jCalcTFRs(obj, channel_in_layer)
+        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel)
 
-            [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+            if ~exist("tfrByChannel", "var")
+
+                tfrByChannel = 0;
+
+            end
+
+            if tfrByChannel
+
+                [pgxt, xinfo] = jCalculateTFRbyChannel(obj.x, channel_in_layer);
+
+            else
+            
+                [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+
+            end
 
             obj.pgx = pgxt;
             obj.freqlims = xinfo.freqlims;

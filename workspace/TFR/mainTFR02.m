@@ -290,11 +290,12 @@ q2.jVFLIP(channel_in_layer2.goodch, [1:500, 1100:1550]);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer);
+% q2.jCalcTFRs(channel_in_layer);
+q2.jCalcTFRs(channel_in_layer, 1);
 
 %% E.5: Visualize TFR
 
-q2.jTFRplot(7, 4, q2.tbands{1}(end-10:end));
+q2.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
