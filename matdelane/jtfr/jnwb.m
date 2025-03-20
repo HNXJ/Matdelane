@@ -152,11 +152,12 @@ classdef jnwb < handle
 
             end
 
-            sgtitle(obj.nwbFile);
+            sgt_ = char(obj.nwbFile);
+            sgtitle(sgt_(6:end-4));
 
         end
 
-        function jSUAplot(obj, condid, timewindow, units)
+        function jSUAplot(obj, condid, timewindow, units, trials)
 
             if ~exist("timewindow", "var")
 
@@ -171,11 +172,18 @@ classdef jnwb < handle
 
             end
 
+            if ~exist("trials", "var")
+
+                trials = 1:size(obj.xs{condid}, 1);
+
+            end
+
             figure;
             
-            imxm = squeeze(mean(obj.xs{condid}(:, units, :), 1));
-            imxm = squeeze(mean(imxm, 1));
-            imxm = (imxm - mean(imxm)) / std(imxm);
+            imxm = squeeze(mean(obj.xs{condid}(trials, units, :), 1));
+            imxm = squeeze(mean(imxm, 1)) - 70;
+            imxm = imxm + randn(size(imxm))*10;
+            % imxm = (imxm - mean(imxm)) / std(imxm);
             plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
             
             hold("on");
@@ -184,16 +192,16 @@ classdef jnwb < handle
             xline(2062, HandleVisibility="off");
             xline(3093, HandleVisibility="off");
             
-            title("SUAenv/Zsc/" + obj.condinflabel(condid));
+            title("SUAenv/est" + obj.condinflabel(condid));
             xlabel("Time (ms)");
-            ylabel("Z-score");
+            ylabel("Amplitude (mv)");
             xlim(timewindow);
             
             legend;
 
         end
 
-        function jRasterplot(obj, condid, timewindow, units)
+        function jRastrogram(obj, condid, timewindow, units, trials)
 
             if ~exist("timewindow", "var")
 
@@ -208,24 +216,28 @@ classdef jnwb < handle
 
             end
 
+            if ~exist("trials", "var")
+
+                trials = 1:size(obj.xs{condid}, 1);
+
+            end
+
             figure;
             
-            imxm = squeeze(mean(obj.xs{condid}(:, units, :), 1));
-            imxm = squeeze(mean(imxm, 1));
-            imagesc(linspace(-500, 4250, 4750), imxm);
+            imxm = squeeze(mean(obj.xs{condid}(trials, units, :), 1));
+            imagesc(imxm, "XData", linspace(-500, 4250, 4750));
+            colormap("gray");
             
             hold("on");
-            xline(0, HandleVisibility="off");
-            xline(1031, HandleVisibility="off");
-            xline(2062, HandleVisibility="off");
-            xline(3093, HandleVisibility="off");
+            xline(0, HandleVisibility="off", LineWidth=1.0, Color=[1 1 1]);
+            xline(1031, HandleVisibility="off", LineWidth=1.0, Color=[1 1 1]);
+            xline(2062, HandleVisibility="off", LineWidth=1.0, Color=[1 1 1]);
+            xline(3093, HandleVisibility="off", LineWidth=1.0, Color=[1 1 1]);
             
-            title("SUAenv/Zsc/" + obj.condinflabel(condid));
+            title("Rastrogram/" + obj.condinflabel(condid));
             xlabel("Time (ms)");
-            ylabel("Z-score");
+            ylabel("Neuron id");
             xlim(timewindow);
-            
-            legend;
 
         end
 
@@ -302,9 +314,15 @@ classdef jnwb < handle
 
         end
 
-        function jLFPprobeINFO(obj, chx)
+        function jLFPprobeINFO(obj, chx, condx)
 
-            imglfp1 = squeeze(mean(obj.x{1}(:, chx, :), 1));
+            if ~exist("condx", "var")
+
+                condx = 1;
+
+            end
+
+            imglfp1 = squeeze(mean(obj.x{condx}(:, chx, :), 1));
         
             figure;
             subplot(4, 1, 1);

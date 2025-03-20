@@ -36,7 +36,7 @@ q1.jSUAplot(9, [100 4000], 100:120);
 
 %% E.0.4: Rastrogram
 
-q1.jRasterplot(9, [100 4000], 100:120);
+q1.jRastrogram(1, [1000 3000], 10:120, 1:2);
 
 %% E.1: Channel and layer specs
 
@@ -48,7 +48,7 @@ channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_
 
 %% E.2: LFP info plot
 
-q1.jLFPprobeINFO(channel_in_layer.goodch);
+q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
 
 %% E.3: Evaluate vFLIP
 
@@ -247,16 +247,22 @@ nwbFile = nwbPath + nwbFiles{2};
 
 %% E.0.1: jNWB object
 
-q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 0);
+q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 1);
 
 %% E.0.2: MUA plot
 
 % q2.jMUAplot(11, [-400 4200]);
-q2.jMUAplotAll([-400 4200]);
+q2.jMUAplot(3, [1000 3000]);
+% q2.jMUAplotAll([1000 3000]);
 
 %% E.0.3: SUA plot
 
-q2.jSUAplot(7, [100 4000], 100:120);
+% q2.jSUAplot(3, [1000 3000], 109:110, 1:1);
+q2.jSUAplot(3, [1000 1500], 109:110, 1:1);
+
+%% E.0.4: Rastrogram
+
+q2.jRastrogram(3, [1000 3000], 10:120, 1:2);
 
 %% E.1: Channel and layer specs
 
@@ -269,18 +275,18 @@ channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_
 channel_in_layer2 = struct();
 channel_in_layer2.deep = 81:128;
 channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [61:64, 66:75];
+channel_in_layer2.sup = [57:64, 66:75];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 %% E.2: LFP info plot
 
-q2.jLFPprobeINFO(channel_in_layer.goodch);
+% q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP(channel_in_layer.goodch, 1:500);
-q2.jVFLIP(1:2:128, 1:1000);
+q2.jVFLIP(channel_in_layer2.goodch, [1:500, 1100:1550]);
+% q2.jVFLIP(1:2:128, 1:1000);
 
 %% E.4: TFR calculations all trials
 
