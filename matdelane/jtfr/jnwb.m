@@ -193,6 +193,42 @@ classdef jnwb < handle
 
         end
 
+        function jRasterplot(obj, condid, timewindow, units)
+
+            if ~exist("timewindow", "var")
+
+                obj.tmapsignalset();
+                timewindow = [obj.tmapsignal(1), obj.tmapsignal(end)];
+
+            end
+
+            if ~exist("units", "var")
+
+                units = 1:size(obj.xs{condid}, 2);
+
+            end
+
+            figure;
+            
+            imxm = squeeze(mean(obj.xs{condid}(:, units, :), 1));
+            imxm = squeeze(mean(imxm, 1));
+            imagesc(linspace(-500, 4250, 4750), imxm);
+            
+            hold("on");
+            xline(0, HandleVisibility="off");
+            xline(1031, HandleVisibility="off");
+            xline(2062, HandleVisibility="off");
+            xline(3093, HandleVisibility="off");
+            
+            title("SUAenv/Zsc/" + obj.condinflabel(condid));
+            xlabel("Time (ms)");
+            ylabel("Z-score");
+            xlim(timewindow);
+            
+            legend;
+
+        end
+
         function jTFRplot(obj, tcond1, layerid, tbaseline, txlims)
 
             if ~exist("tbaseline", "var")

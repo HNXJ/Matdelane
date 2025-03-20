@@ -34,6 +34,10 @@ q1.jMUAplot(9, [1000 3000]);
 
 q1.jSUAplot(9, [100 4000], 100:120);
 
+%% E.0.4: Rastrogram
+
+q1.jRasterplot(9, [100 4000], 100:120);
+
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
