@@ -39,7 +39,7 @@ q1.jSUAplot(9, [100 4000], 100:120);
 channel_in_layer = struct();
 channel_in_layer.deep = 21:81;
 channel_in_layer.mid = 82:86;
-channel_in_layer.sup = [87:112, 114:2:128];
+channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 %% E.2: LFP info plot
