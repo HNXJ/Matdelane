@@ -56,11 +56,14 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer);
+% q1.jCalcTFRs(channel_in_layer);
+q1.jCalcTFRs(channel_in_layer, 1);
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(12, 4, q1.tbands{1}(end-5:end));
+q1.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
+q1.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
+q1.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
@@ -295,6 +298,8 @@ q2.jCalcTFRs(channel_in_layer, 1);
 
 %% E.5: Visualize TFR
 
+q2.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
+q2.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
 q2.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
