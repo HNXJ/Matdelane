@@ -63,9 +63,23 @@ classdef jnwb < handle
 
         end
 
-        function obj = jCalcTFRs(obj, channel_in_layer)
+        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel)
 
-            [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+            if ~exist("tfrByChannel", "var")
+
+                tfrByChannel = 0;
+
+            end
+
+            if tfrByChannel
+
+                [pgxt, xinfo] = jCalculateTFRbyChannel(obj.x, channel_in_layer);
+
+            else
+            
+                [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+
+            end
 
             obj.pgx = pgxt;
             obj.freqlims = xinfo.freqlims;
@@ -201,57 +215,6 @@ classdef jnwb < handle
 
         end
 
-        function jSUAanimate(obj, condid, timewindow, timewondow2, units, trials)
-
-            if ~exist("timewindow", "var")
-
-                obj.tmapsignalset();
-                timewindow = [obj.tmapsignal(1), obj.tmapsignal(end)];
-
-            end
-
-            if ~exist("timewindow2", "var")
-
-                obj.tmapsignalset();
-                timewindow2 = [obj.tmapsignal(1), obj.tmapsignal(end)];
-
-            end
-
-            if ~exist("units", "var")
-
-                units = 1:size(obj.xs{condid}, 2);
-
-            end
-
-            if ~exist("trials", "var")
-
-                trials = 1:size(obj.xs{condid}, 1);
-
-            end
-
-            figure;
-            
-            imxm = squeeze(mean(obj.xs{condid}(trials, units, :), 1));
-            imxm = squeeze(mean(imxm, 1)) - 70;
-            imxm = imxm + randn(size(imxm))*10;
-            % imxm = (imxm - mean(imxm)) / std(imxm);
-            plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
-            
-            hold("on");
-            xline(0, HandleVisibility="off");
-            xline(1031, HandleVisibility="off");
-            xline(2062, HandleVisibility="off");
-            xline(3093, HandleVisibility="off");
-            
-            title("SUAenv/est" + obj.condinflabel(condid));
-            xlabel("Time (ms)");
-            ylabel("Amplitude (mv)");
-            xlim(timewindow);
-            
-            legend;
-
-        end
-
         function jRastrogram(obj, condid, timewindow, units, trials)
 
             if ~exist("timewindow", "var")
@@ -309,6 +272,7 @@ classdef jnwb < handle
             figure;
             subplot(2, 1, 1);
             tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
+            % tfr1e = squeeze(std(obj.pgx{tcond1, layerid}));
             
             for ik = 1:size(tfr1, 1)
             
@@ -338,17 +302,46 @@ classdef jnwb < handle
             
             xlabel("Time (ms)");
             subplot(2, 1, 2);
+            cls = zeros(5, 3);
+            cls(1, :) = [0 0 1];
+            cls(2, :) = [1 0 0];
+            cls(3, :) = [1 0.5 0];
+            cls(4, :) = [1 0 1];
+            cls(5, :) = [0 0.8 0.4];
             
             for fband = 1:5
             
                 tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
                 tfr1 = squeeze(mean(tfr1, 1));
                 tfr1 = smooth(tfr1, 10);
-                tfr1 = tfr1 / mean(tfr1(tbaseline));
-                plot(obj.tmap, 10*log10(tfr1), "DisplayName", obj.fbandlabels(fband), "LineWidth", 2);
+                baselinecrx = mean(tfr1(tbaseline));
+
+                tfr1 = tfr1 / baselinecrx;
+
+                ne1 = length(obj.fbands{fband});
+                ne2 = size(obj.pgx{tcond1, layerid}, 1);
+                tfr1e = squeeze(std(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :) / baselinecrx));
+                tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
+                tfr1e = smooth(tfr1e, 10);
+
+                cl = cls(fband, :);
+                y1s = 10*log10(tfr1);
+                plot(obj.tmap, y1s, "DisplayName", obj.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
+                hold("on");
+
+                stx = tfr1 + 2*tfr1e;
+                sty = tfr1 - 2*tfr1e;
+                stx(stx <= 0) = 1e-2;
+                sty(sty <= 0) = 1e-2;
+
+                stx = 10*log10(stx);
+                sty = 10*log10(sty);
+
+                patch([obj.tmap; obj.tmap(end:-1:1)], [stx; sty(end:-1:1)], cl, "EdgeColor", "none", "FaceColor", cl, "FaceAlpha", 0.5, "HandleVisibility", "off");
+
                 % ylim([0 20])
                 xlim(txlims);
-                hold("on");
+
                 xline(0, HandleVisibility="off");
                 xline(1031, HandleVisibility="off");
                 xline(2062, HandleVisibility="off");
@@ -365,9 +358,15 @@ classdef jnwb < handle
 
         end
 
-        function jLFPprobeINFO(obj, chx)
+        function jLFPprobeINFO(obj, chx, condx)
 
-            imglfp1 = squeeze(mean(obj.x{1}(:, chx, :), 1));
+            if ~exist("condx", "var")
+
+                condx = 1;
+
+            end
+
+            imglfp1 = squeeze(mean(obj.x{condx}(:, chx, :), 1));
         
             figure;
             subplot(4, 1, 1);

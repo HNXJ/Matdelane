@@ -38,6 +38,9 @@ classdef jnwb < handle
         tbandlabels = ["Fix", "S1d1", "S2d2", "S3d3", "S4d4"];
         fbandlabels = ["Theta(2-7Hz)", "Alpha(8-12Hz)", "Beta(14-30Hz)", "GammaL(32-80Hz)", "GammaH(80+Hz)"];
 
+        objectfile = "";
+        channelinfo = cell(1);
+
     end
     
     methods
@@ -60,6 +63,14 @@ classdef jnwb < handle
             [obj.cs, obj.xs] = jOGLOUnits(nwb, "omission_glo_passive", tpre, tpost, convFlag);
 
             obj.tmapsignal = linspace(-obj.tpre, obj.tpost, size(obj.xm{1}, 3));
+
+        end
+
+        function jSave(obj, path, filename)
+
+            filename = replace(filename, ["/", "\"], "");
+            obj.objectfile = path + "\" + filename + ".mat";
+            save(obj.objectfile, "obj", "-v7.3");
 
         end
 
@@ -272,6 +283,7 @@ classdef jnwb < handle
             figure;
             subplot(2, 1, 1);
             tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
+            % tfr1e = squeeze(std(obj.pgx{tcond1, layerid}));
             
             for ik = 1:size(tfr1, 1)
             
@@ -301,24 +313,55 @@ classdef jnwb < handle
             
             xlabel("Time (ms)");
             subplot(2, 1, 2);
+            cls = zeros(5, 3);
+            cls(1, :) = [0 0 1];
+            cls(2, :) = [1 0 0];
+            cls(3, :) = [1 0.5 0];
+            cls(4, :) = [1 0 1];
+            cls(5, :) = [0 0.8 0.4];
             
             for fband = 1:5
             
                 tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
                 tfr1 = squeeze(mean(tfr1, 1));
                 tfr1 = smooth(tfr1, 10);
-                tfr1 = tfr1 / mean(tfr1(tbaseline));
-                plot(obj.tmap, 10*log10(tfr1), "DisplayName", obj.fbandlabels(fband), "LineWidth", 2);
+                baselinecrx = mean(tfr1(tbaseline));
+
+                tfr1 = tfr1 / baselinecrx;
+
+                ne1 = length(obj.fbands{fband}); % spectral res. bands
+                ne2 = size(obj.pgx{tcond1, layerid}, 1); % trial count
+                ne3 = size(obj.x{tcond1}, 2); % channel count
+
+                tfr1e = squeeze(std(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :) / baselinecrx));
+                tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
+                tfr1e = smooth(tfr1e, 10);
+
+                cl = cls(fband, :);
+                y1s = 10*log10(tfr1);
+                plot(obj.tmap, y1s, "DisplayName", obj.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
+                hold("on");
+
+                stx = tfr1 + 2*tfr1e;
+                sty = tfr1 - 2*tfr1e;
+                stx(stx <= 0) = 1e-2;
+                sty(sty <= 0) = 1e-2;
+
+                stx = 10*log10(stx);
+                sty = 10*log10(sty);
+
+                patch([obj.tmap; obj.tmap(end:-1:1)], [stx; sty(end:-1:1)], cl, "EdgeColor", "none", "FaceColor", cl, "FaceAlpha", 0.5, "HandleVisibility", "off");
+
                 % ylim([0 20])
                 xlim(txlims);
-                hold("on");
+
                 xline(0, HandleVisibility="off");
                 xline(1031, HandleVisibility="off");
                 xline(2062, HandleVisibility="off");
                 xline(3093, HandleVisibility="off");
                 xlabel("Times (ms)");
                 ylabel("Power change (dB)");
-                title("Power change from fixation baseline");
+                title("Power change from fixation baseline (+-2Se)");
             
             end
             
