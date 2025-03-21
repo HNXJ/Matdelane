@@ -70,7 +70,7 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -544,7 +544,8 @@ q3.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_layer);
+% q3.jCalcTFRs(channel_in_layer);
+q3.jCalcTFRs(channel_in_layer, 1);
 
 %% E4.1: Save object
 
