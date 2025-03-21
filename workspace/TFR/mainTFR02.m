@@ -68,6 +68,10 @@ temp_filename = temp_filename(6:end-4);
 temp_filename = temp_filename + q1.areainf;
 q1.jSave("OGLOobj", temp_filename);
 
+%% E4.2: Load if object exists
+
+q1 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
+
 %% E.5: Visualize TFR
 
 q1.jTFRplot(3, 4, q2.tbands{2}(end-10:end), [1000 3000]);
@@ -317,7 +321,7 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj");
+q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
