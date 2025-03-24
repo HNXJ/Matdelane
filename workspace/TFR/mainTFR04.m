@@ -485,11 +485,15 @@ channel_in_layer.mid = 39:43;
 channel_in_layer.sup = 21:38;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
+q3.channelinfo{1} = channel_in_layer;
+
 channel_in_layer2 = struct(); % V2
 channel_in_layer2.sup = 109:121;
 channel_in_layer2.mid = 104:107;
 channel_in_layer2.deep = 80:103;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
+
+q3.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
@@ -503,7 +507,7 @@ q3.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_layer);
+q3.jCalcTFRs(channel_in_layer, 1);
 
 %% E.5: Visualize TFR
 
