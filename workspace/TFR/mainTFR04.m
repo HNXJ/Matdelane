@@ -511,15 +511,15 @@ q3.jCalcTFRs(channel_in_layer, 1);
 
 %% E.5: Visualize TFR
 
-q3.jTFRplot(9, 4, q3.tbands{1}(end-10:end));
+q3.jTFRplot(11, 4, q3.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q3.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q3.jCalcPEV(1, [2, 6]);
 
 %% E.7: Visualize PEV
 
-q3.jPEVplot(expvars, layerinf, [1 5]);
+q3.jPEVplot(expvars, layerinf, [2 6]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
@@ -527,7 +527,7 @@ q3.jPEVplot(expvars, layerinf, [1 5]);
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [2, 3, 4];
 
 layerinf2 = q3.layeridlabel(layerid) + " layer";
@@ -535,9 +535,9 @@ expvars2 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, q3.tbands{3}); % S2d2
-    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, q3.tbands{4}); % S3d3
-    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, q3.tbands{5}); % S4d4
+    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, [q3.tbands{2}, q3.tbands{3}]); % S2d2
+    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, [q3.tbands{3}, q3.tbands{4}]); % S3d3
+    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, [q3.tbands{4}, q3.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -550,13 +550,16 @@ for fband = 1:5
     
     groupIDs = [ones(1, N1), ones(1, N2)*2, ones(1, N3)*3];
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    % expv(p > 0.05) = 1e-3;
+    expv = expv .* (1 - p);
+    % expv = expv .* (1 - p*2) .* (p < 0.5);
     expvars2{fband} = squeeze(expv)*100;
 
 end
 
 %% E.10: Omission PEV (Positional, BX2/BX3/BX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [6, 7, 8];
 
 layerinf3 = q3.layeridlabel(layerid) + " layer";
@@ -564,9 +567,9 @@ expvars3 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, q3.tbands{3}); % S2d2
-    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, q3.tbands{4}); % S3d3
-    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, q3.tbands{5}); % S4d4
+    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, [q3.tbands{2}, q3.tbands{3}]); % S2d2
+    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, [q3.tbands{3}, q3.tbands{4}]); % S3d3
+    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, [q3.tbands{4}, q3.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -579,13 +582,16 @@ for fband = 1:5
     
     groupIDs = [ones(1, N1), ones(1, N2)*2, ones(1, N3)*3];
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    % expv(p > 0.05) = 1e-3;
+    expv = expv .* (1 - p);
+    % expv = expv .* (1 - p*2) .* (p < 0.5);
     expvars3{fband} = squeeze(expv)*100;
 
 end
 
 %% E.11: Omission PEV (Positional, RX2/RX3/RX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [10, 11, 12];
 
 layerinf4 = q3.layeridlabel(layerid) + " layer";
@@ -593,9 +599,9 @@ expvars4 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, q3.tbands{3}); % S2d2
-    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, q3.tbands{4}); % S3d3
-    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, q3.tbands{5}); % S4d4
+    x1 = q3.pgx{condinf(1), layerid}(:, q3.fbands{fband}, [q3.tbands{2}, q3.tbands{3}]); % S2d2
+    x2 = q3.pgx{condinf(2), layerid}(:, q3.fbands{fband}, [q3.tbands{3}, q3.tbands{4}]); % S3d3
+    x3 = q3.pgx{condinf(3), layerid}(:, q3.fbands{fband}, [q3.tbands{4}, q3.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -608,6 +614,9 @@ for fband = 1:5
     
     groupIDs = [ones(1, N1), ones(1, N2)*2, ones(1, N3)*3];
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    % expv(p > 0.05) = 1e-3;
+    expv = expv .* (1 - p);
+    % expv = expv .* (1 - p*2) .* (p < 0.5);
     expvars4{fband} = squeeze(expv)*100;
 
 end
@@ -615,7 +624,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = q3.tmap(q3.tbands{2});
+ntmap = q3.tmap([q3.tbands{3}, q3.tbands{4}]);
 
 for fband = 1:5
 
@@ -641,7 +650,7 @@ sgtitle("Area:" + q3.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.13: PEV plot BX
 
 figure;
-ntmap = q3.tmap(q3.tbands{2});
+ntmap = q3.tmap([q3.tbands{3}, q3.tbands{4}]);
 
 for fband = 1:5
 
@@ -667,7 +676,7 @@ sgtitle("Area:" + q3.areainf + " posOmission/Bx/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.14: PEV plot RX
 
 figure;
-ntmap = q3.tmap(q3.tbands{2});
+ntmap = q3.tmap([q3.tbands{3}, q3.tbands{4}]);
 
 for fband = 1:5
 
@@ -683,6 +692,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q3.fbandlabels(fband));
 

@@ -634,6 +634,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q3.fbandlabels(fband));
 
@@ -660,6 +662,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q3.fbandlabels(fband));
 
@@ -686,6 +690,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q3.fbandlabels(fband));
 

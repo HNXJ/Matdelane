@@ -70,7 +70,7 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-23081", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -92,7 +92,7 @@ q1.jPEVplot(expvars, layerinf, [1 5]);
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [2, 3, 4];
 
 layerinf2 = q1.layeridlabel(layerid) + " layer";
@@ -100,9 +100,9 @@ expvars2 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, q1.tbands{3}); % S2d2
-    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, q1.tbands{4}); % S3d3
-    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, q1.tbands{5}); % S4d4
+    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, [q1.tbands{2}, q1.tbands{3}]); % S2d2
+    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, [q1.tbands{3}, q1.tbands{4}]); % S3d3
+    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, [q1.tbands{4}, q1.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -121,7 +121,7 @@ end
 
 %% E.10: Omission PEV (Positional, BX2/BX3/BX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [6, 7, 8];
 
 layerinf3 = q1.layeridlabel(layerid) + " layer";
@@ -129,9 +129,9 @@ expvars3 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, q1.tbands{3}); % S2d2
-    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, q1.tbands{4}); % S3d3
-    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, q1.tbands{5}); % S4d4
+    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, [q1.tbands{2}, q1.tbands{3}]); % S2d2
+    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, [q1.tbands{3}, q1.tbands{4}]); % S3d3
+    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, [q1.tbands{4}, q1.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -150,7 +150,7 @@ end
 
 %% E.11: Omission PEV (Positional, RX2/RX3/RX4)
 
-layerid = 1;
+layerid = 4;
 condinf = [10, 11, 12];
 
 layerinf4 = q1.layeridlabel(layerid) + " layer";
@@ -158,9 +158,9 @@ expvars4 = cell(1, 5);
 
 for fband = 1:5
 
-    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, q1.tbands{3}); % S2d2
-    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, q1.tbands{4}); % S3d3
-    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, q1.tbands{5}); % S4d4
+    x1 = q1.pgx{condinf(1), layerid}(:, q1.fbands{fband}, [q1.tbands{2}, q1.tbands{3}]); % S2d2
+    x2 = q1.pgx{condinf(2), layerid}(:, q1.fbands{fband}, [q1.tbands{3}, q1.tbands{4}]); % S3d3
+    x3 = q1.pgx{condinf(3), layerid}(:, q1.fbands{fband}, [q1.tbands{4}, q1.tbands{5}]); % S4d4
     
     [N1, nF, nT] = size(x1);
     N2 = size(x2, 1);
@@ -180,7 +180,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = q1.tmap(q1.tbands{2});
+ntmap = q1.tmap([q1.tbands{3}, q1.tbands{4}]);
 
 for fband = 1:5
 
@@ -196,6 +196,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q1.fbandlabels(fband));
 
@@ -206,7 +208,7 @@ sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.13: PEV plot BX
 
 figure;
-ntmap = q1.tmap(q1.tbands{2});
+ntmap = q1.tmap([q1.tbands{3}, q1.tbands{4}]);
 
 for fband = 1:5
 
@@ -222,6 +224,8 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q1.fbandlabels(fband));
 
@@ -232,7 +236,7 @@ sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.14: PEV plot RX
 
 figure;
-ntmap = q1.tmap(q1.tbands{2});
+ntmap = q1.tmap([q1.tbands{3}, q1.tbands{4}]);
 
 for fband = 1:5
 
@@ -248,12 +252,14 @@ for fband = 1:5
     plot(ntmap, sty, "Color", cl);
     patch([ntmap', ntmap(end:-1:1)'], [stx;sty(end:-1:1)], cl);
     xline(500);
+    xline(2000);
+    xlim([min(ntmap), max(ntmap)]);
     xlabel("Time(ms)");ylabel("PEV(%)");
     title(q1.fbandlabels(fband));
 
 end
 
-sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(q1.freqres) + "Hz/ovlrp=." + num2str(q2.overlap) + " " + layerinf4);
+sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(q1.freqres) + "Hz/ovlrp=." + num2str(q1.overlap) + " " + layerinf4);
 
 %% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
