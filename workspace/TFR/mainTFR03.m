@@ -42,9 +42,11 @@ channel_in_layer.mid = 77:83;
 channel_in_layer.sup = 84:112;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
+q1.channelinfo{1} = channel_in_layer;
+
 %% E.2: LFP info plot
 
-q1.jLFPprobeINFO(channel_in_layer.goodch);
+q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
 
 %% E.3: Evaluate vFLIP
 
@@ -52,11 +54,19 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer);
+% q1.jCalcTFRs(channel_in_layer);
+q1.jCalcTFRs(channel_in_layer, 1);
+
+%% E4.1: Save object
+
+temp_filename = char(q1.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q1.areainf;
+q1.jSave("OGLOobj", temp_filename);
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+q1.jTFRplot(11, 4, q1.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 

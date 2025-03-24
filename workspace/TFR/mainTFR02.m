@@ -70,13 +70,13 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-23081", "obj").obj;
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(3, 4, q2.tbands{2}(end-10:end), [1000 3000]);
-% q1.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
-% q1.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
+q1.jTFRplot(3, 4, q1.tbands{2}(end-10:end), [1000 3000]);
+% q1.jTFRplot(3, 3, q1.tbands{2}(end-6:end), [1000 3000]);
+% q1.jTFRplot(3, 4, q1.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
@@ -556,7 +556,7 @@ q3.jSave("OGLOobj", temp_filename);
 
 %% E.5: Visualize TFR
 
-q3.jTFRplot(12, 4, q3.tbands{1}(end-10:end));
+q3.jTFRplot(10, 4, q3.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
