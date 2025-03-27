@@ -88,6 +88,11 @@ q1.jPEVplot(expvars, layerinf, [1 5]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
+% TODO: Bar plotter
+% TODO: Save for each
+
+% TODO: 10PFCmain.m file (and other areas)
+
 % q1.jcalcPEVs();
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)
