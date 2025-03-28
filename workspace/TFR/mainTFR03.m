@@ -497,7 +497,7 @@ q3.jMUAplot(9, [1000 3000]);
 
 %% E.0.3: SUA plot
 
-q3.jSUAplot(9, [100 4000], 100:120);
+q3.jSUAplot(9, [100 4000], 55:58);
 
 %% E.1: Channel and layer specs
 
@@ -529,6 +529,7 @@ q3.jVFLIP(channel_in_layer2.goodch);
 %% E.4: TFR calculations all trials
 
 q3.jCalcTFRs(channel_in_layer, 1);
+q3.jCalcTFRs(channel_in_layer2, 1);
 
 %% E4.1: Save object
 

@@ -65,7 +65,7 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230818.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230823.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -491,7 +491,7 @@ nwbFile = nwbPath + nwbFiles{4};
 
 %% E.0.1: jNWB object
 
-q3 = jnwb(nwbFile, "V1-V2/", 500, 4250, 2, 0);
+q3 = jnwb(nwbFile, "V2-V3d/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
@@ -503,7 +503,7 @@ q3.jSUAplot(9, [100 4000], 100:120);
 
 %% E.1: Channel and layer specs
 
-channel_in_layer = struct(); % V1
+channel_in_layer = struct(); % V2
 channel_in_layer.deep = [45:49, 51, 53:74];
 channel_in_layer.mid = 39:43;
 channel_in_layer.sup = 21:38;
@@ -511,7 +511,7 @@ channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_i
 
 q3.channelinfo{1} = channel_in_layer;
 
-channel_in_layer2 = struct(); % V2
+channel_in_layer2 = struct(); % V3d
 channel_in_layer2.sup = 109:121;
 channel_in_layer2.mid = 104:107;
 channel_in_layer2.deep = 80:103;
@@ -542,7 +542,7 @@ q3.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q3 = load("OGLOobj\sub-C31o_ses-230.mat", "obj").obj;
+q3 = load("OGLOobj\sub-C31o_ses-230823.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
