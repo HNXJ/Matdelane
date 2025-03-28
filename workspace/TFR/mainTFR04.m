@@ -70,9 +70,9 @@ q1 = load("OGLOobj\sub-C31o_ses-230823.mat", "obj").obj;
 %% E.5: Visualize TFR
 
 q1.jTFRplot(9, 4, q1.tbands{1}(end-10:end));
-q1.jTFRplot(10, 4, q1.tbands{1}(end-10:end));
-q1.jTFRplot(11, 4, q1.tbands{1}(end-10:end));
-q1.jTFRplot(12, 4, q1.tbands{1}(end-10:end));
+% q1.jTFRplot(10, 4, q1.tbands{1}(end-10:end));
+% q1.jTFRplot(11, 4, q1.tbands{1}(end-10:end));
+% q1.jTFRplot(12, 4, q1.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
