@@ -80,7 +80,7 @@ q1.jTFRplot(3, 4, q1.tbands{2}(end-10:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q1.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q1.jCalcPEV(4, [1, 5]);
 
 %% E.7: Visualize PEV
 
@@ -89,6 +89,24 @@ q1.jPEVplot(expvars, layerinf, [1 5]);
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
 % TODO: Bar plotter
+% TODO: X-Y 2D TFR scatter for AX, BX, RX; A-B; A-G; B-G
+
+[a1, a2] = q1.jTFR2dScatters(3, 7, 4, q1.tbands{2}(end-10:end), [1000 3000]);
+
+timew = [q1.tbands{1}, q1.tbands{2}, q1.tbands{3}, q1.tbands{4}, q1.tbands{5}];
+x1 = a1(2, timew);
+x2 = a2(2, timew);
+clx = [ones(size(q1.tbands{1})), 2*ones(size(q1.tbands{2})), ...
+    3*ones(size(q1.tbands{3})), 4*ones(size(q1.tbands{4})), 5*ones(size(q1.tbands{5}))];
+
+x1 = decimate(x1, 1);
+x2 = decimate(x2, 1);
+
+% clx = linspace(q1.tmap(1), q1.tmap(end), length(x1));
+
+scatter(x1, x2, clx*10, clx, "filled");
+colorbar;
+
 % TODO: Save for each
 
 % TODO: 10PFCmain.m file (and other areas)

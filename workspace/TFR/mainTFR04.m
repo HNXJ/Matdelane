@@ -42,6 +42,8 @@ channel_in_layer.mid = 58:64;
 channel_in_layer.deep = 65:112;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
+q1.channelinfo{1} = channel_in_layer;
+
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch);
@@ -52,7 +54,18 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer);
+q1.jCalcTFRs(channel_in_layer, 1);
+
+%% E4.1: Save object
+
+temp_filename = char(q1.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q1.areainf;
+q1.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q1 = load("OGLOobj\sub-C31o_ses-230818.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -276,7 +289,18 @@ q2.jVFLIP(1:2:128, 1:1000);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer);
+q2.jCalcTFRs(channel_in_layer, 1);
+
+%% E4.1: Save object
+
+temp_filename = char(q2.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q2.areainf;
+q2.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q2 = load("OGLOobj\sub-C31o_ses-230.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -508,6 +532,17 @@ q3.jVFLIP(channel_in_layer2.goodch);
 %% E.4: TFR calculations all trials
 
 q3.jCalcTFRs(channel_in_layer, 1);
+
+%% E4.1: Save object
+
+temp_filename = char(q3.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q3.areainf;
+q3.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q3 = load("OGLOobj\sub-C31o_ses-230.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 

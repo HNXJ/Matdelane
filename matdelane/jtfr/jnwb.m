@@ -29,6 +29,7 @@ classdef jnwb < handle
         fbands = 0;
 
         pgx = {};
+        pgx2 = {};
         leakage = 0;
         freqlims = 0;
         overlap = 0;
@@ -74,7 +75,7 @@ classdef jnwb < handle
 
         end
 
-        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel)
+        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel) % TODO concat
 
             if ~exist("tfrByChannel", "var")
 
@@ -92,7 +93,16 @@ classdef jnwb < handle
 
             end
 
-            obj.pgx = pgxt;
+            if sum(size(obj.pgx)) > 0
+
+                obj.pgx2 = pgxt;
+
+            else
+            
+                obj.pgx = pgxt;
+
+            end
+
             obj.freqlims = xinfo.freqlims;
             obj.leakage = xinfo.leakage;
 
@@ -521,6 +531,67 @@ classdef jnwb < handle
             
             flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.04, 'plot_result', true);
         
+        end
+
+        function [tfr1x, tfr2x] = jTFR2dScatters(obj, tcond1, tcond2, layerid, tbaseline, txlims) % TODO
+
+            if ~exist("tbaseline", "var")
+            
+                tbaseline = obj.tbands{1};
+
+            end
+
+            if ~exist("txlims", "var")
+            
+                txlims = [obj.tmap(1) obj.tmap(end)];
+
+            end
+           
+            tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
+            tfr2 = squeeze(mean(obj.pgx{tcond2, layerid}, 1));
+            
+            for ik = 1:size(tfr1, 1)
+            
+                tfr1(ik, :) = tfr1(ik, :) / mean(tfr1(ik, tbaseline));
+            
+            end
+                        
+            for ik = 1:size(tfr2, 1)
+            
+                tfr2(ik, :) = tfr2(ik, :) / mean(tfr2(ik, tbaseline));
+            
+            end
+
+            tfr1x = zeros([5, size(tfr1, 2)]);
+            tfr2x = zeros([5, size(tfr2, 2)]);
+
+            cls = zeros(5, 3);
+            cls(1, :) = [0 0 1];
+            cls(2, :) = [1 0 0];
+            cls(3, :) = [1 0.5 0];
+            cls(4, :) = [1 0 1];
+            cls(5, :) = [0 0.8 0.4];
+            
+            for fband = 1:5
+            
+                tfr1t = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
+                tfr1t = squeeze(mean(tfr1t, 1));
+                tfr1t = smooth(tfr1t, 10);
+                baselinecrx = mean(tfr1t(tbaseline));
+
+                tfr1t = tfr1t / baselinecrx;
+                tfr1x(fband, :) = tfr1t;
+
+                tfr2t = squeeze(mean(obj.pgx{tcond2, layerid}(:, obj.fbands{fband}, :), 1));
+                tfr2t = squeeze(mean(tfr2t, 1));
+                tfr2t = smooth(tfr2t, 10);
+                baselinecrx = mean(tfr2t(tbaseline));
+
+                tfr2t = tfr2t / baselinecrx;
+                tfr2x(fband, :) = tfr2t;
+
+            end
+           
         end
 
     end
