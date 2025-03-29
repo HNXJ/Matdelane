@@ -543,7 +543,7 @@ q3.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q3 = load("OGLOobj\sub-C31o_ses-230823.mat", "obj").obj;
+q3 = load("OGLOobj\sub-C31o_ses-230823V2-V3d.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
