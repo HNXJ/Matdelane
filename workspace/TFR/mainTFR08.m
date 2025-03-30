@@ -39,7 +39,7 @@ q1.jSUAplot(9, [100 4000], 100:120);
 channel_in_layer = struct();
 channel_in_layer.deep = 1:45;
 channel_in_layer.mid = 46:50;
-channel_in_layer.sup = [51:100, 102:2:128];
+channel_in_layer.sup = 52:2:90;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -56,7 +56,7 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 q1.jCalcTFRs(channel_in_layer, 1);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q1.nwbFile);
 temp_filename = temp_filename(6:end-4);

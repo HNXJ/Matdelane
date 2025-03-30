@@ -16,7 +16,7 @@ disp("Toolbox setup done.");
 
 %% Ses: sub-C31o_ses-230831 (Probes A,B,C)
 
-%% Probe A (PFC, laminar)
+%% Probe A (FEF, laminar)
 
 %% E.0: Load NWB
 

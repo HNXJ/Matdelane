@@ -56,7 +56,7 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 q1.jCalcTFRs(channel_in_layer, 1);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q1.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -65,11 +65,11 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230830.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230830PFC.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+q1.jTFRplot(9, 4, q1.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 
