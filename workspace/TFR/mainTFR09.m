@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(9, [100 4000]);
 
 %% E.0.3: SUA plot
 
@@ -37,10 +37,12 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 1:45;
-channel_in_layer.mid = 46:50;
-channel_in_layer.sup = [51:100, 102:2:128];
+channel_in_layer.deep = 1:2:45;
+channel_in_layer.mid = 45:2:51;
+channel_in_layer.sup = 53:120;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+
+q1.channelinfo{1} = channel_in_layer;
 
 %% E.2: LFP info plot
 

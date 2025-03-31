@@ -10,6 +10,9 @@ q2 = load("OGLOobj\sub-C31o_ses-230818PFC.mat", "obj").obj;
 q1.jTFRplot(9, 4, q1.tbands{2}(end-10:end-5));
 q2.jTFRplot(9, 4, q2.tbands{2}(end-10:end-5));
 
+%% TFR barplot
+
+
 
 %%
 
