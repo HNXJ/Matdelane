@@ -540,7 +540,7 @@ q3.jVFLIP(channel_in_layer2.goodch);
 q3.jCalcTFRs(channel_in_laye, 1);
 q3.jCalcTFRs(channel_in_laye, 2);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q3.nwbFile);
 temp_filename = temp_filename(6:end-4);
