@@ -511,19 +511,19 @@ q3.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct(); % V3d
-channel_in_layer.deep = [26:43, 45:48, 49:2:55];
-channel_in_layer.mid = 21:25;
-channel_in_layer.sup = 1:20;
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = 1:37;
+channel_in_layer.mid = 38:41;
+channel_in_layer.sup = [42:43, 45:2:53, 54:57];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % V4
-channel_in_layer2.sup = [105:107, 109:128];
-channel_in_layer2.mid = 101:104;
-channel_in_layer2.deep = 70:100;
-channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
+channel_in_layer2.deep = 117:128;
+channel_in_layer2.mid = 113:116;
+channel_in_layer2.sup = [90:104, 105:107, 109:112];
+channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q3.channelinfo{1} = channel_in_layer;
-q3.channelinfo{2} = channel_in_laye2;
+q3.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
@@ -537,8 +537,8 @@ q3.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_laye, 1);
-q3.jCalcTFRs(channel_in_laye, 2);
+q3.jCalcTFRs(channel_in_layer, 1);
+q3.jCalcTFRs(channel_in_layer2, 1);
 
 % E4.1: Save object
 
