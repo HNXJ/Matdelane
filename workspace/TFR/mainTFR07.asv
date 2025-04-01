@@ -14,17 +14,17 @@ nwbFiles = {dir(nwbPath).name};
 nwbFiles = nwbFiles(endsWith(nwbFiles, ".nwb"));
 disp("Toolbox setup done.");
 
-%% Ses: sub-C31o_ses-230825 (Probes A,B,C)
+%% Ses: sub-C31o_ses-230831 (Probes A,B,C)
 
-%% Probe A (PFC, laminar)
+%% Probe A (FEF, laminar)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{5};
+nwbFile = nwbPath + nwbFiles{7};
 
 %% E.0.1: jNWB object
 
-q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
+q1 = jnwb(nwbFile, "FEF/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
@@ -37,10 +37,10 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = [73:111, 112:2:128];
-channel_in_layer.mid = 67:72;
-channel_in_layer.sup = [17:38, 39:65];
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = 1:45;
+channel_in_layer.mid = 46:50;
+channel_in_layer.sup = [51:100, 102:2:128];
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;
 
@@ -56,7 +56,7 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 q1.jCalcTFRs(channel_in_layer, 1);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q1.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -65,11 +65,11 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230830.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, q1.tbands{1}(end-5:end));
+q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 
@@ -248,11 +248,11 @@ end
 
 sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(q1.freqres) + "Hz/ovlrp=." + num2str(q2.overlap) + " " + layerinf4);
 
-%% Probe B (MT/MST, It seems to be majorly MT due to strong gamma response)
+%% Probe B (V4/MT, It seems to be majorly MT due to strong gamma response)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{5};
+nwbFile = nwbPath + nwbFiles{7};
 
 %% E.0.1: jNWB object
 
@@ -269,7 +269,7 @@ q2.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer identification
 
 channel_in_layer = struct(); % MT
-channel_in_layer.deep = 9:2:15;
+channel_in_layer.deep = 1:2:15;
 channel_in_layer.mid = 27;
 channel_in_layer.sup = 31:2:37;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
@@ -307,7 +307,7 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230825MT-MST.mat", "obj").obj;
+q2 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -490,11 +490,11 @@ end
 
 sgtitle("Area:" + q2.areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(q2.freqres) + "Hz/ovlrp=." + num2str(q2.overlap) + " " + layerinf4);
 
-%% Probe C (V4/TEO)
+%% Probe C (V1/V2, It seems that it consists only of one area, to be identified, highly foveal)
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{5};
+nwbFile = nwbPath + nwbFiles{7};
 
 %% E.0.1: jNWB object
 
@@ -502,7 +502,7 @@ q3 = jnwb(nwbFile, "V4-TEO/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
-q3.jMUAplot(9, [100 4000]);
+q3.jMUAplot(9, [1000 3000]);
 
 %% E.0.3: SUA plot
 
@@ -523,7 +523,7 @@ channel_in_layer2.deep = 70:100;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q3.channelinfo{1} = channel_in_layer;
-q3.channelinfo{2} = channel_in_layer2;
+q3.channelinfo{2} = channel_in_laye2;
 
 %% E.2: LFP info plot
 
@@ -537,8 +537,8 @@ q3.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_layer, 1);
-q3.jCalcTFRs(channel_in_layer2, 1);
+q3.jCalcTFRs(channel_in_laye, 1);
+q3.jCalcTFRs(channel_in_laye, 2);
 
 %% E4.1: Save object
 
@@ -549,7 +549,7 @@ q3.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q3 = load("OGLOobj\sub-C31o_ses-230825.mat", "obj").obj;
+q3 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 

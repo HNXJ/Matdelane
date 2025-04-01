@@ -298,7 +298,7 @@ q2.jVFLIP(1:2:128, 1:1000);
 q2.jCalcTFRs(channel_in_layer, 1);
 q2.jCalcTFRs(channel_in_layer2, 1);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q2.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -307,7 +307,7 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230825.mat", "obj").obj;
+q2 = load("OGLOobj\sub-C31o_ses-230825MT-MST.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
@@ -502,7 +502,7 @@ q3 = jnwb(nwbFile, "V4-TEO/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
-q3.jMUAplot(9, [1000 3000]);
+q3.jMUAplot(9, [100 4000]);
 
 %% E.0.3: SUA plot
 
@@ -540,7 +540,7 @@ q3.jVFLIP(channel_in_layer2.goodch);
 q3.jCalcTFRs(channel_in_layer, 1);
 q3.jCalcTFRs(channel_in_layer2, 1);
 
-%% E4.1: Save object
+% E4.1: Save object
 
 temp_filename = char(q3.nwbFile);
 temp_filename = temp_filename(6:end-4);
