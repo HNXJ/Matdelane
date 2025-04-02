@@ -64,6 +64,7 @@ q1.jVFLIP(channel_in_layer2.goodch);
 %% E.4: TFR calculations all trials
 
 q1.jCalcTFRs(channel_in_layer, 1);
+q1.jCalcTFRs(channel_in_layer2, 1);
 
 % E4.1: Save object
 
