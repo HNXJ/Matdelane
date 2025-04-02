@@ -16,50 +16,68 @@ disp("Toolbox setup done.");
 
 %% Ses: sub-V198o_ses-230714 (Probes A,B)
 
-%% Probe A (PFC, laminar)
+%% Probe A (V1-V2, laminar)
 
 %% E.0: Load NWB
 
 nwbFile = nwbPath + nwbFiles{13};
-nwb = nwbRead(nwbFile);
-disp(length(nwb.general_extracellular_ephys.keys()));
 
-layeridlabel = ["deep", "mid", "sup"];
-areainf = "PFC/";
+%% E.0.1: jNWB object
 
-condinflabel = ["AAAB", "AXAB", "AAXB", "AAAX", "BBBA", "BXBA", "BBXA",...
-    "BBBX", "RRRR", "RXRR", "RRXR", "RRRX"];
+q1 = jnwb(nwbFile, "V1-V2/", 500, 4250, 0, 0);
 
-%% E.1: Load LFP probeA PFC
+%% E.0.2: MUA plot
 
-[c, x] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0);
-disp(c{1}.session);
+q1.jMUAplot(7, [-500 4000]);
 
-%% E1.1: MUAe plots
+%% E.0.3: SUA plot
 
-[cm, xm] = jOGLOSignals(nwb, "omission_glo_passive", 500, 4000, 0, "muae");
-disp(cm{1}.session);
+q1.jSUAplot(9, [100 4000], 100:120);
 
-condid = 12;
-figure;
+%% E.1: Channel and layer specs
 
-imxm = squeeze(mean(xm{condid}, 1));
-imxm = squeeze(mean(imxm, 1));
-imxm = (imxm - mean(imxm)) / std(imxm);
-plot(linspace(-500, 4000, 5000), imxm, "DisplayName", areainf);
+channel_in_layer = struct();
+channel_in_layer.deep = 1:45;
+channel_in_layer.mid = 46:50;
+channel_in_layer.sup = 52:2:90;
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
-hold("on");
-xline(0, HandleVisibility="off");
-xline(1031, HandleVisibility="off");
-xline(2062, HandleVisibility="off");
-xline(3093, HandleVisibility="off");
+q1.channelinfo{1} = channel_in_layer;
 
-title("MUAenv/Zsc/" + condinflabel(condid));
-xlabel("Time (ms)");
-ylabel("Z-score");
-xlim([-500 4000]);
+%% E.2: LFP info plot
 
-legend;
+q1.jLFPprobeINFO(channel_in_layer.goodch);
+
+%% E.3: Evaluate vFLIP
+
+q1.jVFLIP(channel_in_layer.goodch);
+
+%% E.4: TFR calculations all trials
+
+q1.jCalcTFRs(channel_in_layer, 1);
+
+% E4.1: Save object
+
+temp_filename = char(q1.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q1.areainf;
+q1.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q1 = load("OGLOobj\sub-C31o_ses-230714.mat", "obj").obj;
+
+%% E.5: Visualize TFR
+
+q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+
+%% E.6: PEV calculations all trials
+
+[expvars, layerinf] = q1.jCalcPEV(1, [1, 5]);
+
+%% E.7: Visualize PEV
+
+q1.jPEVplot(expvars, layerinf, [1 5]);
 
 %% E.2: Channel and layer identification
 
