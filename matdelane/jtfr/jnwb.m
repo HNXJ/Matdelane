@@ -381,11 +381,17 @@ classdef jnwb < handle
 
         end
 
-        function jLFPprobeINFO(obj, chx, condx)
+        function jLFPprobeINFO(obj, chx, condx, txlims)
 
             if ~exist("condx", "var")
 
                 condx = 1;
+
+            end
+
+            if ~exist("txlims", "var")
+
+                txlims = [0, obj.tpost];
 
             end
 
@@ -394,6 +400,8 @@ classdef jnwb < handle
             figure;
             subplot(4, 1, 1);
             imagesc(imglfp1, "YData", chx);
+            xlim(txlims);
+            % clim([-2.5 2.5]);
             xlabel("Time (ms)");
             ylabel("Channel");
             title("LFP average by trial");
@@ -401,10 +409,13 @@ classdef jnwb < handle
             imglfp2 = smoothdata2(imglfp1, "gaussian", {10, 20});
             imgcsd1 = (-imglfp2(1:end-2, :) + 2*imglfp2(2:end-1, :) - imglfp2(3:end, :));
             imgcsd1 =  smoothdata2(imgcsd1, "gaussian", {7, 20});
+
             % imgcsd1 = (imgcsd1);
         
             subplot(4, 1, 2);
             imagesc(imgcsd1, "YData", chx);
+            xlim(txlims);
+            clim([-2.5 2.5]);
             xlabel("Time (ms)");
             ylabel("Channel");%clim([-1 1]);
             title("CSD average by trial");

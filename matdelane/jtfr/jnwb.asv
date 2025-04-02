@@ -381,11 +381,17 @@ classdef jnwb < handle
 
         end
 
-        function jLFPprobeINFO(obj, chx, condx)
+        function jLFPprobeINFO(obj, chx, condx, txlims)
 
             if ~exist("condx", "var")
 
                 condx = 1;
+
+            end
+
+            if ~exist("txlims", "var")
+
+                txlims = [0, obj.tpost];
 
             end
 
@@ -394,6 +400,8 @@ classdef jnwb < handle
             figure;
             subplot(4, 1, 1);
             imagesc(imglfp1, "YData", chx);
+            xlim(txlims);
+            clim([-2.5 ])
             xlabel("Time (ms)");
             ylabel("Channel");
             title("LFP average by trial");
@@ -401,10 +409,12 @@ classdef jnwb < handle
             imglfp2 = smoothdata2(imglfp1, "gaussian", {10, 20});
             imgcsd1 = (-imglfp2(1:end-2, :) + 2*imglfp2(2:end-1, :) - imglfp2(3:end, :));
             imgcsd1 =  smoothdata2(imgcsd1, "gaussian", {7, 20});
+
             % imgcsd1 = (imgcsd1);
         
             subplot(4, 1, 2);
             imagesc(imgcsd1, "YData", chx);
+            xlim(txlims);
             xlabel("Time (ms)");
             ylabel("Channel");%clim([-1 1]);
             title("CSD average by trial");
@@ -533,7 +543,7 @@ classdef jnwb < handle
         
         end
 
-        function jTFR2dScatters(obj, tcond1, tcond2, layerid, tbaseline, txlims) % TODO
+        function [tfr1x, tfr2x] = jTFR2dScatters(obj, tcond1, tcond2, layerid, tbaseline, txlims) % TODO
 
             if ~exist("tbaseline", "var")
             
@@ -549,7 +559,6 @@ classdef jnwb < handle
            
             tfr1 = squeeze(mean(obj.pgx{tcond1, layerid}, 1));
             tfr2 = squeeze(mean(obj.pgx{tcond2, layerid}, 1));
-            % tfr1e = squeeze(std(obj.pgx{tcond1, layerid}));
             
             for ik = 1:size(tfr1, 1)
             
@@ -566,11 +575,6 @@ classdef jnwb < handle
             tfr1x = zeros([5, size(tfr1, 2)]);
             tfr2x = zeros([5, size(tfr2, 2)]);
 
-            figure;
-            subplot(2, 1, 1);
-            
-            xlabel("Time (ms)");
-            subplot(2, 1, 2);
             cls = zeros(5, 3);
             cls(1, :) = [0 0 1];
             cls(2, :) = [1 0 0];
@@ -581,53 +585,23 @@ classdef jnwb < handle
             for fband = 1:5
             
                 tfr1t = squeeze(mean(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :), 1));
-                tfr1t = squeeze(mean(tfr1, 1));
-                tfr1t = smooth(tfr1, 10);
+                tfr1t = squeeze(mean(tfr1t, 1));
+                tfr1t = smooth(tfr1t, 10);
                 baselinecrx = mean(tfr1t(tbaseline));
 
                 tfr1t = tfr1t / baselinecrx;
                 tfr1x(fband, :) = tfr1t;
 
-                ne1 = length(obj.fbands{fband}); % spectral res. bands
-                ne2 = size(obj.pgx{tcond1, layerid}, 1); % trial count
-                ne3 = size(obj.x{tcond1}, 2); % channel count
+                tfr2t = squeeze(mean(obj.pgx{tcond2, layerid}(:, obj.fbands{fband}, :), 1));
+                tfr2t = squeeze(mean(tfr2t, 1));
+                tfr2t = smooth(tfr2t, 10);
+                baselinecrx = mean(tfr2t(tbaseline));
 
-                tfr1e = squeeze(std(obj.pgx{tcond1, layerid}(:, obj.fbands{fband}, :) / baselinecrx));
-                tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
-                tfr1e = smooth(tfr1e, 10);
+                tfr2t = tfr2t / baselinecrx;
+                tfr2x(fband, :) = tfr2t;
 
-                cl = cls(fband, :);
-                y1s = 10*log10(tfr1);
-                plot(obj.tmap, y1s, "DisplayName", obj.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
-                hold("on");
-
-                stx = tfr1 + 2*tfr1e;
-                sty = tfr1 - 2*tfr1e;
-                stx(stx <= 0) = 1e-2;
-                sty(sty <= 0) = 1e-2;
-
-                stx = 10*log10(stx);
-                sty = 10*log10(sty);
-
-                patch([obj.tmap; obj.tmap(end:-1:1)], [stx; sty(end:-1:1)], cl, "EdgeColor", "none", "FaceColor", cl, "FaceAlpha", 0.5, "HandleVisibility", "off");
-
-                % ylim([0 20])
-                xlim(txlims);
-
-                xline(0, HandleVisibility="off");
-                xline(1031, HandleVisibility="off");
-                xline(2062, HandleVisibility="off");
-                xline(3093, HandleVisibility="off");
-                xlabel("Times (ms)");
-                ylabel("Power change (dB)");
-                title("Power change from fixation baseline (+-2Se)");
-            
             end
-            
-            colorbar;
-            sgtitle(obj.areainf + obj.condinflabel(tcond1) + "/" + obj.layeridlabel(layerid));
-            legend;
-
+           
         end
 
     end
