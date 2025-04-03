@@ -352,8 +352,8 @@ classdef jnwb < handle
                 plot(obj.tmap, y1s, "DisplayName", obj.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
                 hold("on");
 
-                stx = tfr1 + 2*tfr1e;
-                sty = tfr1 - 2*tfr1e;
+                stx = tfr1 + tfr1e;
+                sty = tfr1 - tfr1e;
                 stx(stx <= 0) = 1e-2;
                 sty(sty <= 0) = 1e-2;
 
