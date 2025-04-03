@@ -356,7 +356,8 @@ q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
 
 % q2.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
 % q2.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
-q2.jTFRplot(3, 4, q2.tbands{2}(end-10:end), [1000 3000]);
+q2.jTFRplot(3, 4, q2.tbands{3}(end-10:end), [1000 3000]);
+% q2.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
@@ -582,6 +583,10 @@ temp_filename = char(q3.nwbFile);
 temp_filename = temp_filename(6:end-4);
 temp_filename = temp_filename + q3.areainf;
 q3.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
