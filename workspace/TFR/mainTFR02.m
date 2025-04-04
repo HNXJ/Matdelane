@@ -548,11 +548,11 @@ q3 = jnwb(nwbFile, "V1-V2/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
-q3.jMUAplot(9, [1000 3000]);
+q3.jMUAplot(3, [-400 4000]);
 
 %% E.0.3: SUA plot
 
-q3.jSUAplot(9, [100 4000], 100:120);
+q3.jSUAplot(11, [100 4000], 10:20);
 
 %% E.1: Channel and layer specs
 
@@ -590,18 +590,23 @@ q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
 %% E.5: Visualize TFR
 
-q3.jTFRplot(10, 4, q3.tbands{1}(end-10:end));
+q3.jTFRplot(3, 4, q3.tbands{3}(end-5:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q3.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q3.jCalcPEV(1, [3, 7]);
 
 %% E.7: Visualize PEV
 
-q3.jPEVplot(expvars, layerinf, [1 5]);
+q3.jPEVplot(expvars, layerinf, [3 7]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
+xs10 = q3.xs{12};
+xs10a = squeeze(mean(xs10, 1));
+xs10b = mean(xs10a, 1);
+xs10b = smooth(xs10b, 100, "sgolay");
+plot(xs10b);
 % q3.jcalcPEVs();
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)

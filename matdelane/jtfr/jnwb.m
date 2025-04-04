@@ -216,8 +216,9 @@ classdef jnwb < handle
             figure;
             
             imxm = squeeze(mean(obj.xs{condid}(trials, units, :), 1));
-            imxm = squeeze(mean(imxm, 1)) - 70;
-            imxm = imxm + randn(size(imxm))*10;
+            imxm = squeeze(mean(imxm, 1))*1000;
+            imxm = smooth(imxm, 100, "sgolay");
+            % imxm = imxm + randn(size(imxm))*10;
             % imxm = (imxm - mean(imxm)) / std(imxm);
             plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
             
@@ -229,7 +230,7 @@ classdef jnwb < handle
             
             title("SUAenv/est" + obj.condinflabel(condid));
             xlabel("Time (ms)");
-            ylabel("Amplitude (mv)");
+            ylabel("Sp/s");
             xlim(timewindow);
             
             legend;
