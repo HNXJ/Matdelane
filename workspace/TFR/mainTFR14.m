@@ -277,7 +277,7 @@ q2 = jnwb(nwbFile, "V3d-V3a/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+q2.jMUAplot(9, [100 4000]);
 
 %% E.0.3: SUA plot
 
@@ -302,8 +302,9 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
+q2.jLFPprobeINFO(1:128);
 % q2.jLFPprobeINFO(channel_in_layer.goodch);
-q2.jLFPprobeINFO(channel_in_layer2.goodch);
+% q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
