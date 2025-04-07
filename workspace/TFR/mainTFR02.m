@@ -72,6 +72,13 @@ q1.jSave("OGLOobj", temp_filename);
 
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+% tfrname = 
+tfrx = q1.pgx;
+% save();
+
 %% E.5: Visualize TFR
 
 q1.jTFRplot(3, 4, q1.tbands{2}(end-10:end), [1000 3000]);
