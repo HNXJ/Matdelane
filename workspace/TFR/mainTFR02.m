@@ -75,9 +75,9 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 %% E4.3: Save TFR separately
 
 tfrpath = "tfrData\";
-% tfrname = 
+tfrname = "230816PFC.mat";
 tfrx = q1.pgx;
-% save();
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
@@ -359,6 +359,13 @@ q2.jSave("OGLOobj", temp_filename);
 
 q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230816V4MT.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
 %% E.5: Visualize TFR
 
 % q2.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
@@ -594,6 +601,13 @@ q3.jSave("OGLOobj", temp_filename);
 %% E4.2: Load if object exists
 
 q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230816V1V2.mat";
+tfrx = q3.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 

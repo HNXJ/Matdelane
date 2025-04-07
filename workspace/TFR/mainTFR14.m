@@ -37,15 +37,15 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 26:47;
-channel_in_layer.mid = 21:25;
-channel_in_layer.sup = 1:20;
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = 7:38;
+channel_in_layer.mid = 39:42;
+channel_in_layer.sup = 43:60;
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 65:90;
-channel_in_layer2.mid = 91:95;
-channel_in_layer2.sup = 96:128;
+channel_in_layer2.deep = 70:94;
+channel_in_layer2.mid = 95:99;
+channel_in_layer2.sup = 100:112;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -58,7 +58,7 @@ q1.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-% q1.jVFLIP(channel_in_layer.goodch);
+q1.jVFLIP(channel_in_layer.goodch);
 q1.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
@@ -75,7 +75,14 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230714.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230719V1-V2.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230719V1V2.mat";
+tfrx = q1.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
@@ -262,7 +269,7 @@ sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 
 %% E.0: Load NWB
 
-nwbFile = nwbPath + nwbFiles{13};
+nwbFile = nwbPath + nwbFiles{14};
 
 %% E.0.1: jNWB object
 
@@ -317,7 +324,14 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230901.mat", "obj").obj;
+q2 = load("OGLOobj\sub-C31o_ses-230719.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230719V3dV3a.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 

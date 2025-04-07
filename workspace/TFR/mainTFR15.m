@@ -28,25 +28,28 @@ q1 = jnwb(nwbFile, "V1-V2/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(7, [-500 4000]);
 
 %% E.0.3: SUA plot
 
 q1.jSUAplot(9, [100 4000], 100:120);
 
-%% E.1: Channel and layer identification
+%% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 15:32;
-channel_in_layer.mid = 12:14;
-channel_in_layer.sup = 1:11;
-channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
+channel_in_layer.deep = 7:38;
+channel_in_layer.mid = 39:42;
+channel_in_layer.sup = 43:60;
+channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 41:60;
-channel_in_layer2.mid = 61:64;
-channel_in_layer2.sup = 65:100;
+channel_in_layer2.deep = 70:94;
+channel_in_layer2.mid = 95:99;
+channel_in_layer2.sup = 100:112;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
+
+q1.channelinfo{1} = channel_in_layer;
+q1.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
@@ -60,14 +63,30 @@ q1.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer);
+q1.jCalcTFRs(channel_in_layer, 1);
+q1.jCalcTFRs(channel_in_layer2, 1);
+
+% E4.1: Save object
+
+temp_filename = char(q1.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q1.areainf;
+q1.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q1 = load("OGLOobj\sub-C31o_ses-230720V1-V2.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230720V1V2.mat";
+tfrx = q1.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, q1.tbands{1}(end-5:end));
-q1.jTFRplot(10, 4, q1.tbands{1}(end-5:end));
-q1.jTFRplot(11, 4, q1.tbands{1}(end-5:end));
-q1.jTFRplot(12, 4, q1.tbands{1}(end-5:end));
+q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 
@@ -246,7 +265,7 @@ end
 
 sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(q1.freqres) + "Hz/ovlrp=." + num2str(q2.overlap) + " " + layerinf4);
 
-%% Probe B (V1-V2)
+%% Probe B (V3d/V3a)
 
 %% E.0: Load NWB
 
@@ -266,35 +285,57 @@ q2.jSUAplot(9, [100 4000], 100:120);
 
 %% E.1: Channel and layer identification
 
-channel_in_layer = struct();
-channel_in_layer.deep = 1:27;
-channel_in_layer.mid = 29:2:35;
-channel_in_layer.sup = [36:44, 46:60];
+channel_in_layer = struct(); % V3d
+channel_in_layer.deep = [1:9, 11:27];
+channel_in_layer.mid = 28:32;
+channel_in_layer.sup = [33:43, 45:47, 49:2:55];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
-channel_in_layer2 = struct();
-channel_in_layer2.deep = 81:128;
-channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [61:64, 66:75];
+channel_in_layer2 = struct(); % V3a
+channel_in_layer2.deep = 97:2:128;
+channel_in_layer2.mid = 91:2:95;
+channel_in_layer2.sup = 67:2:90;
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+
+q2.channelinfo{1} = channel_in_layer;
+q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-q2.jLFPprobeINFO(channel_in_layer.goodch);
+% q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP(channel_in_layer.goodch, 1:500);
-q2.jVFLIP(1:2:128, 1:1000);
+% q2.jVFLIP(channel_in_layer.goodch, 1:1000);
+q2.jVFLIP(channel_in_layer2.goodch, 1:2000);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer);
+q2.jCalcTFRs(channel_in_layer, 1);
+q2.jCalcTFRs(channel_in_layer2, 1);
+
+% E4.1: Save object
+
+temp_filename = char(q2.nwbFile);
+temp_filename = temp_filename(6:end-4);
+temp_filename = temp_filename + q2.areainf;
+q2.jSave("OGLOobj", temp_filename);
+
+%% E4.2: Load if object exists
+
+q2 = load("OGLOobj\sub-C31o_ses-230720.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230720V3dV3a.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q2.jTFRplot(12, 4, q2.tbands{1}(end-10:end));
+q2.jTFRplot(9, 4, q2.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
