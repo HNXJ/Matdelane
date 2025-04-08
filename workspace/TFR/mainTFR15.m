@@ -329,13 +329,18 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-V198o_ses-230720.mat", "obj").obj;
+q2 = load("OGLOobj\sub-V198o_ses-230720V3d-V3a.mat", "obj").obj;
 
 %% E4.3: Save TFR separately
 
 tfrpath = "tfrData\";
-tfrname = "230720V3dV3a.mat";
+tfrname = "230720V3d.mat";
 tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230720V3a.mat";
+tfrx = q2.pgx2;
 save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
