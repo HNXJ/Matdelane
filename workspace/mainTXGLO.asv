@@ -1,8 +1,8 @@
 %% Concatenate OGLO analysis
 
 
-q1 = load("OGLOobj\sub-V198o_ses-230816PFC.mat", "obj").obj;
-q2 = load("OGLOobj\sub-V198o_ses-230818PFC.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
+q2 = load("OGLOobj\sub-C31o_ses-230818PFC.mat", "obj").obj;
 
 %%
 
