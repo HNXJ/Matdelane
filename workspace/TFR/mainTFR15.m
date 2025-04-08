@@ -75,7 +75,7 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230720V1-V2.mat", "obj").obj;
+q1 = load("OGLOobj\sub-V198o_ses-230720V1-V2.mat", "obj").obj;
 
 %% E4.3: Save TFR separately
 
@@ -286,29 +286,29 @@ q2.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer identification
 
 channel_in_layer = struct(); % V3d
-channel_in_layer.deep = [1:9, 11:27];
-channel_in_layer.mid = 28:32;
-channel_in_layer.sup = [33:43, 45:47, 49:2:55];
-channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.deep = 20:43;
+channel_in_layer.mid = 16:19;
+channel_in_layer.sup = [1:9, 11:2:15];
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 channel_in_layer2 = struct(); % V3a
-channel_in_layer2.deep = 97:2:128;
+channel_in_layer2.deep = [45:2:67, 69:2:90];
 channel_in_layer2.mid = 91:2:95;
-channel_in_layer2.sup = 67:2:90;
-channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2.sup = 97:2:128;
+channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q2.channelinfo{1} = channel_in_layer;
 q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
 % q2.jVFLIP(channel_in_layer.goodch, 1:1000);
-q2.jVFLIP(channel_in_layer2.goodch, 1:2000);
+q2.jVFLIP(channel_in_layer2.goodch, 1:1000);
 
 %% E.4: TFR calculations all trials
 
@@ -324,7 +324,7 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230720.mat", "obj").obj;
+q2 = load("OGLOobj\sub-V198o_ses-230720.mat", "obj").obj;
 
 %% E4.3: Save TFR separately
 

@@ -53,8 +53,10 @@ q1.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-q1.jLFPprobeINFO(channel_in_layer.goodch);
-q1.jLFPprobeINFO(channel_in_layer2.goodch);
+% q1.jLFPprobeINFO(2:2:128);
+q1.jLFPmuaINFO(2:2:128);
+% q1.jLFPprobeINFO(channel_in_layer.goodch);
+% q1.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
@@ -75,7 +77,7 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230721V1-V2.mat", "obj").obj;
+q1 = load("OGLOobj\sub-V198o_ses-230721V1-V2.mat", "obj").obj;
 
 %% E4.3: Save TFR separately
 
@@ -302,13 +304,13 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-% q2.jVFLIP(channel_in_layer.goodch, 1:1000);
-q2.jVFLIP(channel_in_layer2.goodch, 1:2000);
+q2.jVFLIP(channel_in_layer.goodch, 1:500);
+q2.jVFLIP(channel_in_layer2.goodch, 1:500);
 
 %% E.4: TFR calculations all trials
 
@@ -324,7 +326,7 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230721.mat", "obj").obj;
+q2 = load("OGLOobj\sub-V198o_ses-230721.mat", "obj").obj;
 
 %% E4.3: Save TFR separately
 

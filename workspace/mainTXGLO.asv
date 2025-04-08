@@ -1,8 +1,8 @@
 %% Concatenate OGLO analysis
 
 
-q1 = load("OGLOq1\sub-C31o_ses-230816PFC.mat", "obj").obj;
-q2 = load("OGLOq1\sub-C31o_ses-230818PFC.mat", "obj").obj;
+q1 = load("OGLOobj\sub-V198o_ses-230816PFC.mat", "obj").obj;
+q2 = load("OGLOobj\sub-V198o_ses-230818PFC.mat", "obj").obj;
 
 %%
 
@@ -10,8 +10,16 @@ q2 = load("OGLOq1\sub-C31o_ses-230818PFC.mat", "obj").obj;
 q1.jTFRplot(9, 4, q1.tbands{2}(end-10:end-5));
 q2.jTFRplot(9, 4, q2.tbands{2}(end-10:end-5));
 
+%% TFR barplot
+
+
 
 %%
+
+tcond1 = 9;
+layerid = 4;
+tbaseline = q1.tbands{2}(end-10:end-5);
+txlims = [obj.tmap(1) obj.tmap(end)];
 
 figure;
 subplot(2, 1, 1);

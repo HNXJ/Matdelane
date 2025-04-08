@@ -444,6 +444,63 @@ classdef jnwb < handle
             
         end
 
+        function jLFPmuaINFO(obj, chx, condx, txlims)
+
+            if ~exist("condx", "var")
+
+                condx = 1;
+
+            end
+
+            if ~exist("txlims", "var")
+
+                txlims = [0, obj.tpost];
+
+            end
+
+            imglfp1 = squeeze(mean(obj.x{condx}(:, chx, :), 1));
+            imgmua1 = squeeze(mean(obj.xm{condx}(:, chx, :), 1));
+        
+            figure;
+            subplot(4, 1, 1);
+            imagesc(imglfp1, "YData", chx);
+            xlim(txlims);
+            % clim([-2.5 2.5]);
+            xlabel("Time (ms)");
+            ylabel("Channel");
+            title("LFP average by trial");
+
+            subplot(4, 1, 2);
+            imagesc(imgmua1, "YData", chx);
+            xlim(txlims);
+            clim([-2.5 2.5]);
+            xlabel("Time (ms)");
+            ylabel("Channel");%clim([-1 1]);
+            title("MUA average by trial");
+        
+            corrx = corr(imglfp1', imgmua1', "Type", "Spearman");
+            subplot(2, 2, 3);
+            imagesc(corrx);
+            xlabel("Channel");
+            ylabel("Channel");
+            title("LFP-MUA corr average by trial");
+            colorbar;
+            
+            subplot(2, 2, 4);
+            imxcorr = mean(corr(corrx), 1);
+            stem(imxcorr);
+            hold("on");
+        
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            
+            xlabel("Channel");
+            ylabel("Spearman deviation index");
+            title("Channel grand corr. (corr of corr)");
+            
+        end
+
         function [expvars, layerinf] = jCalcPEV(obj, layerid, condinf)
             
             layerinf = obj.layeridlabel(layerid) + " layer";
