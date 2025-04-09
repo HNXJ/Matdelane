@@ -322,7 +322,7 @@ q2.jTFRplot(9, 4, q2.tbands{1}(end-10:end));
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q2.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q2.jCalcPEV(1, [2, 6]);
 
 %% E.7: Visualize PEV
 
