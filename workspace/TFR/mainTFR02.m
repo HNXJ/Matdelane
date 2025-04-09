@@ -335,18 +335,17 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP(channel_in_layer2.goodch, [1:500, 1100:1550]);
-% q2.jVFLIP(1:2:128, 1:1000);
+q2.jVFLIP(channel_in_layer.goodch, [1:500, 1100:1550]);
 
 %% E.4: TFR calculations all trials
 
-% q2.jCalcTFRs(channel_in_layer);
 q2.jCalcTFRs(channel_in_layer, 1);
+q2.jCalcTFRs(channel_in_layer2, 1);
 
 %% E4.1: Save object
 
