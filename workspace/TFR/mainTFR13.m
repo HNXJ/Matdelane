@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "V1-V2/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(7, [-500 4000]);
+q1.jMUAplot(3, [-500 4000]);
 
 %% E.0.3: SUA plot
 
@@ -91,7 +91,7 @@ save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+q1.jTFRplot(3, 4, q1.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 

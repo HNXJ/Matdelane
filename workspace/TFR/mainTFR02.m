@@ -81,7 +81,7 @@ save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(3, 4, q1.tbands{2}(end-10:end), [1000 3000]);
+q1.jTFRplot(11, 4, q1.tbands{3}(end-10:end));
 % q1.jTFRplot(3, 3, q1.tbands{2}(end-6:end), [1000 3000]);
 % q1.jTFRplot(3, 4, q1.tbands{2}(end-6:end), [1000 3000]);
 
@@ -368,18 +368,19 @@ save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
+q2.jTFRplot(11, 4, q2.tbands{3}(end-10:end-1));
 % q2.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
 % q2.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
-q2.jTFRplot(3, 4, q2.tbands{3}(end-10:end), [1000 3000]);
+% q2.jTFRplot(3, 4, q2.tbands{3}(end-10:end), [1000 3000]);
 % q2.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q2.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q2.jCalcPEV(1, [2, 6]);
 
 %% E.7: Visualize PEV
 
-q2.jPEVplot(expvars, layerinf, [1 5]);
+q2.jPEVplot(expvars, layerinf, [2 6]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
@@ -475,7 +476,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = q2.tmap(q2.tbands{2});
+ntmap = q2.tmap([q2.tbands{2}, q2.tbands{3}]);
 
 for fband = 1:5
 
