@@ -559,8 +559,13 @@ q3 = load("OGLOobj\sub-C31o_ses-230818MT-MST.mat", "obj").obj;
 %% E4.3: Save TFR separately
 
 tfrpath = "tfrData\";
-tfrname = "230818MTMST.mat";
+tfrname = "230818MT.mat";
 tfrx = q3.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230818MST.mat";
+tfrx = q3.pgx2;
 save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
