@@ -24,7 +24,7 @@ tfrData = cell(Nfiles, 12, 4);
 
 %%
 
-for ik = 21:30
+for ik = 31:43
 
     tfrx = load(tfrpath + tfrfiles{ik});
     tfrx = tfrx.tfrx;
@@ -42,6 +42,10 @@ for ik = 21:30
     fprintf(num2str(ik));
 
 end
+
+%%
+
+save("tfrData\gtfr.mat", "tfrData", "-v7.3");
 
 %% TFR plotter > TODO/Implement for tfrData
 
