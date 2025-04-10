@@ -76,7 +76,7 @@ save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, q1.tbands{1}(end-5:end));
+q1.jTFRplot(10, 4, q1.tbands{1}(end-9:end));
 
 %% E.6: PEV calculations all trials
 
