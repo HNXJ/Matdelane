@@ -1,6 +1,20 @@
 %% Concatenate OGLO analysis
 
-%% TFR unifier >
+clear;clc;close all;
+
+%% Setup
+
+cd('D:\Electrophysiology\Matdelane\');
+addpath(genpath('matnwb'));
+addpath(genpath('matdelane'));
+addpath(genpath('flipv2'));
+
+generateCore();
+addpath('fieldtrip');
+ft_defaults;
+disp("Setup done.");
+
+%% TFR unifier > LOAD/append
 
 %% TFR plotter > TODO/Implement for tfrData
 
