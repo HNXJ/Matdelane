@@ -20,12 +20,24 @@ tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, ".mat"));
 Nfiles = length(tfrfiles);
-tfrData = cell(1, Nfiles);
+tfrData = cell(Nfiles, 12, 4);
 
 for ik = 1:10
 
-    tfrData{ik} = load(tfrpath + tfrfiles{ik});
-    fprintf(ik);
+    a_temp = load(tfrpath + tfrfiles{ik});
+    tfrx = a_temp.tfrx;
+
+    for kk = 1:4
+
+        for jk = 1:12
+
+            tfrData{ik, jk, kk} = tfrx{jk, kk};
+
+        end
+        
+    end
+
+    fprintf(num2str(ik));
 
 end
 
