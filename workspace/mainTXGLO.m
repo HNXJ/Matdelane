@@ -43,7 +43,7 @@ for ik = 31:43
 
 end
 
-%%
+%% gSave
 
 save("tfrData\gtfr.mat", "tfrData", "-v7.3");
 
