@@ -65,7 +65,14 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
+q1 = load("OGLOobj\sub-C31o_ses-230831FEF.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230831FEF.mat";
+tfrx = q1.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
@@ -309,6 +316,18 @@ q2.jSave("OGLOobj", temp_filename);
 
 q2 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230831MT.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230831MST.mat";
+tfrx = q2.pgx2;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
 %% E.5: Visualize TFR
 
 q2.jTFRplot(9, 4, q2.tbands{1}(end-10:end));
@@ -540,7 +559,7 @@ q3.jVFLIP(channel_in_layer2.goodch);
 q3.jCalcTFRs(channel_in_layer, 1);
 q3.jCalcTFRs(channel_in_layer2, 1);
 
-% E4.1: Save object
+%% E4.1: Save object
 
 temp_filename = char(q3.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -550,6 +569,18 @@ q3.jSave("OGLOobj", temp_filename);
 %% E4.2: Load if object exists
 
 q3 = load("OGLOobj\sub-C31o_ses-230831.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230831V4.mat";
+tfrx = q3.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230831TEO.mat";
+tfrx = q3.pgx2;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
