@@ -24,10 +24,10 @@ tfrData = cell(Nfiles, 12, 4);
 
 %%
 
-for ik = 1:10
+for ik = 21:30
 
-    a_temp = load(tfrpath + tfrfiles{ik});
-    tfrx = a_temp.tfrx;
+    tfrx = load(tfrpath + tfrfiles{ik});
+    tfrx = tfrx.tfrx;
 
     for kk = 1:4
 
