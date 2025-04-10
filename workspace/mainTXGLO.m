@@ -22,6 +22,8 @@ tfrfiles = tfrfiles(endsWith(tfrfiles, ".mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
+%%
+
 for ik = 1:10
 
     a_temp = load(tfrpath + tfrfiles{ik});
@@ -34,16 +36,12 @@ for ik = 1:10
             tfrData{ik, jk, kk} = tfrx{jk, kk};
 
         end
-        
+
     end
 
     fprintf(num2str(ik));
 
 end
-
-%%
-
-load(tfrpath + tfrfiles{1});
 
 %% TFR plotter > TODO/Implement for tfrData
 
