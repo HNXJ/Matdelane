@@ -56,7 +56,7 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 q1.jCalcTFRs(channel_in_layer, 1);
 
-% E4.1: Save object
+%% E4.1: Save object
 
 temp_filename = char(q1.nwbFile);
 temp_filename = temp_filename(6:end-4);
