@@ -20,10 +20,15 @@ tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, ".mat"));
 Nfiles = length(tfrfiles);
+tfrData = cell(1, Nfiles);
 
-for ik = 1:Nfiles
-    disp(tfrfiles{ik});
+parfor ik = 1:Nfiles
+
+    tfrData{ik} = load(tfrpath + tfrfiles{ik});
+    fprintf(ik);
+
 end
+
 %%
 
 load(tfrpath + tfrfiles{1});
