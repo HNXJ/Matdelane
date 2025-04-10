@@ -22,7 +22,7 @@ tfrfiles = tfrfiles(endsWith(tfrfiles, ".mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(1, Nfiles);
 
-parfor ik = 1:Nfiles
+for ik = 1:10
 
     tfrData{ik} = load(tfrpath + tfrfiles{ik});
     fprintf(ik);
