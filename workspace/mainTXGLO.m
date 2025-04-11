@@ -33,6 +33,11 @@ for ik = 1:Nfiles
 
         for jk = 1:12
 
+            imxx = tfrx{jk, kk};
+            imx = squeeze(mean(imxx, 2));
+            imx2 = corr(imx');
+            imx2 = mean(imx2) < 0.6;
+            imxx(imx2, :, :) = [];
             tfrData{ik, jk, kk} = tfrx{jk, kk};
 
         end
@@ -45,7 +50,7 @@ end
 
 %% gSave
 
-save("tfrData\gtfr.mat", "tfrData", "-v7.3");
+save("tfrData\tfrV1g.mat", "tfrData", "-v7.3");
 
 %% TFR plotter > TODO/Implement for tfrData
 
@@ -56,23 +61,38 @@ save("tfrData\gtfr.mat", "tfrData", "-v7.3");
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% 
-if ~exist("tbaseline", "var")
 
-    tbaseline = q1.tbands{1};
+tbaseline = q1.tbands{1};
+txlims = [q1.tmap(1) q1.tmap(end)];
+% q1.tmap = q1.tmap + 50;
 
-end
-
-if ~exist("txlims", "var")
-
-    txlims = [q1.tmap(1) q1.tmap(end)];
-
-end
+jTFRplot(tfrData, 10, 4, tbaseline, txlims, q1, "V1-");
 
 %%
 
-function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims)
+imx = tfrData{1, 2, 4};
+imx = squeeze(mean(imx, 2));
+imx2 = corr(imx');
+imx2 = mean(imx2) < 0.6;
+imx(imx2, :) = [];
+figure;
+subplot(1, 2, 1);
+imagesc(imx);
+subplot(1, 2, 2);
+stem(imx2);
+
+%%
+
+function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
-    tfr1 = squeeze(mean(pgx{tcond1, layerid}, 1));
+    tfr1 = squeeze(mean(pgx{1, tcond1, layerid}, 1));
+
+    for cntx = 2:size(pgx, 1)
+    
+        tfr1 = tfr1 + squeeze(mean(pgx{cntx, tcond1, layerid}, 1));
+
+    end
+
     % tfr1e = squeeze(std(pgx{tcond1, layerid}));
     
     for ik = 1:size(tfr1, 1)
@@ -114,21 +134,35 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims)
     cls(5, :) = [0 0.8 0.4];
     
     for fband = 1:5
-    
-        tfr1 = squeeze(mean(pgx{tcond1, layerid}(:, q1.fbands{fband}, :), 1));
+
+        tfr1 = squeeze(mean(pgx{1, tcond1, layerid}(:, q1.fbands{fband}, :), 1));
+
+        for cntx = 2:size(pgx, 1)
+        
+            tfr1 = tfr1 + squeeze(mean(pgx{cntx, tcond1, layerid}(:, q1.fbands{fband}, :), 1));
+
+        end
+
         tfr1 = squeeze(mean(tfr1, 1));
-        tfr1 = smooth(tfr1, 10);
+        tfr1 = smooth(tfr1, 10, "lowess");
         baselinecrx = mean(tfr1(tbaseline));
 
         tfr1 = tfr1 / baselinecrx;
 
         ne1 = length(q1.fbands{fband}); % spectral res. bands
-        ne2 = size(pgx{tcond1, layerid}, 1); % trial count
+        ne2 = size(pgx{1, tcond1, layerid}, 1); % trial count
         ne3 = size(q1.x{tcond1}, 2); % channel count
 
-        tfr1e = squeeze(std(pgx{tcond1, layerid}(:, q1.fbands{fband}, :) / baselinecrx));
+        tfr1e = squeeze(std(pgx{1, tcond1, layerid}(:, q1.fbands{fband}, :) / baselinecrx));
+
+        for cntx = 2:size(pgx, 1)
+
+            tfr1e = tfr1e + squeeze(std(pgx{cntx, tcond1, layerid}(:, q1.fbands{fband}, :) / baselinecrx));
+
+        end
+
         tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
-        tfr1e = smooth(tfr1e, 10);
+        tfr1e = smooth(tfr1e, 10, "lowess");
 
         cl = cls(fband, :);
         y1s = 10*log10(tfr1);
@@ -159,8 +193,11 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims)
     end
     
     colorbar;
-    sgtitle(q1.areainf + q1.condinflabel(tcond1) + "/" + q1.layeridlabel(layerid));
+    sgtitle(areanamex + q1.condinflabel(tcond1) + "-" + q1.layeridlabel(layerid));
     legend;
+
+    fname = areanamex + q1.condinflabel(tcond1) + "-" + q1.layeridlabel(layerid);
+    print(gcf,'-vector','-dsvg', fname + ".svg");
 
 end
 
