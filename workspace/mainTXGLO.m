@@ -35,10 +35,12 @@ for ik = 1:Nfiles
 
             imxx = tfrx{jk, kk};
             imx = squeeze(mean(imxx, 2));
-            imx2 = corr(imx');
-            imx2 = mean(imx2) < 0.6;
+            imx2 = mean(imx, 2);
+            sethresh = std(imx2);
+            imx2 = imx2 - mean(imx2);
+            imx2 = imx2 > sethresh;
             imxx(imx2, :, :) = [];
-            tfrData{ik, jk, kk} = tfrx{jk, kk};
+            tfrData{ik, jk, kk} = imxx;
 
         end
 
@@ -65,16 +67,14 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 tbaseline = q1.tbands{1};
 txlims = [q1.tmap(1) q1.tmap(end)];
 % q1.tmap = q1.tmap + 50;
-
-jTFRplot(tfrData, 10, 4, tbaseline, txlims, q1, "V1-");
+jTFRplot(tfrData, 11, 4, tbaseline, txlims, q1, "V1-");
 
 %%
 
-imx = tfrData{1, 2, 4};
+imx = tfrData{3, 10, 4};
 imx = squeeze(mean(imx, 2));
-imx2 = corr(imx');
-imx2 = mean(imx2) < 0.6;
-imx(imx2, :) = [];
+imx2 = mean(imx, 2);
+% imx(imx2, :) = [];
 figure;
 subplot(1, 2, 1);
 imagesc(imx);
