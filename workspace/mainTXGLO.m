@@ -18,13 +18,13 @@ disp("Setup done.");
 
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, ".mat"));
+tfrfiles = tfrfiles(endsWith(tfrfiles, "V1.mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
 %%
 
-for ik = 31:43
+for ik = 1:Nfiles
 
     tfrx = load(tfrpath + tfrfiles{ik});
     tfrx = tfrx.tfrx;
