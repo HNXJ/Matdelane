@@ -18,7 +18,7 @@ disp("Setup done.");
 
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, "V3a.mat"));
+tfrfiles = tfrfiles(endsWith(tfrfiles, "V1.mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
@@ -34,11 +34,11 @@ for ik = 1:Nfiles
         for jk = 1:12
 
             imxx = tfrx{jk, kk};
-            imx = squeeze(mean(imxx(:, 400:end, 1:250), 2));
-            imx2 = mean(imx, 2);
-            sethresh = std(imx2);
-            imx2 = imx2 - mean(imx2);
-            imx2 = imx2 > sethresh*2;
+            imx2 = squeeze(max(imxx, [], 2));
+            imx2 = max(imx2, [], 2);
+            sethresh = std(imx2) / sqrt(length(imx2));
+            imx2 = (imx2 - mean(imx2))/sethresh;
+            imx2 = abs(imx2) > 10;
             imxx(imx2, :, :) = [];
             tfrData{ik, jk, kk} = imxx;
 
@@ -64,17 +64,25 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% 
 
-tbaseline = q1.tbands{1};
+tbaseline = q1.tbands{2}(end-6:end-1);
 txlims = [q1.tmap(1) q1.tmap(end)];
 % q1.tmap = q1.tmap + 50;
-jTFRplot(tfrData, 2, 4, tbaseline, txlims, q1, "V1-");
+jTFRplot(tfrData, 10, 4, tbaseline, [0 3000], q1, "V3d-");
 
 %%
 
-imx = tfrData{3, 10, 4};
-imx = squeeze(mean(imx(:, 400:800, :), 2));
-imx2 = mean(imx, 2);
-% imx(imx2, :) = [];
+imxx = tfrData{1, 12, 4};
+imx = squeeze(mean(imxx(:, :, :), 2));
+
+imx2 = squeeze(max(imxx, [], 2));
+imx2 = max(imx2, [], 2);
+sethresh = std(imx2) / sqrt(length(imx2));
+imx2 = (imx2 - mean(imx2))/sethresh;
+imx3 = abs(imx2) > 10;
+% imxx(imx2, :, :) = [];
+imx(imx3, :) = [];
+tfrData{ik, jk, kk} = imxx;
+
 figure;
 subplot(1, 2, 1);
 imagesc(imx);
