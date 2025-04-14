@@ -18,7 +18,7 @@ disp("Setup done.");
 
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, "V3a.mat"));
+tfrfiles = tfrfiles(endsWith(tfrfiles, "V4.mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
@@ -64,10 +64,10 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% 
 
-tbaseline = q1.tbands{4}(end-16:end);
+tbaseline = q1.tbands{3}(end-10:end-4);
 txlims = [q1.tmap(1) q1.tmap(end)];
 % q1.tmap = q1.tmap + 50;
-jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, "V3d-");
+jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, "V3a-");
 
 %%
 
