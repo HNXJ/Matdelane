@@ -16,9 +16,10 @@ disp("Setup done.");
 
 %% TFR unifier > LOAD/append
 
+areax = "MT";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, "V4.mat"));
+tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
@@ -61,13 +62,17 @@ save("tfrData\tfrV1g.mat", "tfrData", "-v7.3");
 %% Load base jNWB
 
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
+q1.tmap = q1.tmap + 50;
 
 %% 
 
-tbaseline = q1.tbands{3}(end-10:end-4);
 txlims = [q1.tmap(1) q1.tmap(end)];
-% q1.tmap = q1.tmap + 50;
-jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, "V3a-");
+
+tbaseline = q1.tbands{3}(end-10:end-4);
+jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, areax + "-");
+
+tbaseline = q1.tbands{2}(end-10:end-4);
+jTFRplot(tfrData, 7, 4, tbaseline, [1000 3000], q1, areax + "-");
 
 %%
 
