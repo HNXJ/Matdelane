@@ -18,7 +18,7 @@ disp("Setup done.");
 
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, "V1.mat"));
+tfrfiles = tfrfiles(endsWith(tfrfiles, "V3d.mat"));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 12, 4);
 
@@ -36,9 +36,9 @@ for ik = 1:Nfiles
             imxx = tfrx{jk, kk};
             imx2 = squeeze(max(imxx, [], 2));
             imx2 = max(imx2, [], 2);
-            sethresh = std(imx2) / sqrt(length(imx2));
-            imx2 = (imx2 - mean(imx2))/sethresh;
-            imx2 = abs(imx2) > 10;
+            imx2 = (imx2 - mean(imx2)) / (std(imx2) / sqrt(length(imx2)));
+            
+            imx2 = abs(imx2) > 5;
             imxx(imx2, :, :) = [];
             tfrData{ik, jk, kk} = imxx;
 
@@ -64,35 +64,29 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 %% 
 
-tbaseline = q1.tbands{2}(end-6:end-1);
+tbaseline = q1.tbands{4}(end-16:end);
 txlims = [q1.tmap(1) q1.tmap(end)];
 % q1.tmap = q1.tmap + 50;
-jTFRplot(tfrData, 10, 4, tbaseline, [0 3000], q1, "V3d-");
-
-%%
-
-imxx = tfrData{1, 12, 4};
-imx = squeeze(mean(imxx(:, :, :), 2));
-
-imx2 = squeeze(max(imxx, [], 2));
-imx2 = max(imx2, [], 2);
-sethresh = std(imx2) / sqrt(length(imx2));
-imx2 = (imx2 - mean(imx2))/sethresh;
-imx3 = abs(imx2) > 10;
-% imxx(imx2, :, :) = [];
-imx(imx3, :) = [];
-tfrData{ik, jk, kk} = imxx;
-
-figure;
-subplot(1, 2, 1);
-imagesc(imx);
-subplot(1, 2, 2);
-stem(imx2);
+jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, "V2-");
 
 %%
 
 function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
+    % for cntx = 1:size(pgx, 1)
+    % 
+    %     for ik = 1:size(pgx, 2)
+    % 
+    %         for jk = 1:size(pgx, 3)
+    % 
+    %             % pgx{cntx, ik, jk} = jmed
+    % 
+    %         end
+    % 
+    %     end
+    % 
+    % end
+
     tfr1 = squeeze(mean(pgx{1, tcond1, layerid}, 1));
 
     for cntx = 2:size(pgx, 1)
@@ -189,6 +183,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
 
         % ylim([0 20])
         xlim(txlims);
+        yline(0, HandleVisibility="off");
 
         xline(0, HandleVisibility="off");
         xline(1031, HandleVisibility="off");
