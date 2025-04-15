@@ -16,7 +16,7 @@ disp("Setup done.");
 
 %% TFR unifier > LOAD/append
 
-areax = "MST";
+areax = "V1";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
@@ -108,7 +108,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
     end
     
-    figure;
+    figure("Position", [0 0 1500 700]);
     subplot(2, 1, 1);
     imagesc(10*log10(tfr1), "XData", q1.tmap, "YData", q1.fmap);
     % ylim([0 20])
