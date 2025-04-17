@@ -16,7 +16,7 @@ disp("Setup done.");
 
 %% TFR unifier > LOAD/append
 
-areax = "TEO";
+areax = "FST";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
