@@ -16,7 +16,7 @@ disp("Setup done.");
 
 %% TFR unifier > LOAD/append
 
-areax = "FEF";
+areax = "TEO";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
@@ -68,11 +68,11 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
 txlims = [q1.tmap(1) q1.tmap(end)];
 
-tbaseline = q1.tbands{3}(end-10:end-1);
-jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, areax + "-");
+tbaseline = q1.tbands{4}(end-10:end-1);
+jTFRplot(tfrData, 8, 4, tbaseline, [2000 4100], q1, areax + "-");
 
-tbaseline = q1.tbands{2}(end-10:end-1);
-jTFRplot(tfrData, 7, 4, tbaseline, [1000 3000], q1, areax + "-");
+tbaseline = q1.tbands{3}(end-10:end-1);
+jTFRplot(tfrData, 7, 4, tbaseline, [1000 3100], q1, areax + "-");
 
 %%
 
@@ -151,7 +151,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
         end
 
         tfr1 = squeeze(mean(tfr1, 1));
-        tfr1 = smooth(tfr1, 10, "lowess");
+        tfr1 = smooth(tfr1, 2, "lowess");
         baselinecrx = mean(tfr1(tbaseline));
 
         tfr1 = tfr1 / baselinecrx;
@@ -169,7 +169,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
         end
 
         tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
-        tfr1e = smooth(tfr1e, 10, "lowess");
+        tfr1e = smooth(tfr1e, 2, "lowess");
 
         cl = cls(fband, :);
         y1s = 10*log10(tfr1);
