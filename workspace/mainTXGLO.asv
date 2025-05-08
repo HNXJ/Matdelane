@@ -14,9 +14,9 @@ addpath('fieldtrip');
 ft_defaults;
 disp("Setup done.");
 
-%% TFR unifier > LOAD/append
+%% TFR unifier
 
-areax = "MT";
+areax = "V1";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
@@ -62,21 +62,31 @@ save("tfrData\tfrV1g.mat", "tfrData", "-v7.3");
 %% Load base jNWB
 
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
-q1.tmap = q1.tmap + 50;
+% q1.tmap = q1.tmap + 50;
 
 %% 
 
 txlims = [q1.tmap(1) q1.tmap(end)];
 
-tbaseline = q1.tbands{3}(end-10:end-4);
-jTFRplot(tfrData, 8, 4, tbaseline, [2000 4000], q1, areax + "-");
+tbaseline = q1.tbands{4}(end-10:end-1);
+jTFRplot(tfrData, 8, 4, tbaseline, [1000 4100], q1, areax + "-");
 
-tbaseline = q1.tbands{2}(end-10:end-4);
-jTFRplot(tfrData, 7, 4, tbaseline, [1000 4000], q1, areax + "-");
+tbaseline = q1.tbands{3}(end-10:end-1);
+jTFRplot(tfrData, 7, 4, tbaseline, [0 3100], q1, areax + "-");
+
+%% Stim evoked dynamics after omission 
+
+for ik = 1:size(tfrData, 1)
+
+    xtfr = tfrData{ik, 12, 4}; % Trial-Freq-Time
+
+
+end
+
 
 %%
 
-function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
+function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
     % for cntx = 1:size(pgx, 1)
     % 
@@ -108,7 +118,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
     end
     
-    figure;
+    figure("Position", [0 0 1500 700]);
     subplot(2, 1, 1);
     imagesc(10*log10(tfr1), "XData", q1.tmap, "YData", q1.fmap);
     % ylim([0 20])
@@ -151,7 +161,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
         end
 
         tfr1 = squeeze(mean(tfr1, 1));
-        tfr1 = smooth(tfr1, 10, "lowess");
+        tfr1 = smooth(tfr1, 2, "lowess");
         baselinecrx = mean(tfr1(tbaseline));
 
         tfr1 = tfr1 / baselinecrx;
@@ -169,7 +179,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
         end
 
         tfr1e = squeeze(mean(tfr1e, 1)) / sqrt(ne1 + ne2 + ne3);
-        tfr1e = smooth(tfr1e, 10, "lowess");
+        tfr1e = smooth(tfr1e, 2, "lowess");
 
         cl = cls(fband, :);
         y1s = 10*log10(tfr1);

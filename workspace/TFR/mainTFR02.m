@@ -41,7 +41,7 @@ q1.jRastrogram(1, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 21:81;
+channel_in_layer.deep = [21:65, 67:81];
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
@@ -54,7 +54,7 @@ q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
 
 %% E.3: Evaluate vFLIP
 
-q1.jVFLIP(channel_in_layer.goodch);
+a = q1.jVFLIP(channel_in_layer.goodch, q1.tbands{1});
 
 %% E.4: TFR calculations all trials
 

@@ -14,9 +14,9 @@ addpath('fieldtrip');
 ft_defaults;
 disp("Setup done.");
 
-%% TFR unifier > LOAD/append
+%% TFR unifier
 
-areax = "PFC";
+areax = "V4";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
@@ -69,14 +69,24 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 txlims = [q1.tmap(1) q1.tmap(end)];
 
 tbaseline = q1.tbands{4}(end-10:end-1);
-jTFRplot(tfrData, 8, 4, tbaseline, [2000 4100], q1, areax + "-");
+% jTFRplot(tfrData, 8, 4, tbaseline, [1000 4100], q1, areax + "-");
 
-tbaseline = q1.tbands{3}(end-10:end-1);
-jTFRplot(tfrData, 7, 4, tbaseline, [1000 3100], q1, areax + "-");
+% tbaseline = q1.tbands{3}(end-10:end-1);
+% jTFRplot(tfrData, 7, 4, tbaseline, [0 3100], q1, areax + "-");
+
+%% Stim evoked dynamics after omission 
+
+[imx1, tfx1] = jTFRplot(tfrData, 12, 4, tbaseline, [-250 4000], q1, areax + "-");
 
 %%
 
-function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
+im1 = imx1(:, q1.tbands{5});
+im2 = imx1(:, q1.tbands{1});
+imagesc(im2);
+
+%%
+
+function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     
     % for cntx = 1:size(pgx, 1)
     % 
@@ -113,6 +123,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     imagesc(10*log10(tfr1), "XData", q1.tmap, "YData", q1.fmap);
     % ylim([0 20])
     xlim(txlims);
+    imx = 10*log10(tfr1);
 
     set(gca, "YDir", "normal");
     hold("on");
@@ -139,6 +150,8 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
     cls(3, :) = [1 0.5 0];
     cls(4, :) = [1 0 1];
     cls(5, :) = [0 0.8 0.4];
+
+    tfx = cell([5, 3]);
     
     for fband = 1:5
 
@@ -173,6 +186,7 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
 
         cl = cls(fband, :);
         y1s = 10*log10(tfr1);
+        tfx{fband, 1} = y1s;
         plot(q1.tmap, y1s, "DisplayName", q1.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
         hold("on");
 
@@ -183,6 +197,9 @@ function jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, areanamex)
 
         stx = 10*log10(stx);
         sty = 10*log10(sty);
+
+        tfx{fband, 2} = stx;
+        tfx{fband, 3} = sty;
 
         patch([q1.tmap; q1.tmap(end:-1:1)], [stx; sty(end:-1:1)], cl, "EdgeColor", "none", "FaceColor", cl, "FaceAlpha", 0.5, "HandleVisibility", "off");
 

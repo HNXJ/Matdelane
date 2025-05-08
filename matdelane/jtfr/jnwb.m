@@ -598,7 +598,7 @@ classdef jnwb < handle
 
             end
             
-            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.04, 'plot_result', true);
+            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.025, 'plot_result', true);
         
         end
 
