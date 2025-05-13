@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(9, [-500 4000]);
 
 %% E.0.3: SUA plot
 
@@ -54,7 +54,18 @@ q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
 
 %% E.3: Evaluate vFLIP
 
-a = q1.jVFLIP(channel_in_layer.goodch, q1.tbands{1});
+a1 = q1.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
+a2 = q1.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.2);
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+clim([-.25 .25]);
+colorbar;
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
@@ -297,6 +308,8 @@ sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 
 nwbFile = nwbPath + nwbFiles{2};
 
+q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
+
 %% E.0.1: jNWB object
 
 q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 1);
@@ -304,7 +317,7 @@ q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 1);
 %% E.0.2: MUA plot
 
 % q2.jMUAplot(11, [-400 4200]);
-q2.jMUAplot(3, [1000 3000]);
+q2.jMUAplot(12, [2500 4500]);
 % q2.jMUAplotAll([1000 3000]);
 
 %% E.0.3: SUA plot
@@ -340,7 +353,31 @@ q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP(channel_in_layer.goodch, [1:500, 1100:1550]);
+a1 = q2.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
+a2 = q2.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+clim([-.25 .25]);
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline");
+
+%% E.3.2:
+
+a1 = q2.jVFLIP(channel_in_layer2.goodch, 3601:4200, 12);
+a2 = q2.jVFLIP(channel_in_layer2.goodch, 4101:4700, 12);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.2);
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+clim([-.25 .25]);
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
@@ -560,6 +597,7 @@ sgtitle("Area:" + q2.areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.0: Load NWB
 
 nwbFile = nwbPath + nwbFiles{2};
+q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
 %% E.0.1: jNWB object
 
@@ -576,9 +614,9 @@ q3.jSUAplot(11, [100 4000], 10:20);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct(); % V1
-channel_in_layer.deep = [46:107, 109:115];
+channel_in_layer.deep = 46:107;
 channel_in_layer.mid = 41:45;
-channel_in_layer.sup = 1:40;
+channel_in_layer.sup = 11:40;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -590,6 +628,21 @@ q3.jLFPprobeINFO(channel_in_layer.goodch);
 %% E.3: Evaluate vFLIP
 
 q3.jVFLIP(channel_in_layer.goodch);
+
+%% E.3.1: Compare vFLIP
+
+a1 = q3.jVFLIP(channel_in_layer.goodch, 3601:4200, 12, 0.04, 0);
+a2 = q3.jVFLIP(channel_in_layer.goodch, 4101:4700, 12, 0.04, 0);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+clim([-.25 .25]);
+colorbar;
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline - V1");
 
 %% E.4: TFR calculations all trials
 

@@ -586,19 +586,37 @@ classdef jnwb < handle
 
         end
 
-        function flipObj = jVFLIP(obj, xch, txlim)
+        function flipObj = jVFLIP(obj, xch, txlim, cond, dist, plotflag)
+
+            if ~exist('cond', 'var')
+
+                cond = 1;
+
+            end
+
+            if ~exist('dist', 'var')
+
+                dist = 0.040;
+
+            end
+
+            if ~exist('plotflag', 'var')
+
+                plotflag = 1;
+
+            end
 
             if ~exist('txlim', 'var')
 
-                data = permute(obj.x{1}(:, xch, :), [2, 3, 1]);
+                data = permute(obj.x{cond}(:, xch, :), [2, 3, 1]);
 
             else
 
-                data = permute(obj.x{1}(:, xch, txlim), [2, 3, 1]);
+                data = permute(obj.x{cond}(:, xch, txlim), [2, 3, 1]);
 
             end
             
-            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.025, 'plot_result', true);
+            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', dist, 'plot_result', plotflag);
         
         end
 

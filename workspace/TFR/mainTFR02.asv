@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [1000 3000]);
+q1.jMUAplot(9, [-500 4000]);
 
 %% E.0.3: SUA plot
 
@@ -41,7 +41,7 @@ q1.jRastrogram(1, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 21:81;
+channel_in_layer.deep = [21:65, 67:81];
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
@@ -54,7 +54,16 @@ q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
 
 %% E.3: Evaluate vFLIP
 
-q1.jVFLIP(channel_in_layer.goodch);
+a1 = q1.jVFLIP(channel_in_layer.goodch, 2801:3400, 12, false);
+a2 = q1.jVFLIP(channel_in_layer.goodch, 3001:4000, 12, false);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", );
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
@@ -72,9 +81,16 @@ q1.jSave("OGLOobj", temp_filename);
 
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230816PFC.mat";
+tfrx = q1.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
 %% E.5: Visualize TFR
 
-q1.jTFRplot(3, 4, q1.tbands{2}(end-10:end), [1000 3000]);
+q1.jTFRplot(11, 4, q1.tbands{3}(end-10:end));
 % q1.jTFRplot(3, 3, q1.tbands{2}(end-6:end), [1000 3000]);
 % q1.jTFRplot(3, 4, q1.tbands{2}(end-6:end), [1000 3000]);
 
@@ -328,18 +344,17 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP(channel_in_layer2.goodch, [1:500, 1100:1550]);
-% q2.jVFLIP(1:2:128, 1:1000);
+q2.jVFLIP(channel_in_layer.goodch, [1:500, 1100:1550]);
 
 %% E.4: TFR calculations all trials
 
-% q2.jCalcTFRs(channel_in_layer);
 q2.jCalcTFRs(channel_in_layer, 1);
+q2.jCalcTFRs(channel_in_layer2, 1);
 
 %% E4.1: Save object
 
@@ -352,20 +367,33 @@ q2.jSave("OGLOobj", temp_filename);
 
 q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230816V4.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230816MT.mat";
+tfrx = q2.pgx2;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
 %% E.5: Visualize TFR
 
+q2.jTFRplot(11, 4, q2.tbands{3}(end-10:end-1));
 % q2.jTFRplot(3, 1, q2.tbands{2}(end-6:end), [1000 3000]);
 % q2.jTFRplot(3, 3, q2.tbands{2}(end-6:end), [1000 3000]);
-q2.jTFRplot(3, 4, q2.tbands{3}(end-10:end), [1000 3000]);
+% q2.jTFRplot(3, 4, q2.tbands{3}(end-10:end), [1000 3000]);
 % q2.jTFRplot(3, 4, q2.tbands{2}(end-6:end), [1000 3000]);
 
 %% E.6: PEV calculations all trials
 
-[expvars, layerinf] = q2.jCalcPEV(1, [1, 5]);
+[expvars, layerinf] = q2.jCalcPEV(1, [2, 6]);
 
 %% E.7: Visualize PEV
 
-q2.jPEVplot(expvars, layerinf, [1 5]);
+q2.jPEVplot(expvars, layerinf, [2 6]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
@@ -461,7 +489,7 @@ end
 %% E.12: PEV plot AX
 
 figure;
-ntmap = q2.tmap(q2.tbands{2});
+ntmap = q2.tmap([q2.tbands{2}, q2.tbands{3}]);
 
 for fband = 1:5
 
@@ -588,6 +616,13 @@ q3.jSave("OGLOobj", temp_filename);
 
 q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230816V1.mat";
+tfrx = q3.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
 %% E.5: Visualize TFR
 
 q3.jTFRplot(3, 4, q3.tbands{3}(end-5:end), [1000 3000]);
@@ -598,10 +633,15 @@ q3.jTFRplot(3, 4, q3.tbands{3}(end-5:end), [1000 3000]);
 
 %% E.7: Visualize PEV
 
-q3.jPEVplot(expvars, layerinf, [3 ]);
+q3.jPEVplot(expvars, layerinf, [3 7]);
 
 %% E.8: PEV calculations for all omission identities (bar plot and time plot)
 
+xs10 = q3.xs{12};
+xs10a = squeeze(mean(xs10, 1));
+xs10b = mean(xs10a, 1);
+xs10b = smooth(xs10b, 100, "sgolay");
+plot(xs10b);
 % q3.jcalcPEVs();
 
 %% E.9: Omission PEV (Positional, AX2/AX3/AX4)
