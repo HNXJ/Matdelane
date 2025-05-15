@@ -75,7 +75,7 @@ classdef jnwb < handle
 
         end
 
-        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel) % TODO concat
+        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel, tfrAllChannel) % TODO concat
 
             if ~exist("tfrByChannel", "var")
 
@@ -83,13 +83,27 @@ classdef jnwb < handle
 
             end
 
-            if tfrByChannel
+            if ~exist("tfrAllChannel", "var")
 
-                [pgxt, xinfo] = jCalculateTFRbyChannel(obj.x, channel_in_layer);
+                tfrAllChannel = 0;
+
+            end
+
+            if tfrAllChannel
+
+                [pgxt, xinfo] = jCalculateTFRallChannel(obj.x, channel_in_layer);
 
             else
-            
-                [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+
+                if tfrByChannel
+    
+                    [pgxt, xinfo] = jCalculateTFRbyChannel(obj.x, channel_in_layer);
+    
+                else
+                
+                    [pgxt, xinfo] = jCalculateTFR(obj.x, channel_in_layer);
+    
+                end
 
             end
 

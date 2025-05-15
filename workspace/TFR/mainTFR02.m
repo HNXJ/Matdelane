@@ -70,7 +70,59 @@ title("Omission - Baseline");
 %% E.4: TFR calculations all trials
 
 % q1.jCalcTFRs(channel_in_layer);
-q1.jCalcTFRs(channel_in_layer, 1);
+q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%% E.4.1: TFR check
+
+im1 = q1.pgx{3};
+tbaselinex = q1.tbands{1}(end-12:end-4);
+
+for ik = 1:size(im1, 2)
+
+    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+
+end
+
+fmapx = q1.fmap;
+locx = (linspace(1, 99, 99) - 60)*40;
+
+figure;
+
+tctx1 = q1.tbands{3}(end-23:end-7);
+imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+
+subplot(2, 2, 1);
+imagesc(imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (baseline before omission)");
+clim([-15 15]);
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+tctx2 = q1.tbands{4}(1:30);
+imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+
+subplot(2, 2, 2);
+imagesc(imx2, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (omission)");
+clim([-15 15]);
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+subplot(2, 1, 2);
+imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (omission - pre-omission-base)");
+clim([-15 15]);
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
 
 %% E4.1: Save object
 

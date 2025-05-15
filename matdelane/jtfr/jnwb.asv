@@ -75,13 +75,23 @@ classdef jnwb < handle
 
         end
 
-        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel) % TODO concat
+        function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel, tfrAllChannel) % TODO concat
 
             if ~exist("tfrByChannel", "var")
 
                 tfrByChannel = 0;
 
             end
+
+            if ~exist("tfrAllChannel", "var")
+
+                tfrAllChannel = 0;
+
+            end
+
+            if tfrAllChannel
+
+            else
 
             if tfrByChannel
 
@@ -216,8 +226,9 @@ classdef jnwb < handle
             figure;
             
             imxm = squeeze(mean(obj.xs{condid}(trials, units, :), 1));
-            imxm = squeeze(mean(imxm, 1)) - 70;
-            imxm = imxm + randn(size(imxm))*10;
+            imxm = squeeze(mean(imxm, 1))*1000;
+            imxm = smooth(imxm, 100, "sgolay");
+            % imxm = imxm + randn(size(imxm))*10;
             % imxm = (imxm - mean(imxm)) / std(imxm);
             plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
             
@@ -229,7 +240,7 @@ classdef jnwb < handle
             
             title("SUAenv/est" + obj.condinflabel(condid));
             xlabel("Time (ms)");
-            ylabel("Amplitude (mv)");
+            ylabel("Sp/s");
             xlim(timewindow);
             
             legend;
@@ -352,8 +363,8 @@ classdef jnwb < handle
                 plot(obj.tmap, y1s, "DisplayName", obj.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
                 hold("on");
 
-                stx = tfr1 + 2*tfr1e;
-                sty = tfr1 - 2*tfr1e;
+                stx = tfr1 + tfr1e;
+                sty = tfr1 - tfr1e;
                 stx(stx <= 0) = 1e-2;
                 sty(sty <= 0) = 1e-2;
 
@@ -401,7 +412,7 @@ classdef jnwb < handle
             subplot(4, 1, 1);
             imagesc(imglfp1, "YData", chx);
             xlim(txlims);
-            clim([-2.5 ])
+            % clim([-2.5 2.5]);
             xlabel("Time (ms)");
             ylabel("Channel");
             title("LFP average by trial");
@@ -415,6 +426,7 @@ classdef jnwb < handle
             subplot(4, 1, 2);
             imagesc(imgcsd1, "YData", chx);
             xlim(txlims);
+            clim([-2.5 2.5]);
             xlabel("Time (ms)");
             ylabel("Channel");%clim([-1 1]);
             title("CSD average by trial");
@@ -425,6 +437,63 @@ classdef jnwb < handle
             xlabel("Channel");
             ylabel("Channel");
             title("Corr of LFP average by trial");
+            colorbar;
+            
+            subplot(2, 2, 4);
+            imxcorr = mean(corr(corrx), 1);
+            stem(imxcorr);
+            hold("on");
+        
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            % rectangle("Position", [1 2 3 4], "FaceColor", "b", "FaceAlpha", 0.25);
+            
+            xlabel("Channel");
+            ylabel("Spearman deviation index");
+            title("Channel grand corr. (corr of corr)");
+            
+        end
+
+        function jLFPmuaINFO(obj, chx, condx, txlims)
+
+            if ~exist("condx", "var")
+
+                condx = 1;
+
+            end
+
+            if ~exist("txlims", "var")
+
+                txlims = [0, obj.tpost];
+
+            end
+
+            imglfp1 = squeeze(mean(obj.x{condx}(:, chx, :), 1));
+            imgmua1 = squeeze(mean(obj.xm{condx}(:, chx, :), 1));
+        
+            figure;
+            subplot(4, 1, 1);
+            imagesc(imglfp1, "YData", chx);
+            xlim(txlims);
+            % clim([-2.5 2.5]);
+            xlabel("Time (ms)");
+            ylabel("Channel");
+            title("LFP average by trial");
+
+            subplot(4, 1, 2);
+            imagesc(imgmua1, "YData", chx);
+            xlim(txlims);
+            clim([-2.5 2.5]);
+            xlabel("Time (ms)");
+            ylabel("Channel");%clim([-1 1]);
+            title("MUA average by trial");
+        
+            corrx = corr(imglfp1', imgmua1', "Type", "Spearman");
+            subplot(2, 2, 3);
+            imagesc(corrx);
+            xlabel("Channel");
+            ylabel("Channel");
+            title("LFP-MUA corr average by trial");
             colorbar;
             
             subplot(2, 2, 4);
@@ -527,19 +596,37 @@ classdef jnwb < handle
 
         end
 
-        function flipObj = jVFLIP(obj, xch, txlim)
+        function flipObj = jVFLIP(obj, xch, txlim, cond, dist, plotflag)
+
+            if ~exist('cond', 'var')
+
+                cond = 1;
+
+            end
+
+            if ~exist('dist', 'var')
+
+                dist = 0.040;
+
+            end
+
+            if ~exist('plotflag', 'var')
+
+                plotflag = 1;
+
+            end
 
             if ~exist('txlim', 'var')
 
-                data = permute(obj.x{1}(:, xch, :), [2, 3, 1]);
+                data = permute(obj.x{cond}(:, xch, :), [2, 3, 1]);
 
             else
 
-                data = permute(obj.x{1}(:, xch, txlim), [2, 3, 1]);
+                data = permute(obj.x{cond}(:, xch, txlim), [2, 3, 1]);
 
             end
             
-            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', 0.04, 'plot_result', true);
+            flipObj = vFLIP2(data(:, :, :), 'DataType', 'raw_cut', 'fsample', 1000, 'intdist', dist, 'plot_result', plotflag);
         
         end
 

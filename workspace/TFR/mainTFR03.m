@@ -571,8 +571,8 @@ q3 = load("OGLOobj\sub-C31o_ses-230818MT-MST.mat", "obj").obj;
 
 %% E.3: Evaluate vFLIP
 
-a1 = q2.jVFLIP(q2.channelinfo{1}.goodch, 3601:4200, 12);
-a2 = q2.jVFLIP(q2.channelinfo{1}.goodch, 4101:4700, 12);
+a1 = q3.jVFLIP(q3.channelinfo{2}.goodch, 3601:4200, 12);
+a2 = q3.jVFLIP(q3.channelinfo{2}.goodch, 4101:4700, 12);
 
 imx1 = a1.relpow - a2.relpow;
 imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.2);

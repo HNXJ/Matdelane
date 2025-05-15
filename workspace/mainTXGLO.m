@@ -16,7 +16,7 @@ disp("Setup done.");
 
 %% TFR unifier
 
-areax = "V4";
+areax = "V1";
 tfrpath = "tfrData\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
@@ -76,13 +76,17 @@ tbaseline = q1.tbands{4}(end-10:end-1);
 
 %% Stim evoked dynamics after omission 
 
-[imx1, tfx1] = jTFRplot(tfrData, 12, 4, tbaseline, [-250 4000], q1, areax + "-");
+tbaseline = q1.tbands{1}(end-10:end-1);
+[imx1, tfx1] = jTFRplot(tfrData, 3, 4, tbaseline, [-250 4000], q1, areax + "-");
+[imx2, tfx2] = jTFRplot(tfrData, 5, 4, tbaseline, [-250 4000], q1, areax + "-");
 
 %%
 
-im1 = imx1(:, q1.tbands{5});
-im2 = imx1(:, q1.tbands{1});
-imagesc(im2);
+im1 = imx2(:, q1.tbands{2});
+im2 = imx1(:, q1.tbands{5});
+figure;
+imagesc(im2-im1);
+colorbar;
 
 %%
 
@@ -134,6 +138,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
     xlabel("Time (ms)");
     ylabel("Frequency (Hz)");
     title("Power change from baseline (dB)");
+    clim([-10 10])
     colorbar;
     
     for fband = 1:5
@@ -211,6 +216,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
         xline(1031, HandleVisibility="off");
         xline(2062, HandleVisibility="off");
         xline(3093, HandleVisibility="off");
+        ylim([-10 10]);
         xlabel("Times (ms)");
         ylabel("Power change (dB)");
         title("Power change from fixation baseline (+-2Se)");

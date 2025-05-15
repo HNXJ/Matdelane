@@ -48,9 +48,24 @@ q1.channelinfo{1} = channel_in_layer;
 
 q1.jLFPprobeINFO(channel_in_layer.goodch);
 
+%% E.3.0: Load Q
+
+q1 = load("OGLOobj\sub-C31o_ses-230823FEF.mat", "obj").obj;
+
 %% E.3: Evaluate vFLIP
 
-q1.jVFLIP(channel_in_layer.goodch);
+a1 = q1.jVFLIP(q1.channelinfo{1}.goodch, 3601:4200, 12);
+a2 = q1.jVFLIP(q1.channelinfo{1}.goodch, 4101:4700, 12);
+
+imx1 = a1.relpow - a2.relpow;
+imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.2);
+figure;
+imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+clim([-.25 .25]);
+colorbar;
+xlabel("Frequency");
+ylabel("Channel");
+title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
