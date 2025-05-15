@@ -88,7 +88,7 @@ locx = (linspace(1, 99, 99) - 60)*40;
 
 figure;
 
-tctx1 = q1.tbands{3}(end-21:end-5);
+tctx1 = q1.tbands{3}(end-23:end-7);
 imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
 
 subplot(2, 2, 1);
@@ -98,10 +98,11 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title("Deep-Sup-PFC (baseline before omission)");
 clim([-15 15]);
+set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
-tctx2 = q1.tbands{4}(1:40);
+tctx2 = q1.tbands{4}(1:30);
 imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
 
 subplot(2, 2, 2);
@@ -111,6 +112,7 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title("Deep-Sup-PFC (omission)");
 clim([-15 15]);
+set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
@@ -119,8 +121,9 @@ imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (omission - base)");
+title("Deep-Sup-PFC (omission - pre-omission-base)");
 clim([-15 15]);
+set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
@@ -360,7 +363,7 @@ sgtitle("Area:" + q1.areainf + " posOmission/Ax/PEV/TFR/+-2SEM/fRes=" + num2str(
 
 nwbFile = nwbPath + nwbFiles{2};
 
-q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
+% q2 = load("OGLOobj\sub-C31o_ses-230816V4-MT.mat", "obj").obj;
 
 %% E.0.1: jNWB object
 
@@ -435,6 +438,61 @@ title("Omission - Baseline");
 
 q2.jCalcTFRs(channel_in_layer, 1);
 q2.jCalcTFRs(channel_in_layer2, 1);
+
+%% E.4.1: TFR check
+
+im1 = q1.pgx{3};
+tbaselinex = q1.tbands{1}(end-12:end-4);
+
+for ik = 1:size(im1, 2)
+
+    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+
+end
+
+fmapx = q1.fmap;
+locx = (linspace(1, 99, 99) - 60)*40;
+
+figure;
+
+tctx1 = q1.tbands{3}(end-23:end-7);
+imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+
+subplot(2, 2, 1);
+imagesc(imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (baseline before omission)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+tctx2 = q1.tbands{4}(1:30);
+imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+
+subplot(2, 2, 2);
+imagesc(imx2, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (omission)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+subplot(2, 1, 2);
+imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title("Deep-Sup-PFC (omission - pre-omission-base)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
 
 %% E4.1: Save object
 
