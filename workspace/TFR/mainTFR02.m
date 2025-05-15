@@ -84,7 +84,7 @@ for ik = 1:size(im1, 2)
 end
 
 fmapx = q1.fmap;
-locx = (linspace(1, 99, 99) - 60)*40;
+locx = (linspace(1, 99, 99) - 60)*25;
 
 figure;
 
@@ -96,7 +96,7 @@ imagesc(imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (baseline before omission)");
+title("PFC (baseline before omission)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
@@ -110,7 +110,7 @@ imagesc(imx2, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (omission)");
+title("PFC (omission)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
@@ -121,7 +121,7 @@ imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (omission - pre-omission-base)");
+title("PFC (omission - pre-omission-base)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
@@ -411,14 +411,14 @@ q2.jLFPprobeINFO(channel_in_layer2.goodch);
 a1 = q2.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 a2 = q2.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
 
-imx1 = a1.relpow - a2.relpow;
-imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
-figure;
-imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
-clim([-.25 .25]);
-xlabel("Frequency");
-ylabel("Channel");
-title("Omission - Baseline");
+% imx1 = a1.relpow - a2.relpow;
+% imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
+% figure;
+% imagesc(imx1, "XData", linspace(0, 150, size(imx1, 1)));
+% clim([-.25 .25]);
+% xlabel("Frequency");
+% ylabel("Channel");
+% title("Omission - Baseline");
 
 %% E.3.2:
 
@@ -436,13 +436,18 @@ title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer, 1);
-q2.jCalcTFRs(channel_in_layer2, 1);
+% q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer2, 1, 1);
 
 %% E.4.1: TFR check
 
-im1 = q1.pgx{3};
-tbaselinex = q1.tbands{1}(end-12:end-4);
+areaname = "V4";
+
+% im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
+im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
+% im1 = q2.pgx2{3};
+
+tbaselinex = q2.tbands{1}(end-12:end-4);
 
 for ik = 1:size(im1, 2)
 
@@ -450,12 +455,12 @@ for ik = 1:size(im1, 2)
 
 end
 
-fmapx = q1.fmap;
-locx = (linspace(1, 99, 99) - 60)*40;
+fmapx = q2.fmap;
+locx = (linspace(1, 55, 55) - 33)*40;
 
 figure;
 
-tctx1 = q1.tbands{3}(end-23:end-7);
+tctx1 = q2.tbands{3}(end-23:end-7);
 imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
 
 subplot(2, 2, 1);
@@ -463,13 +468,13 @@ imagesc(imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (baseline before omission)");
+title(areaname + " (baseline before omission)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
-tctx2 = q1.tbands{4}(1:30);
+tctx2 = q2.tbands{4}(1:30);
 imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
 
 subplot(2, 2, 2);
@@ -477,7 +482,7 @@ imagesc(imx2, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (omission)");
+title(areaname + " (omission)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
@@ -488,8 +493,8 @@ imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title("Deep-Sup-PFC (omission - pre-omission-base)");
-clim([-15 15]);
+title(areaname + " (omission - pre-omission-base)");
+clim([-10 10]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
@@ -707,7 +712,7 @@ sgtitle("Area:" + q2.areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.0: Load NWB
 
 nwbFile = nwbPath + nwbFiles{2};
-q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
+% q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
 %% E.0.1: jNWB object
 
@@ -757,7 +762,67 @@ title("Omission - Baseline - V1");
 %% E.4: TFR calculations all trials
 
 % q3.jCalcTFRs(channel_in_layer);
-q3.jCalcTFRs(channel_in_layer, 1);
+q3.jCalcTFRs(channel_in_layer, 1, 1);
+
+%% E.4.1: TFR check
+
+areaname = "V1";
+
+% im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
+im1 = q3.pgx{3} + q3.pgx{7} + q3.pgx{11};
+% im1 = q3.pgx2{3};
+
+tbaselinex = q3.tbands{1}(end-12:end-4);
+
+for ik = 1:size(im1, 2)
+
+    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+
+end
+
+fmapx = q3.fmap;
+locx = (linspace(1, 55, 55) - 33)*40;
+
+figure;
+
+tctx1 = q3.tbands{3}(end-23:end-7);
+imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+
+subplot(2, 2, 1);
+imagesc(imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (baseline before omission)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+tctx2 = q3.tbands{4}(1:30);
+imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+
+subplot(2, 2, 2);
+imagesc(imx2, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (omission)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+subplot(2, 1, 2);
+imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (omission - pre-omission-base)");
+clim([-10 10]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
 
 %% E4.1: Save object
 
