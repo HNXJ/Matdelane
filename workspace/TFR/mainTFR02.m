@@ -729,9 +729,9 @@ q3.jSUAplot(11, [100 4000], 10:20);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct(); % V1
-channel_in_layer.deep = 46:107;
-channel_in_layer.mid = 41:45;
-channel_in_layer.sup = 11:40;
+channel_in_layer.deep = 34:65;
+channel_in_layer.mid = 31:33;
+channel_in_layer.sup = 12:30;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -772,11 +772,15 @@ areaname = "V1";
 im1 = q3.pgx{3} + q3.pgx{7} + q3.pgx{11};
 % im1 = q3.pgx2{3};
 
-tbaselinex = q3.tbands{1}(end-12:end-4);
+tbaselinex = q3.tbands{1}(5:end-5);
 
 for ik = 1:size(im1, 2)
 
-    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+    for jk = 1:size(im1, 1)
+
+        im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+
+    end
 
 end
 
@@ -785,8 +789,9 @@ locx = (linspace(1, 55, 55) - 33)*40;
 
 figure;
 
-tctx1 = q3.tbands{3}(end-23:end-7);
+tctx1 = q3.tbands{3}(end-30:end);
 imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+imx1 = smoothdata2(imx1, "movmedian", 10);
 
 subplot(2, 2, 1);
 imagesc(imx1, "XData", fmapx, "YData", locx);
@@ -795,12 +800,13 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (baseline before omission)");
 clim([-15 15]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
 tctx2 = q3.tbands{4}(1:30);
 imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+imx2 = smoothdata2(imx2, "movmedian", 10);
 
 subplot(2, 2, 2);
 imagesc(imx2, "XData", fmapx, "YData", locx);
@@ -809,7 +815,7 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (omission)");
 clim([-15 15]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
@@ -820,7 +826,7 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (omission - pre-omission-base)");
 clim([-10 10]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
