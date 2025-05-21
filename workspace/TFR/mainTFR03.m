@@ -37,9 +37,9 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 31:76;
-channel_in_layer.mid = 77:83;
-channel_in_layer.sup = 84:112;
+channel_in_layer.deep = 51:80;
+channel_in_layer.mid = 81:84;
+channel_in_layer.sup = 85:112;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -47,6 +47,7 @@ q1.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
+q1.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 
 %% E.3.0: Load Q
 
@@ -71,6 +72,17 @@ title("Omission - Baseline");
 
 % q2.jCalcTFRs(channel_in_layer, 1, 1);
 q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "10_PFC_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -373,8 +385,8 @@ q2.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = [31:2:43, 47:2:63];
-channel_in_layer.mid = 67:2:73;
+channel_in_layer.deep = [31:2:43, 43, 47:2:63, 63, 67:2:70];
+channel_in_layer.mid = 71:2:73;
 channel_in_layer.sup = 75:2:107;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
@@ -383,6 +395,7 @@ q2.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jVFLIP(q2.channelinfo{1}.goodch, 3601:4200, 12);
 
 %% E.3.0: Load Q
 
@@ -406,6 +419,17 @@ title("Omission - Baseline");
 %% E.4: TFR calculations all trials
 
 q2.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "11_FST_tFRch_1.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -791,6 +815,10 @@ q3.channelinfo{2} = channel_in_layer2;
 q3.jLFPprobeINFO(channel_in_layer.goodch);
 q3.jLFPprobeINFO(channel_in_layer2.goodch);
 
+%%
+
+q3.jVFLIP(q3.channelinfo{1}.goodch, 3601:4200, 12);
+
 %% E.3.0: Load Q
 
 q3 = load("OGLOobj\sub-C31o_ses-230818MT-MST.mat", "obj").obj;
@@ -815,6 +843,17 @@ title("Omission - Baseline");
 % q3.jCalcTFRs(channel_in_layer);
 q3.jCalcTFRs(channel_in_layer, 1, 1);
 q3.jCalcTFRs(channel_in_layer2, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q3.pgx;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "06_MT_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check omission vs baseline
 

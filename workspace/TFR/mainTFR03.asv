@@ -37,9 +37,9 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 31:76;
-channel_in_layer.mid = 77:83;
-channel_in_layer.sup = 84:112;
+channel_in_layer.deep = 51:80;
+channel_in_layer.mid = 81:84;
+channel_in_layer.sup = 85:112;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -47,6 +47,7 @@ q1.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
+q1.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 
 %% E.3.0: Load Q
 
@@ -72,11 +73,23 @@ title("Omission - Baseline");
 % q2.jCalcTFRs(channel_in_layer, 1, 1);
 q1.jCalcTFRs(channel_in_layer, 1, 1);
 
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "10_PFC_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
 %% E.4.1: TFR check
 
 areaname = "PFC";
 
 im1 = q1.pgx{3} + q1.pgx{7} + q1.pgx{11};
+im2 = q1.pgx{1} + q1.pgx{5} + q1.pgx{9};
 
 tbaselinex = q1.tbands{1}(end-12:end-4);
 
@@ -86,49 +99,71 @@ for ik = 1:size(im1, 2)
 
 end
 
+for ik = 1:size(im2, 2)
+
+    im2(:, ik, :) = im2(:, ik, :) / mean(im2(:, ik, tbaselinex), "all");
+
+end
+
 fmapx = q1.fmap;
-locx = (linspace(1, 55, 55) - 33)*40;
+locx = (linspace(1, 82, 82) - 41)*25;
 
 figure;
 
-tctx1 = q1.tbands{3}(end-23:end-7);
-imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+tctx1 = q1.tbands{5};
+imx1x = squeeze(mean(im1(:, :, tctx1), 3));
+imx1 = 10*log(imx1x);
 
 subplot(2, 2, 1);
 imagesc(imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (baseline before omission)");
+title(areaname + " (xS4)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
-tctx2 = q1.tbands{4}(1:30);
-imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+tctx2 = q1.tbands{5};
+imx2x = squeeze(mean(im2(:, :, tctx2), 3));
+imx2 = 10*log(imx2x);
 
 subplot(2, 2, 2);
 imagesc(imx2, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (omission)");
+title(areaname + " (nS4)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
+imx3 = 100*(imx1x - imx2x) ./ (imx1x);
+
 subplot(2, 1, 2);
-imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+imagesc(imx3, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (omission - pre-omission-base)");
-clim([-10 10]);
+title(areaname + " (xS4/nS4)");
+clim([-50 50]);
 set(gca, "YDir", "normal");
 cb = colorbar();
-ylabel(cb, "Power vs. baseline (dB)");
+ylabel(cb, "Power change (%)");
+
+%%
+
+figure;
+% subplot(2, 1, 1);
+stem(fmapx, mean(imx3(1:41, :), 1), "DisplayName", "Deep(?)");
+% title("Sup");
+% subplot(2, 1, 2);
+hold("on");
+stem(fmapx, mean(imx3(41:end, :), 1), "DisplayName", "Sup(?)");
+legend();
+title("S(after omission) vs. S(first stim fx)");
 
 %% E4.1: Save object
 
@@ -350,8 +385,8 @@ q2.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = [31:2:43, 47:2:63];
-channel_in_layer.mid = 67:2:73;
+channel_in_layer.deep = [31:2:43, 43, 47:2:63, 63, 67:2:70];
+channel_in_layer.mid = 71:2:73;
 channel_in_layer.sup = 75:2:107;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
@@ -360,6 +395,7 @@ q2.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jVFLIP(q2.channelinfo{1}.goodch, 3601:4200, 12);
 
 %% E.3.0: Load Q
 
@@ -383,6 +419,17 @@ title("Omission - Baseline");
 %% E.4: TFR calculations all trials
 
 q2.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "11_FST_tFRch_1.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -793,6 +840,17 @@ title("Omission - Baseline");
 q3.jCalcTFRs(channel_in_layer, 1, 1);
 q3.jCalcTFRs(channel_in_layer2, 1, 1);
 
+%%
+
+tset = struct();
+tset.pgx = q3.pgx;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "06_MT_tFRch_1.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
 %% E.4.1: TFR check omission vs baseline
 
 areaname = "MT";
@@ -861,10 +919,10 @@ ylabel(cb, "Power vs. baseline (dB)");
 
 %% E.4.2: TFR check stim after fixation vs stim after omission
 
-areaname = "MST";
+areaname = "MT";
 
 % im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
-im1 = q3.pgx{2} + q3.pgx2{6} + q3.pgx2{10};
+im1 = q3.pgx{2} + q3.pgx{6} + q3.pgx{10};
 % im1 = q3.pgx2{3};
 
 tbaselinex = q3.tbands{1}(5:end-5);
@@ -932,17 +990,17 @@ ylabel(cb, "Power change (%)");
 
 %%
 
-q3.jVFLIP(q3.channelinfo{2}.goodch, 3601:4200, 12)
+q3.jVFLIP(q3.channelinfo{1}.goodch, 3601:4200, 12)
 
 %%
 
 figure;
 % subplot(2, 1, 1);
-stem(fmapx, mean(imx3(1:12, :), 1), "DisplayName", "Sup");
+stem(fmapx, mean(imx3(27:end, :), 1), "DisplayName", "Sup");
 % title("Sup");
 % subplot(2, 1, 2);
 hold("on");
-stem(fmapx, mean(imx3(13:end, :), 1), "DisplayName", "Deep");
+stem(fmapx, mean(imx3(1:26, :), 1), "DisplayName", "Deep");
 legend();
 title("S(after omission) vs. S(first stim fx)");
 

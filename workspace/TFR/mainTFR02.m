@@ -76,12 +76,12 @@ q1.jCalcTFRs(channel_in_layer, 1, 1);
 %%
 
 tset = struct();
-tset.pgx = q3.pgx2;
-tset.fmap = q3.fmap;
-tset.tmap = q3.tmap;
-tset.chan = q3.channelinfo;
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
 
-fname = "01_V1_tFRch.mat";
+fname = "10_PFC_tFRch.mat";
 save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
@@ -399,15 +399,15 @@ q2.jRastrogram(3, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 1:27;
-channel_in_layer.mid = 29:2:35;
-channel_in_layer.sup = [36:44, 46:60];
+channel_in_layer.deep = [1:27, 27, 29, 29];
+channel_in_layer.mid = [31, 31, 33, 33, 35];
+channel_in_layer.sup = [36:44, 46:54];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 81:128;
-channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [57:64, 66:75];
+channel_in_layer2.deep = 79:120;
+channel_in_layer2.mid = 76:78;
+channel_in_layer2.sup = [55:64, 64, 66:75];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q2.channelinfo{1} = channel_in_layer;
@@ -423,6 +423,7 @@ q2.jLFPprobeINFO(channel_in_layer2.goodch);
 a1 = q2.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 a2 = q2.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
 
+%%
 % imx1 = a1.relpow - a2.relpow;
 % imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
 % figure;
@@ -448,8 +449,28 @@ title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
-% q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
 q2.jCalcTFRs(channel_in_layer2, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "05_V4_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q2.pgx2;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "06_MT_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 

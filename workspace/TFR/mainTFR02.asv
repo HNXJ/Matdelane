@@ -41,7 +41,7 @@ q1.jRastrogram(1, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = [21:65, 67:81];
+channel_in_layer.deep = [21:65, 65, 67:81];
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
@@ -51,6 +51,7 @@ q1.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
+% q1.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 
 %% E.3: Evaluate vFLIP
 
@@ -71,6 +72,17 @@ title("Omission - Baseline");
 
 % q1.jCalcTFRs(channel_in_layer);
 q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "10_PFC_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -387,15 +399,15 @@ q2.jRastrogram(3, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 1:27;
-channel_in_layer.mid = 29:2:35;
-channel_in_layer.sup = [36:44, 46:60];
+channel_in_layer.deep = 1:29;
+channel_in_layer.mid = 31:2:35;
+channel_in_layer.sup = [36:44, 46:54];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 81:128;
-channel_in_layer2.mid = 76:80;
-channel_in_layer2.sup = [57:64, 66:75];
+channel_in_layer2.deep = 79:12;
+channel_in_layer2.mid = 76:78;
+channel_in_layer2.sup = [55:64, 64, 66:75];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q2.channelinfo{1} = channel_in_layer;
@@ -408,9 +420,9 @@ q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-a1 = q2.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
-a2 = q2.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
-
+a1 = q2.jVFLIP(channel_in_layer2.goodch, 3601:4200, 12);
+% a2 = q2.jVFLIP(channel_in_layer.goodch, 4101:4700, 12);
+%%
 % imx1 = a1.relpow - a2.relpow;
 % imx1 = smoothdata2(imx1, "movmedian", "omitmissing", "SmoothingFactor", 0.25);
 % figure;
@@ -436,8 +448,28 @@ title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
-% q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
 q2.jCalcTFRs(channel_in_layer2, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "05_V4_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q2.pgx2;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "06_MT_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -712,7 +744,7 @@ sgtitle("Area:" + q2.areainf + " posOmission/Rx/PEV/TFR/+-2SEM/fRes=" + num2str(
 %% E.0: Load NWB
 
 nwbFile = nwbPath + nwbFiles{2};
-q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
+% q3 = load("OGLOobj\sub-C31o_ses-230816V1-V2.mat", "obj").obj;
 
 %% E.0.1: jNWB object
 
@@ -729,9 +761,9 @@ q3.jSUAplot(11, [100 4000], 10:20);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct(); % V1
-channel_in_layer.deep = 46:107;
-channel_in_layer.mid = 41:45;
-channel_in_layer.sup = 11:40;
+channel_in_layer.deep = 34:65;
+channel_in_layer.mid = 29:31;
+channel_in_layer.sup = 12:28;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -746,7 +778,7 @@ q3.jVFLIP(channel_in_layer.goodch);
 
 %% E.3.1: Compare vFLIP
 
-a1 = q3.jVFLIP(channel_in_layer.goodch, 3601:4200, 12, 0.04, 0);
+a1 = q3.jVFLIP(channel_in_layer.goodch, 3601:4200, 12, 0.04, 1);
 a2 = q3.jVFLIP(channel_in_layer.goodch, 4101:4700, 12, 0.04, 0);
 
 imx1 = a1.relpow - a2.relpow;
@@ -762,31 +794,47 @@ title("Omission - Baseline - V1");
 %% E.4: TFR calculations all trials
 
 % q3.jCalcTFRs(channel_in_layer);
-q3.jCalcTFRs(channel_in_layer, 1);
+q3.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "01_V1_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
-areaname = "V4";
+areaname = "V1";
 
-% im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
-im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
-% im1 = q2.pgx2{3};
+% im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
+im1 = q3.pgx{3} + q3.pgx{7} + q3.pgx{11};
+% im1 = q3.pgx2{3};
 
-tbaselinex = q2.tbands{1}(end-12:end-4);
+tbaselinex = q3.tbands{1}(5:end-5);
 
 for ik = 1:size(im1, 2)
 
-    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+    for jk = 1:size(im1, 1)
+
+        im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+
+    end
 
 end
 
-fmapx = q2.fmap;
+fmapx = q3.fmap;
 locx = (linspace(1, 55, 55) - 33)*40;
 
 figure;
 
-tctx1 = q2.tbands{3}(end-23:end-7);
+tctx1 = q3.tbands{3}(end-30:end);
 imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+imx1 = smoothdata2(imx1, "movmedian", 10);
 
 subplot(2, 2, 1);
 imagesc(imx1, "XData", fmapx, "YData", locx);
@@ -795,12 +843,13 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (baseline before omission)");
 clim([-15 15]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
-tctx2 = q2.tbands{4}(1:30);
+tctx2 = q3.tbands{4}(1:30);
 imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+imx2 = smoothdata2(imx2, "movmedian", 10);
 
 subplot(2, 2, 2);
 imagesc(imx2, "XData", fmapx, "YData", locx);
@@ -809,7 +858,7 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (omission)");
 clim([-15 15]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
@@ -820,7 +869,7 @@ xlabel("Freq.");
 ylabel("Dist. from L4 in um");
 title(areaname + " (omission - pre-omission-base)");
 clim([-10 10]);
-set(gca, "YDir", "normal");
+% set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
