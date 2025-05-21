@@ -77,6 +77,7 @@ q1.jCalcTFRs(channel_in_layer, 1, 1);
 areaname = "PFC";
 
 im1 = q1.pgx{3} + q1.pgx{7} + q1.pgx{11};
+im2 = q1.pgx{1} + q1.pgx{5} + q1.pgx{9};
 
 tbaselinex = q1.tbands{1}(end-12:end-4);
 
@@ -86,49 +87,71 @@ for ik = 1:size(im1, 2)
 
 end
 
+for ik = 1:size(im2, 2)
+
+    im2(:, ik, :) = im2(:, ik, :) / mean(im2(:, ik, tbaselinex), "all");
+
+end
+
 fmapx = q1.fmap;
-locx = (linspace(1, 55, 55) - 33)*40;
+locx = (linspace(1, 82, 82) - 41)*25;
 
 figure;
 
-tctx1 = q1.tbands{3}(end-23:end-7);
-imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+tctx1 = q1.tbands{5};
+imx1x = squeeze(mean(im1(:, :, tctx1), 3));
+imx1 = 10*log(imx1x);
 
 subplot(2, 2, 1);
 imagesc(imx1, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (baseline before omission)");
+title(areaname + " (xS4)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
-tctx2 = q1.tbands{4}(1:30);
-imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+tctx2 = q1.tbands{5};
+imx2x = squeeze(mean(im2(:, :, tctx2), 3));
+imx2 = 10*log(imx2x);
 
 subplot(2, 2, 2);
 imagesc(imx2, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (omission)");
+title(areaname + " (nS4)");
 clim([-15 15]);
 set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
+imx3 = 100*(imx1x - imx2x) ./ (imx1x);
+
 subplot(2, 1, 2);
-imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+imagesc(imx3, "XData", fmapx, "YData", locx);
 yline(0);
 xlabel("Freq.");
 ylabel("Dist. from L4 in um");
-title(areaname + " (omission - pre-omission-base)");
-clim([-10 10]);
+title(areaname + " (xS4/nS4)");
+clim([-50 50]);
 set(gca, "YDir", "normal");
 cb = colorbar();
-ylabel(cb, "Power vs. baseline (dB)");
+ylabel(cb, "Power change (%)");
+
+%%
+
+figure;
+% subplot(2, 1, 1);
+stem(fmapx, mean(imx3(1:41, :), 1), "DisplayName", "Deep(?)");
+% title("Sup");
+% subplot(2, 1, 2);
+hold("on");
+stem(fmapx, mean(imx3(41:end, :), 1), "DisplayName", "Sup(?)");
+legend();
+title("S(after omission) vs. S(first stim fx)");
 
 %% E4.1: Save object
 
@@ -454,6 +477,81 @@ set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
 
+%% E.4.2: TFR check stim/ox
+
+areaname = "FST";
+
+% im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
+im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
+% im1 = q2.pgx{1};
+
+tbaselinex = q2.tbands{1}(end-12:end-4);
+
+% for ik = 1:size(im1, 2)
+% 
+%     im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+% 
+% end
+
+for ik = 1:size(im1, 2)
+
+    for jk = 1:size(im1, 1)
+
+        im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+
+    end
+
+end
+
+fmapx = q2.fmap;
+locx = (linspace(1, 55, 55) - 33)*40;
+
+figure;
+
+tctx1 = q2.tbands{5};
+imx1x = squeeze(mean(im1(:, :, tctx1), 3));
+imx1 = 10*log(imx1x);
+
+subplot(2, 2, 1);
+imagesc(imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (xS4)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+tctx2 = q2.tbands{2};
+imx2x = squeeze(mean(im1(:, :, tctx2), 3));
+imx2 = 10*log(imx2x);
+
+subplot(2, 2, 2);
+imagesc(imx2, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (fS1)");
+clim([-15 15]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+imx3 = 100*(imx1x - imx2x) ./ (imx1x);
+% imx3 = smoothdata2(imx3, "movmedian", 20);
+
+subplot(2, 1, 2);
+imagesc(imx3, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (Sx/S1 change %)");
+clim([-100 100]);
+set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power change (%)");
+
 %% E4.1: Save object
 
 temp_filename = char(q2.nwbFile);
@@ -680,7 +778,7 @@ channel_in_layer.sup = 18:37;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % MST
-channel_in_layer2.sup = 77:97;
+channel_in_layer2.sup = 60:97;
 channel_in_layer2.mid = 98:103;
 channel_in_layer2.deep = [104:107, 109:128];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
@@ -716,10 +814,11 @@ title("Omission - Baseline");
 
 % q3.jCalcTFRs(channel_in_layer);
 q3.jCalcTFRs(channel_in_layer, 1, 1);
+q3.jCalcTFRs(channel_in_layer2, 1, 1);
 
-%% E.4.1: TFR check
+%% E.4.1: TFR check omission vs baseline
 
-areaname = "V1";
+areaname = "MT";
 
 % im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
 im1 = q3.pgx{3} + q3.pgx{7} + q3.pgx{11};
@@ -738,7 +837,7 @@ for ik = 1:size(im1, 2)
 end
 
 fmapx = q3.fmap;
-locx = (linspace(1, 55, 55) - 33)*40;
+locx = (linspace(1, 60, 60) - 16)*40;
 
 figure;
 
@@ -782,6 +881,93 @@ clim([-10 10]);
 % set(gca, "YDir", "normal");
 cb = colorbar();
 ylabel(cb, "Power vs. baseline (dB)");
+
+%% E.4.2: TFR check stim after fixation vs stim after omission
+
+areaname = "MT";
+
+% im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
+im1 = q3.pgx{2} + q3.pgx{6} + q3.pgx{10};
+% im1 = q3.pgx2{3};
+
+tbaselinex = q3.tbands{1}(5:end-5);
+
+for ik = 1:size(im1, 2)
+
+    for jk = 1:size(im1, 1)
+
+        im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+
+    end
+
+end
+
+fmapx = q3.fmap;
+locx = (linspace(1, 68, 68) - 15)*40;
+
+figure;
+
+tctx1 = q3.tbands{4};
+imx1x = squeeze(mean(im1(:, :, tctx1), 3));
+imx1 = 10*log(imx1x);
+imx1 = smoothdata2(imx1, "movmedian", 10);
+
+subplot(2, 2, 1);
+imagesc(imx1, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (Stim 3 after omission)");
+clim([-15 15]);
+% set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+tctx2 = q3.tbands{2};
+imx2x = squeeze(mean(im1(:, :, tctx2), 3));
+imx2 = 10*log(imx2x);
+imx2 = smoothdata2(imx2, "movmedian", 10);
+
+subplot(2, 2, 2);
+imagesc(imx2, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (Stim 1)");
+clim([-15 15]);
+% set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power vs. baseline (dB)");
+
+imx3 = 100*(imx1x - imx2x) ./ (imx1x);
+imx3 = smoothdata2(imx3, "movmedian", 20);
+
+subplot(2, 1, 2);
+imagesc(imx3, "XData", fmapx, "YData", locx);
+yline(0);
+xlabel("Freq.");
+ylabel("Dist. from L4 in um");
+title(areaname + " (Stim3afterOx-Stim1)/(Stim3atferOx)");
+clim([-50 50]);
+% set(gca, "YDir", "normal");
+cb = colorbar();
+ylabel(cb, "Power change (%)");
+
+%%
+
+q3.jVFLIP(q3.channelinfo{1}.goodch, 3601:4200, 12)
+
+%%
+
+figure;
+% subplot(2, 1, 1);
+stem(fmapx, mean(imx3(27:end, :), 1), "DisplayName", "Sup");
+% title("Sup");
+% subplot(2, 1, 2);
+hold("on");
+stem(fmapx, mean(imx3(1:26, :), 1), "DisplayName", "Deep");
+legend();
+title("S(after omission) vs. S(first stim fx)");
 
 %% E4.1: Save object
 

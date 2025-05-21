@@ -563,6 +563,17 @@ q3.jVFLIP(channel_in_layer2.goodch);
 q3.jCalcTFRs(channel_in_layer, 1);
 q3.jCalcTFRs(channel_in_layer2, 1);
 
+%%
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "01_V1_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
 %% E4.1: Save object
 
 temp_filename = char(q3.nwbFile);

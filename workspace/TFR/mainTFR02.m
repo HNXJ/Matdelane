@@ -41,7 +41,7 @@ q1.jRastrogram(1, [1000 3000], 10:120, 1:2);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = [21:65, 67:81];
+channel_in_layer.deep = [21:65, 65, 67:81];
 channel_in_layer.mid = 82:86;
 channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
@@ -51,6 +51,7 @@ q1.channelinfo{1} = channel_in_layer;
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch, 3);
+% q1.jVFLIP(channel_in_layer.goodch, 3601:4200, 12);
 
 %% E.3: Evaluate vFLIP
 
@@ -71,6 +72,17 @@ title("Omission - Baseline");
 
 % q1.jCalcTFRs(channel_in_layer);
 q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "01_V1_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
@@ -730,8 +742,8 @@ q3.jSUAplot(11, [100 4000], 10:20);
 
 channel_in_layer = struct(); % V1
 channel_in_layer.deep = 34:65;
-channel_in_layer.mid = 31:33;
-channel_in_layer.sup = 12:30;
+channel_in_layer.mid = 29:31;
+channel_in_layer.sup = 12:28;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -746,7 +758,7 @@ q3.jVFLIP(channel_in_layer.goodch);
 
 %% E.3.1: Compare vFLIP
 
-a1 = q3.jVFLIP(channel_in_layer.goodch, 3601:4200, 12, 0.04, 0);
+a1 = q3.jVFLIP(channel_in_layer.goodch, 3601:4200, 12, 0.04, 1);
 a2 = q3.jVFLIP(channel_in_layer.goodch, 4101:4700, 12, 0.04, 0);
 
 imx1 = a1.relpow - a2.relpow;
@@ -763,6 +775,17 @@ title("Omission - Baseline - V1");
 
 % q3.jCalcTFRs(channel_in_layer);
 q3.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "01_V1_tFRch.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
