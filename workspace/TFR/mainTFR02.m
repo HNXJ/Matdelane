@@ -474,10 +474,10 @@ save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
-areaname = "V4";
+areaname = "MT";
 
-% im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
-im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
+im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
+% im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
 % im1 = q2.pgx2{3};
 
 tbaselinex = q2.tbands{1}(end-12:end-4);

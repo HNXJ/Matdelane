@@ -54,7 +54,18 @@ q1.jVFLIP(channel_in_layer.goodch);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer, 1);
+q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "09_FEF_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E4.1: Save object
 

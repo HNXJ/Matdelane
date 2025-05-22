@@ -796,15 +796,15 @@ q3.jSUAplot(9, [100 4000], 55:58);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct(); % MT
-channel_in_layer.deep = 1:11;
-channel_in_layer.mid = 12:17;
-channel_in_layer.sup = 18:37;
+channel_in_layer.deep = 1:21;
+channel_in_layer.mid = 22:24;
+channel_in_layer.sup = 25:48;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % MST
-channel_in_layer2.sup = 60:97;
-channel_in_layer2.mid = 98:103;
-channel_in_layer2.deep = [104:107, 109:128];
+channel_in_layer2.sup = 49:69;
+channel_in_layer2.mid = 70:74;
+channel_in_layer2.deep = [75:107, 109:120];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -853,6 +853,15 @@ tset.tmap = q3.tmap;
 tset.chan = q3.channelinfo;
 
 fname = "06_MT_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "07_MST_tFRch_1.mat";
 save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check omission vs baseline
