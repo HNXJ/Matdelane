@@ -586,8 +586,8 @@ q3.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_layer, 1);
-q3.jCalcTFRs(channel_in_layer2, 1);
+q3.jCalcTFRs(channel_in_layer, 1, 1);
+q3.jCalcTFRs(channel_in_layer2, 1, 1);
 
 %%
 
