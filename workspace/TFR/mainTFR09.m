@@ -50,11 +50,22 @@ q1.jLFPprobeINFO(channel_in_layer.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q1.jVFLIP(channel_in_layer.goodch);
+q1.jVFLIP(channel_in_layer.goodch, 1:1000);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer);
+q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "10_PFC_tFRch_6.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.5: Visualize TFR
 
@@ -281,7 +292,28 @@ q2.jVFLIP(1:2:128, 1:1000);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer2, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "06_MT_tFRch_6.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q2.pgx2;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "07_MST_tFRch_6.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.5: Visualize TFR
 
@@ -484,7 +516,7 @@ q3.jSUAplot(9, [100 4000], 100:120);
 
 %% E.1: Channel and layer specs
 
-channel_in_layer = struct(); % V3
+channel_in_layer = struct(); % V3d
 channel_in_layer.deep = [26:43, 45:48, 49:2:55];
 channel_in_layer.mid = 21:25;
 channel_in_layer.sup = 1:20;
@@ -508,7 +540,28 @@ q3.jVFLIP(channel_in_layer2.goodch);
 
 %% E.4: TFR calculations all trials
 
-q3.jCalcTFRs(channel_in_layer);
+q3.jCalcTFRs(channel_in_layer, 1, 1);
+q3.jCalcTFRs(channel_in_layer2, 1, 1);
+
+%%
+
+tset = struct();
+tset.pgx = q3.pgx;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "03_V3d_tFRch_4.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q3.pgx2;
+tset.fmap = q3.fmap;
+tset.tmap = q3.tmap;
+tset.chan = q3.channelinfo;
+
+fname = "05_V4_tFRch_5.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.5: Visualize TFR
 

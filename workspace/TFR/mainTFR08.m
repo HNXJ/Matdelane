@@ -563,13 +563,13 @@ q3.jSUAplot(9, [100 4000], 100:120);
 channel_in_layer = struct(); % V3d
 channel_in_layer.deep = 1:37;
 channel_in_layer.mid = 38:41;
-channel_in_layer.sup = [42:43, 45:2:53, 54:57];
+channel_in_layer.sup = [42:43, 43, 45:2:47];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % V4
 channel_in_layer2.deep = 117:128;
 channel_in_layer2.mid = 113:116;
-channel_in_layer2.sup = [90:104, 105:107, 109:112];
+channel_in_layer2.sup = [84:107, 107, 109:112];
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q3.channelinfo{1} = channel_in_layer;
@@ -582,8 +582,8 @@ q3.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q3.jVFLIP(channel_in_layer.goodch);
-q3.jVFLIP(channel_in_layer2.goodch);
+q3.jVFLIP(channel_in_layer.goodch, 1:1000);
+q3.jVFLIP(channel_in_layer2.goodch, 1:1000);
 
 %% E.4: TFR calculations all trials
 
