@@ -17,36 +17,18 @@ disp("Setup done.");
 %% TFR unifier
 
 areax = "V1";
-tfrpath = "tfrData\";
+tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
+tfrfiles = tfrfiles(contains(tfrfiles, areax));
 Nfiles = length(tfrfiles);
-tfrData = cell(Nfiles, 12, 4);
+tfrData = cell(Nfiles, 1);
 
 %%
 
 for ik = 1:Nfiles
 
     tfrx = load(tfrpath + tfrfiles{ik});
-    tfrx = tfrx.tfrx;
-
-    for kk = 1:4
-
-        for jk = 1:12
-
-            imxx = tfrx{jk, kk};
-            imx2 = squeeze(max(imxx, [], 2));
-            imx2 = max(imx2, [], 2);
-            imx2 = (imx2 - mean(imx2)) / (std(imx2) / sqrt(length(imx2)));
-            
-            imx2 = abs(imx2) > 5;
-            imxx(imx2, :, :) = [];
-            tfrData{ik, jk, kk} = imxx;
-
-        end
-
-    end
-
+    tfrData{ik} = tfrx.tset.pgx;
     fprintf(num2str(ik));
 
 end
@@ -69,20 +51,98 @@ q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 txlims = [q1.tmap(1) q1.tmap(end)];
 
 tbaseline = q1.tbands{4}(end-10:end-1);
-jTFRplot(tfrData, 8, 4, tbaseline, [1000 4100], q1, areax + "-");
+% jTFRplot(tfrData, 8, 4, tbaseline, [1000 4100], q1, areax + "-");
 
-tbaseline = q1.tbands{3}(end-10:end-1);
-jTFRplot(tfrData, 7, 4, tbaseline, [0 3100], q1, areax + "-");
+% tbaseline = q1.tbands{3}(end-10:end-1);
+% jTFRplot(tfrData, 7, 4, tbaseline, [0 3100], q1, areax + "-");
 
 %% Stim evoked dynamics after omission 
 
-for ik = 1:size(tfrData, 1)
+tbaseline = q1.tbands{1}(end-10:end-1);
+[imx1, tfx1] = jTFRplot(tfrData, 3, 4, tbaseline, [-250 4000], q1, areax + "-");
+[imx2, tfx2] = jTFRplot(tfrData, 5, 4, tbaseline, [-250 4000], q1, areax + "-");
 
-    xtfr = tfrData{ik, 12, 4}; % Trial-Freq-Time
+%%
 
+im1 = imx2(:, q1.tbands{2});
+im2 = imx1(:, q1.tbands{5});
+figure;
+imagesc(im2-im1);
+colorbar;
+
+%%
+
+jTFRplot2(tfrData{1}, tfrx.tset, "V1");
+
+%% E.4.1: TFR check
+
+function jTFRplot2(pgx, tset, areaname)
+
+    areaname = "V1";
+    
+    % im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
+    im1 = pgx{3} + pgx{7} + pgx{11};
+    % im1 = q3.pgx2{3};
+    
+    tbaselinex = tset.tbands{1}(5:end-5);
+    
+    for ik = 1:size(im1, 2)
+    
+        for jk = 1:size(im1, 1)
+    
+            im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+    
+        end
+    
+    end
+    
+    fmapx = tset.fmap;
+    locx = (linspace(1, 55, 55) - 33)*40;
+    
+    figure;
+    
+    tctx1 = t.tbands{3}(end-30:end);
+    imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+    imx1 = smoothdata2(imx1, "movmedian", 10);
+    
+    subplot(2, 2, 1);
+    imagesc(imx1, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (baseline before omission)");
+    clim([-15 15]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
+    
+    tctx2 = q3.tbands{4}(1:30);
+    imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+    imx2 = smoothdata2(imx2, "movmedian", 10);
+    
+    subplot(2, 2, 2);
+    imagesc(imx2, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (omission)");
+    clim([-15 15]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
+    
+    subplot(2, 1, 2);
+    imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (omission - pre-omission-base)");
+    clim([-10 10]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
 
 end
-
 
 %%
 
@@ -123,6 +183,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
     imagesc(10*log10(tfr1), "XData", q1.tmap, "YData", q1.fmap);
     % ylim([0 20])
     xlim(txlims);
+    imx = 10*log10(tfr1);
 
     set(gca, "YDir", "normal");
     hold("on");
@@ -133,6 +194,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
     xlabel("Time (ms)");
     ylabel("Frequency (Hz)");
     title("Power change from baseline (dB)");
+    clim([-10 10])
     colorbar;
     
     for fband = 1:5
@@ -149,6 +211,8 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
     cls(3, :) = [1 0.5 0];
     cls(4, :) = [1 0 1];
     cls(5, :) = [0 0.8 0.4];
+
+    tfx = cell([5, 3]);
     
     for fband = 1:5
 
@@ -183,6 +247,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
 
         cl = cls(fband, :);
         y1s = 10*log10(tfr1);
+        tfx{fband, 1} = y1s;
         plot(q1.tmap, y1s, "DisplayName", q1.fbandlabels(fband), "LineWidth", 0.5, "Color", cl);
         hold("on");
 
@@ -194,6 +259,9 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
         stx = 10*log10(stx);
         sty = 10*log10(sty);
 
+        tfx{fband, 2} = stx;
+        tfx{fband, 3} = sty;
+
         patch([q1.tmap; q1.tmap(end:-1:1)], [stx; sty(end:-1:1)], cl, "EdgeColor", "none", "FaceColor", cl, "FaceAlpha", 0.5, "HandleVisibility", "off");
 
         % ylim([0 20])
@@ -204,6 +272,7 @@ function [imx, tfx] = jTFRplot(pgx, tcond1, layerid, tbaseline, txlims, q1, area
         xline(1031, HandleVisibility="off");
         xline(2062, HandleVisibility="off");
         xline(3093, HandleVisibility="off");
+        ylim([-10 10]);
         xlabel("Times (ms)");
         ylabel("Power change (dB)");
         title("Power change from fixation baseline (+-2Se)");

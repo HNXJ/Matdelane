@@ -37,9 +37,9 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 1:2:45;
+channel_in_layer.deep = 1:2:41;
 channel_in_layer.mid = 45:2:51;
-channel_in_layer.sup = 53:120;
+channel_in_layer.sup = 53:115;
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;

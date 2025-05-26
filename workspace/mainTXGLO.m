@@ -17,36 +17,18 @@ disp("Setup done.");
 %% TFR unifier
 
 areax = "V1";
-tfrpath = "tfrData\";
+tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
-tfrfiles = tfrfiles(endsWith(tfrfiles, areax + ".mat"));
+tfrfiles = tfrfiles(contains(tfrfiles, areax));
 Nfiles = length(tfrfiles);
-tfrData = cell(Nfiles, 12, 4);
+tfrData = cell(Nfiles, 1);
 
 %%
 
 for ik = 1:Nfiles
 
     tfrx = load(tfrpath + tfrfiles{ik});
-    tfrx = tfrx.tfrx;
-
-    for kk = 1:4
-
-        for jk = 1:12
-
-            imxx = tfrx{jk, kk};
-            imx2 = squeeze(max(imxx, [], 2));
-            imx2 = max(imx2, [], 2);
-            imx2 = (imx2 - mean(imx2)) / (std(imx2) / sqrt(length(imx2)));
-            
-            imx2 = abs(imx2) > 5;
-            imxx(imx2, :, :) = [];
-            tfrData{ik, jk, kk} = imxx;
-
-        end
-
-    end
-
+    tfrData{ik} = tfrx.tset.pgx;
     fprintf(num2str(ik));
 
 end
@@ -87,6 +69,80 @@ im2 = imx1(:, q1.tbands{5});
 figure;
 imagesc(im2-im1);
 colorbar;
+
+%%
+
+jTFRplot2(tfrData{1}, tfrx.tset, "V1");
+
+%% E.4.1: TFR check
+
+function jTFRplot2(pgx, tset, areaname)
+
+    % areaname = "V1";
+    
+    % im1 = q3.pgx2{3} + q3.pgx2{7} + q3.pgx2{11};
+    im1 = pgx{3} + pgx{7} + pgx{11};
+    % im1 = q3.pgx2{3};
+    
+    tbaselinex = tset.tbands{1}(5:end-5);
+    
+    for ik = 1:size(im1, 2)
+    
+        for jk = 1:size(im1, 1)
+    
+            im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
+    
+        end
+    
+    end
+    
+    fmapx = tset.fmap;
+    locx = (linspace(1, 55, 55) - 33)*40;
+    
+    figure;
+    
+    tctx1 = tset.tbands{3}(end-30:end);
+    imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+    imx1 = smoothdata2(imx1, "movmedian", 10);
+    
+    subplot(2, 2, 1);
+    imagesc(imx1, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (baseline before omission)");
+    clim([-15 15]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
+    
+    tctx2 = tset.tbands{4}(1:30);
+    imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+    imx2 = smoothdata2(imx2, "movmedian", 10);
+    
+    subplot(2, 2, 2);
+    imagesc(imx2, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (omission)");
+    clim([-15 15]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
+    
+    subplot(2, 1, 2);
+    imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+    yline(0);
+    xlabel("Freq.");
+    ylabel("Dist. from L4 in um");
+    title(areaname + " (omission - pre-omission-base)");
+    clim([-10 10]);
+    % set(gca, "YDir", "normal");
+    cb = colorbar();
+    ylabel(cb, "Power vs. baseline (dB)");
+
+end
 
 %%
 

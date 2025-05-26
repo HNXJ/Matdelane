@@ -30,8 +30,14 @@ function [pgx, xinfo] = jCalculateTFRallChannel(xlfp, channel_in_layer)
             
             for kk = 1:dTR % trials
 
-                [p1temp, ~, ~] = pspectrum(squeeze(xG1f(kk, jk, :)), 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
-                pgxcf(jk, :, :) = p1temp + squeeze(pgxcf(jk, :, :));
+                ysigx = squeeze(xG1f(kk, jk, :));
+
+                if std(ysigx) < 75
+
+                    [p1temp, ~, ~] = pspectrum(ysigx, 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+                    pgxcf(jk, :, :) = p1temp + squeeze(pgxcf(jk, :, :));
+
+                end
 
             end
     
