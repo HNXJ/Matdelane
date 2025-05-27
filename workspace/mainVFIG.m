@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "V4";
+areax = "PFC";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,20 +35,40 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{2}, tsinfo, "V1", 50, 40, 20);
+jTFRLaminarPlotter(tfrData{1}, tsinfo, "PFC", 50, 40, 20);
 
 %% Deep vs Sup concat (V1)
 
-l4s = [25, 25, 22, 20, 20];
+% ls = [25, 25, 22, 20, 20]; % V1
+% lflip = [0, 0, 1, 0, 1]; % V1
+% l4s = [21, 22, 20, 22]; % V4
+% lflip = [0, 0, 0, 1];
+% l4s = [15, 20, 4, 13, 8]; % MT
+% lflip = [1, 0, 1, 1, 1];
+l4s = [50, 10, 80, 40, 30]; % PFC
+lflip = [1, 1, 0, 1, 0];
 tdxsup = cell(12, 1);
 tdxdeep = cell(12, 1);
 
-for ik = 1:Nfiles-1
+for ik = 1:Nfiles
 
-    for jk = 1:12
+    if lflip(ik)
 
-        tdxsup{jk} = [tdxsup{jk}; tfrData{ik}{jk}(1:l4s(ik), :, :)];
-        tdxdeep{jk} = [tdxdeep{jk}; tfrData{ik}{jk}(l4s(ik)+1:end, :, :)];
+        for jk = 1:12
+    
+            tdxdeep{jk} = [tdxdeep{jk}; tfrData{ik}{jk}(1:l4s(ik), :, :)];
+            tdxsup{jk} = [tdxsup{jk}; tfrData{ik}{jk}(l4s(ik)+1:end, :, :)];
+    
+        end
+
+    else
+
+        for jk = 1:12
+    
+            tdxsup{jk} = [tdxsup{jk}; tfrData{ik}{jk}(1:l4s(ik), :, :)];
+            tdxdeep{jk} = [tdxdeep{jk}; tfrData{ik}{jk}(l4s(ik)+1:end, :, :)];
+    
+        end
 
     end
 
@@ -57,8 +77,8 @@ end
 
 %% Stemplots
 
-[a1, a2, a3] = jTFRLaminarPlotter(tdxsup, tsinfo, "V1-sup", 50, 40, 20);
-[b1, b2, b3] = jTFRLaminarPlotter(tdxdeep, tsinfo, "V1-deep", 50, 40, 20);
+[a1, a2, a3] = jTFRLaminarPlotter(tdxsup, tsinfo, "Vx-sup", 50, 40, 20);
+[b1, b2, b3] = jTFRLaminarPlotter(tdxdeep, tsinfo, "Vx-deep", 50, 40, 20);
 
 %%
 
@@ -83,19 +103,23 @@ title("S(after omission) vs. S(first stim fx) deep + vs sup -");
 
 function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn, chd, cl4)
 
-    % im1 = tfrdata{2} + tfrdata{6} + tfrdata{10};
-    im1 = tfrdata{3} + tfrdata{7} + tfrdata{11};
+    im1 = tfrdata{2} + tfrdata{6} + tfrdata{10};
+    % im1 = tfrdata{3} + tfrdata{7} + tfrdata{11};
     
     tbaselinex = tset.tbands{1}(1:end);
-    
+    % for ik = 1:size(im1, 2)
+    % 
+    %     im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+    % 
+    % end
     for ik = 1:size(im1, 2)
-    
+
         for jk = 1:size(im1, 1)
-    
+
             im1(jk, ik, :) = im1(jk, ik, :) / mean(im1(jk, ik, tbaselinex), "all");
-    
+
         end
-    
+
     end
     
     fmapx = tset.fmap;
