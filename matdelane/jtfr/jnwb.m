@@ -75,6 +75,38 @@ classdef jnwb < handle
 
         end
 
+        function jCleanLFPtrials(obj)
+
+            for ik = 1:12
+
+                dLFP = squeeze(mean(obj.x{ik}, 2));
+                dCorrLFP = corr(dLFP');
+                dCorrLFP = mean(dCorrLFP);
+                dCorrLFP = (dCorrLFP - mean(dCorrLFP)) / std(dCorrLFP);
+                dTRgood = abs(dCorrLFP) < 1.0;
+
+                obj.x{ik} = obj.x{ik}(dTRgood, :, :);
+
+            end
+
+        end
+
+        function jCleanMUAtrials(obj)
+
+            for ik = 1:12
+
+                dMUA = squeeze(mean(obj.xm{ik}, 2));
+                dCorrMUA = corr(dMUA');
+                dCorrMUA = mean(dCorrMUA);
+                dCorrMUA = (dCorrMUA - mean(dCorrMUA)) / std(dCorrMUA);
+                dTRgood = abs(dCorrMUA) < 1.0;
+
+                obj.xm{ik} = obj.xm{ik}(dTRgood, :, :);
+
+            end
+
+        end
+
         function obj = jCalcTFRs(obj, channel_in_layer, tfrByChannel, tfrAllChannel) % TODO concat
 
             if ~exist("tfrByChannel", "var")

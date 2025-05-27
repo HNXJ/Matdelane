@@ -32,12 +32,12 @@ function [pgx, xinfo] = jCalculateTFRallChannel(xlfp, channel_in_layer)
 
                 ysigx = squeeze(xG1f(kk, jk, :));
 
-                if std(ysigx) < 75
+                % if std(ysigx) < 70
 
-                    [p1temp, ~, ~] = pspectrum(ysigx, 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
-                    pgxcf(jk, :, :) = p1temp + squeeze(pgxcf(jk, :, :));
+                [p1temp, ~, ~] = pspectrum(ysigx, 1000, "spectrogram", "FrequencyLimits", freqlims, "FrequencyResolution", freqres, "OverlapPercent", overlap, "Leakage", leakage);
+                pgxcf(jk, :, :) = p1temp + squeeze(pgxcf(jk, :, :));
 
-                end
+                % end
 
             end
     

@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "V1-V2/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(7, [-500 4000]);
+q1.jMUAplot(3, [-500 4000]);
 
 %% E.0.3: SUA plot
 
@@ -37,15 +37,15 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 26:47;
+channel_in_layer.deep = 26:42;
 channel_in_layer.mid = 21:25;
 channel_in_layer.sup = 1:20;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 65:90;
-channel_in_layer2.mid = 91:95;
-channel_in_layer2.sup = 96:128;
+channel_in_layer2.deep = 58:90;
+channel_in_layer2.mid = 90:95;
+channel_in_layer2.sup = 96:105;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -58,15 +58,35 @@ q1.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-% q1.jVFLIP(channel_in_layer.goodch);
-q1.jVFLIP(channel_in_layer2.goodch);
+q1.jVFLIP(channel_in_layer.goodch, 1:500);
+q1.jVFLIP(channel_in_layer2.goodch, 1:500);
 
 %% E.4: TFR calculations all trials
 
-q1.jCalcTFRs(channel_in_layer, 1);
-q1.jCalcTFRs(channel_in_layer2, 1);
+q1.jCalcTFRs(channel_in_layer, 1, 1);
+q1.jCalcTFRs(channel_in_layer2, 1, 1);
 
-% E4.1: Save object
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "01_V1_tFRch_3.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q1.pgx2;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "02_V2_tFRch_2.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+%% E4.1: Save object
 
 temp_filename = char(q1.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -75,11 +95,23 @@ q1.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q1 = load("OGLOobj\sub-C31o_ses-230714.mat", "obj").obj;
+q1 = load("OGLOobj\sub-V198o_ses-230714V1-V2.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230714V1.mat";
+tfrx = q1.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230714V2.mat";
+tfrx = q1.pgx2;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 
-q1.jTFRplot(9, 4, xinfo.tbands{1}(end-5:end));
+q1.jTFRplot(3, 4, q1.tbands{1}(end-5:end));
 
 %% E.6: PEV calculations all trials
 
@@ -285,9 +317,9 @@ channel_in_layer.sup = [33:43, 45:47, 49:2:55];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 channel_in_layer2 = struct(); % V3a
-channel_in_layer2.deep = [91:2:94, 95:97, 99:2:110, 111:113, 115:127];
-channel_in_layer2.mid = 91:2:;
-channel_in_layer2.sup = 57:2:90;
+channel_in_layer2.deep = 97:2:128;
+channel_in_layer2.mid = 91:2:95;
+channel_in_layer2.sup = 67:2:90;
 channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
 
 q2.channelinfo{1} = channel_in_layer;
@@ -295,22 +327,40 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-q2.jLFPprobeINFO([1:9, 11:43, 45:46, 47:2:91, 92:128]);
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
-% q2.jLFPprobeINFO(channel_in_layer2.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q2.jVFLIP([1:9, 11:43, 45:46], 1:1500);
-% q2.jVFLIP(channel_in_layer.goodch, 1:500);
-% q2.jVFLIP(channel_in_layer2.goodch, 1:500);
+q2.jVFLIP(channel_in_layer.goodch, 1:1000);
+q2.jVFLIP(channel_in_layer2.goodch, 1:2000);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer, 1);
-q2.jCalcTFRs(channel_in_layer2, 1);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer2, 1, 1);
 
-% E4.1: Save object
+%%
+
+tset = struct();
+tset.pgx = q1.pgx;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "03_V3d_tFRch_4.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q1.pgx2;
+tset.fmap = q1.fmap;
+tset.tmap = q1.tmap;
+tset.chan = q1.channelinfo;
+
+fname = "02_V2_tFRch_3.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+%% E4.1: Save object
 
 temp_filename = char(q2.nwbFile);
 temp_filename = temp_filename(6:end-4);
@@ -319,7 +369,19 @@ q2.jSave("OGLOobj", temp_filename);
 
 %% E4.2: Load if object exists
 
-q2 = load("OGLOobj\sub-C31o_ses-230901.mat", "obj").obj;
+q2 = load("OGLOobj\sub-V198o_ses-230714V3d-V3a.mat", "obj").obj;
+
+%% E4.3: Save TFR separately
+
+tfrpath = "tfrData\";
+tfrname = "230714V3d.mat";
+tfrx = q2.pgx;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
+
+tfrpath = "tfrData\";
+tfrname = "230714V3a.mat";
+tfrx = q2.pgx2;
+save(tfrpath + tfrname, "tfrx", "-v7.3");
 
 %% E.5: Visualize TFR
 

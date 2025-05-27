@@ -58,7 +58,7 @@ q1.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-q1.jVFLIP(channel_in_layer.goodch);
+q1.jVFLIP(channel_in_layer.goodch, 1:500);
 q1.jVFLIP(channel_in_layer2.goodch, 1:500);
 
 %% E.4: TFR calculations all trials
@@ -327,20 +327,40 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q2.jLFPprobeINFO(channel_in_layer.goodch);
+q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
-% q2.jVFLIP(channel_in_layer.goodch, 1:1000);
+q2.jVFLIP(channel_in_layer.goodch, 1:1000);
 q2.jVFLIP(channel_in_layer2.goodch, 1:2000);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer, 1);
-q2.jCalcTFRs(channel_in_layer2, 1);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer2, 1, 1);
 
-% E4.1: Save object
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "03_V3d_tFRch_4.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q2.pgx2;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "04_V3a_tFRch_1.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+%% E4.1: Save object
 
 temp_filename = char(q2.nwbFile);
 temp_filename = temp_filename(6:end-4);

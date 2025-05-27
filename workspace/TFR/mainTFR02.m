@@ -86,12 +86,12 @@ save("tfrSet\" + fname, "tset", "-v7.3");
 
 %% E.4.1: TFR check
 
-im1 = q1.pgx{3};
+im1 = q1.pgx{7};
 tbaselinex = q1.tbands{1}(end-12:end-4);
 
 for ik = 1:size(im1, 2)
 
-    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all");
+    im1(:, ik, :) = im1(:, ik, :) / mean(im1(:, ik, tbaselinex), "all", "omitnan");
 
 end
 
@@ -476,7 +476,7 @@ save("tfrSet\" + fname, "tset", "-v7.3");
 
 areaname = "MT";
 
-im1 = q2.pgx2{3} + q2.pgx2{7} + q2.pgx2{11};
+im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
 % im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
 % im1 = q2.pgx2{3};
 

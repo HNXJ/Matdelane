@@ -46,6 +46,13 @@ save("tfrData\tfrV1g.mat", "tfrData", "-v7.3");
 q1 = load("OGLOobj\sub-C31o_ses-230816PFC.mat", "obj").obj;
 % q1.tmap = q1.tmap + 50;
 
+%%
+
+imx1 = q1.x{1};
+imx1x = squeeze(mean(imx1, 2));
+% imx1x = mean(corr(imx1x'));
+imagesc(imx1x)
+
 %% 
 
 txlims = [q1.tmap(1) q1.tmap(end)];
