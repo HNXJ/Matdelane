@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "V1";
+areax = "V4";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,18 +35,58 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{4}, tsinfo, "V1", 50, 40, 20);
+jTFRLaminarPlotter(tfrData{2}, tsinfo, "V1", 50, 40, 20);
 
-%% Deep vs Sup
-%% Alignment
+%% Deep vs Sup concat (V1)
+
+l4s = [25, 25, 22, 20, 20];
+tdxsup = cell(12, 1);
+tdxdeep = cell(12, 1);
+
+for ik = 1:Nfiles-1
+
+    for jk = 1:12
+
+        tdxsup{jk} = [tdxsup{jk}; tfrData{ik}{jk}(1:l4s(ik), :, :)];
+        tdxdeep{jk} = [tdxdeep{jk}; tfrData{ik}{jk}(l4s(ik)+1:end, :, :)];
+
+    end
+
+end
+
+
 %% Stemplots
+
+[a1, a2, a3] = jTFRLaminarPlotter(tdxsup, tsinfo, "V1-sup", 50, 40, 20);
+[b1, b2, b3] = jTFRLaminarPlotter(tdxdeep, tsinfo, "V1-deep", 50, 40, 20);
+
+%%
+
+fmapx = tsinfo.fmap;
+deepx = mean(a3, 1);
+supx = mean(b3, 1);
+
+figure;
+subplot(2, 1, 1);
+stem(fmapx, deepx, "DisplayName", "Deep");
+
+hold("on");
+stem(fmapx, supx, "DisplayName", "Sup");
+legend();
+title("Stim after omission vs stim after fixation power change");
+
+subplot(2, 1, 2);
+stem(fmapx, deepx-supx);
+title("S(after omission) vs. S(first stim fx) deep + vs sup -");
+
 %% Functions
 
-function jTFRLaminarPlotter(tfrdata, tset, areaname, chn, chd, cl4)
+function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn, chd, cl4)
 
+    % im1 = tfrdata{2} + tfrdata{6} + tfrdata{10};
     im1 = tfrdata{3} + tfrdata{7} + tfrdata{11};
     
-    tbaselinex = tset.tbands{1}(5:end-5);
+    tbaselinex = tset.tbands{1}(1:end);
     
     for ik = 1:size(im1, 2)
     
@@ -63,60 +103,51 @@ function jTFRLaminarPlotter(tfrdata, tset, areaname, chn, chd, cl4)
     
     figure;
     
-    tctx1 = tset.tbands{3}(end-20:end);
-    imx1 = 10*log(squeeze(mean(im1(:, :, tctx1), 3)));
+    tctx1 = tset.tbands{4};
+    imx1x = squeeze(mean(im1(:, :, tctx1), 3));
+    imx1 = 10*log(imx1x);
     imx1 = smoothdata2(imx1, "movmedian", 10);
     
     subplot(2, 2, 1);
     imagesc(imx1, "XData", fmapx, "YData", locx);
     yline(0);
     xlabel("Freq.");
-    ylabel("Dist. from L4 in um");
-    title(areaname + " (baseline before omission)");
+    ylabel("Dist. um");
+    title(areaname + " (S after omission)");
     clim([-15 15]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
     ylabel(cb, "Power vs. baseline (dB)");
     
-    tctx2 = tset.tbands{4}(1:30);
-    imx2 = 10*log(squeeze(mean(im1(:, :, tctx2), 3)));
+    tctx2 = tset.tbands{2};
+    imx2x = squeeze(mean(im1(:, :, tctx2), 3));
+    imx2 = 10*log(imx2x);
     imx2 = smoothdata2(imx2, "movmedian", 10);
     
     subplot(2, 2, 2);
     imagesc(imx2, "XData", fmapx, "YData", locx);
     yline(0);
     xlabel("Freq.");
-    ylabel("Dist. from L4 in um");
-    title(areaname + " (omission)");
+    ylabel("Dist. um");
+    title(areaname + " (S after fixation)");
     clim([-15 15]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
     ylabel(cb, "Power vs. baseline (dB)");
     
+    imx3x = 100*(imx1x - imx2x);
     subplot(2, 1, 2);
-    imagesc(imx2 - imx1, "XData", fmapx, "YData", locx);
+    imagesc(imx3x, "XData", fmapx, "YData", locx);
     yline(0);
     xlabel("Freq.");
     ylabel("Dist. from L4 in um");
-    title(areaname + " (omission - pre-omission-base)");
-    clim([-10 10]);
+    title(areaname + " (S-x vs S-o)");
+    clim([-100 100]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
-    ylabel(cb, "Power vs. baseline (dB)");
+    ylabel(cb, "Change (%)");
 
 end
-
-%%
-
-figure;
-% subplot(2, 1, 1);
-stem(fmapx, mean(imx3(1:41, :), 1), "DisplayName", "Deep(?)");
-% title("Sup");
-% subplot(2, 1, 2);
-hold("on");
-stem(fmapx, mean(imx3(41:end, :), 1), "DisplayName", "Sup(?)");
-legend();
-title("S(after omission) vs. S(first stim fx)");
 
 %%
 
