@@ -37,15 +37,15 @@ q1.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer specs
 
 channel_in_layer = struct();
-channel_in_layer.deep = 7:38;
-channel_in_layer.mid = 39:42;
-channel_in_layer.sup = 43:60;
-channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.sup = 1:2:11;
+channel_in_layer.mid = 11:2:15;
+channel_in_layer.deep = 15:2:34;
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 channel_in_layer2 = struct();
-channel_in_layer2.deep = 70:94;
-channel_in_layer2.mid = 95:99;
-channel_in_layer2.sup = 100:112;
+channel_in_layer2.deep = [58:65, 65, 67:74];
+channel_in_layer2.mid = 75:78;
+channel_in_layer2.sup = 79:95;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q1.channelinfo{1} = channel_in_layer;
@@ -53,10 +53,8 @@ q1.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-% q1.jLFPprobeINFO(2:2:128);
-q1.jLFPmuaINFO(2:2:128);
-% q1.jLFPprobeINFO(channel_in_layer.goodch);
-% q1.jLFPprobeINFO(channel_in_layer2.goodch);
+q1.jLFPprobeINFO(channel_in_layer.goodch);
+q1.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP
 
@@ -314,10 +312,30 @@ q2.jVFLIP(channel_in_layer2.goodch, 1:500);
 
 %% E.4: TFR calculations all trials
 
-q2.jCalcTFRs(channel_in_layer, 1);
-q2.jCalcTFRs(channel_in_layer2, 1);
+q2.jCalcTFRs(channel_in_layer, 1, 1);
+q2.jCalcTFRs(channel_in_layer2, 1, 1);
 
-% E4.1: Save object
+%%
+
+tset = struct();
+tset.pgx = q2.pgx;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "03_V3d_tFRch_6.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+tset = struct();
+tset.pgx = q2.pgx2;
+tset.fmap = q2.fmap;
+tset.tmap = q2.tmap;
+tset.chan = q2.channelinfo;
+
+fname = "04_V3a_tFRch_3.mat";
+save("tfrSet\" + fname, "tset", "-v7.3");
+
+%% E4.1: Save object
 
 temp_filename = char(q2.nwbFile);
 temp_filename = temp_filename(6:end-4);

@@ -476,9 +476,9 @@ save("tfrSet\" + fname, "tset", "-v7.3");
 
 areaname = "MT";
 
-im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
 % im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
-% im1 = q2.pgx2{3};
+% im1 = q2.pgx{3} + q2.pgx{7} + q2.pgx{11};
+im1 = q2.pgx2{3};
 
 tbaselinex = q2.tbands{1}(end-12:end-4);
 
