@@ -70,8 +70,21 @@ title("Omission - Baseline");
 
 %% E.4: TFR calculations all trials
 
-% q2.jCalcTFRs(channel_in_layer, 1, 1);
+% q1.jCalcTFRs(channel_in_layer, 1, 1);
 q1.jCalcTFRs(channel_in_layer, 1, 1);
+
+%%
+
+tsinfo = struct();
+tsinfo.fmap = q1.fmap;
+tsinfo.tmap = q1.tmap;
+tsinfo.condinflabel = q1.condinflabel;
+
+tsinfo.tbands = q1.tbands;
+tsinfo.fbands = q1.fbands;
+
+fname = "info.mat";
+save("tfrSet\" + fname, "tsinfo", "-v7.3");
 
 %%
 

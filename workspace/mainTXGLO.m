@@ -14,6 +14,8 @@ addpath('fieldtrip');
 ft_defaults;
 disp("Setup done.");
 
+load("tfrSet\info.mat");
+
 %% TFR unifier
 
 areax = "V1";

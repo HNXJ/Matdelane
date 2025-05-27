@@ -286,16 +286,16 @@ q2.jSUAplot(9, [100 4000], 100:120);
 %% E.1: Channel and layer identification
 
 channel_in_layer = struct(); % V3d
-channel_in_layer.deep = [1:9, 11:27];
-channel_in_layer.mid = 28:32;
-channel_in_layer.sup = [33:43, 45:47, 49:2:55];
-channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
+channel_in_layer.deep = 22:60;
+channel_in_layer.mid = 19:21;
+channel_in_layer.sup = 5:18;
+channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 channel_in_layer2 = struct(); % V3a
-channel_in_layer2.deep = 97:2:128;
-channel_in_layer2.mid = 91:2:95;
-channel_in_layer2.sup = 67:2:90;
-channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channel_in_layer2.deep];
+channel_in_layer2.deep = 68:81;
+channel_in_layer2.mid = 82:85;
+channel_in_layer2.sup = 86:112;
+channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q2.channelinfo{1} = channel_in_layer;
 q2.channelinfo{2} = channel_in_layer2;
