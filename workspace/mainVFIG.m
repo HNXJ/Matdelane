@@ -35,7 +35,7 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{1}, tsinfo, "V1", 103, 25, 70);
+jTFRLaminarPlotter(tfrData{2}, tsinfo, "V1", 103, 25, 70);
 
 %% Deep vs Sup concat (V1)
 
