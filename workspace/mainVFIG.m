@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "PFC";
+areax = "V1";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,7 +35,7 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{1}, tsinfo, "PFC", 50, 40, 20);
+jTFRLaminarPlotter(tfrData{1}, tsinfo, "V1", 103, 25, 70);
 
 %% Deep vs Sup concat (V1)
 
@@ -135,10 +135,12 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     subplot(2, 2, 1);
     imagesc(imx1, "XData", fmapx, "YData", locx);
     yline(0);
+    xticks(0:20:200)
     xlabel("Freq.");
     ylabel("Dist. um");
     title(areaname + " (S after omission)");
-    clim([-15 15]);
+    clim([-10 10]);
+    xlim([0 150]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
     ylabel(cb, "Power vs. baseline (dB)");
@@ -151,10 +153,12 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     subplot(2, 2, 2);
     imagesc(imx2, "XData", fmapx, "YData", locx);
     yline(0);
+    xticks(0:20:200)
     xlabel("Freq.");
     ylabel("Dist. um");
     title(areaname + " (S after fixation)");
-    clim([-15 15]);
+    clim([-10 10]);
+    xlim([0 150]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
     ylabel(cb, "Power vs. baseline (dB)");
@@ -163,10 +167,12 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     subplot(2, 1, 2);
     imagesc(imx3x, "XData", fmapx, "YData", locx);
     yline(0);
+    xticks(0:20:200)
     xlabel("Freq.");
     ylabel("Dist. from L4 in um");
     title(areaname + " (S-x vs S-o)");
-    clim([-100 100]);
+    clim([-50 50]);
+    xlim([0 150]);
     % set(gca, "YDir", "normal");
     cb = colorbar();
     ylabel(cb, "Change (%)");
