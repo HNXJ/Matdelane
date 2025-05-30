@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "V1";
+areax = "FEF";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,12 +35,12 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{4}, tsinfo, "V1", 52, 40, 16, 0);
+jTFRLaminarPlotter(tfrData{4}, tsinfo, "V2", 52, 40, 16, 0);
 
 %%
 
 immx = tfrData{3}{2};
-immx = squeeze(mean(immx, 3));
+immx = squeeze(mean(immx, 1));
 figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 
 %% Deep vs Sup concat by area
@@ -60,7 +60,7 @@ lflip = [0, 0, 0, 0, 0]; % V1
 tdxsup = cell(12, 1);
 tdxdeep = cell(12, 1);
 
-for ik = 1:4
+for ik = 1:2
 
     if lflip(ik)
 
@@ -134,7 +134,7 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     im1 = tfrdata{2} + tfrdata{6} + tfrdata{10};
     % im1 = tfrdata{3} + tfrdata{7} + tfrdata{11};
     
-    tbaselinex = tset.tbands{3};
+    tbaselinex = tset.tbands{1};
 
     if ~exist("vflipx", "var")
 
