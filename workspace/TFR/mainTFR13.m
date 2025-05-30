@@ -35,14 +35,15 @@ q1.jMUAplot(3, [-500 4000]);
 q1.jSUAplot(9, [100 4000], 100:120);
 
 %% E.1: Channel and layer specs
+% sub-V198o_ses-230714
 
-channel_in_layer = struct();
+channel_in_layer = struct(); % V1
 channel_in_layer.deep = 26:42;
 channel_in_layer.mid = 21:25;
 channel_in_layer.sup = 1:20;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
-channel_in_layer2 = struct();
+channel_in_layer2 = struct(); % V2
 channel_in_layer2.deep = 58:90;
 channel_in_layer2.mid = 90:95;
 channel_in_layer2.sup = 96:105;

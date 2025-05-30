@@ -16,6 +16,8 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
+% V1/V2/V3d/V3a
+
 areax = "V1";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
@@ -35,18 +37,12 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{4}, tsinfo, "V1", 52, 40, 16, 0);
-
-%%
-
-immx = tfrData{3}{2};
-immx = squeeze(mean(immx, 3));
-figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
+jTFRLaminarPlotter(tfrData{2}, tsinfo, "V1", 52, 40, 16, 1);
 
 %% Deep vs Sup concat by area
 
-l4s = [16, 15, 22, 20, 20]; % V1
-lflip = [0, 0, 0, 0, 0]; % V1
+ls = [16, 15, 22, 20, 20]; % V1
+lflip = [0, 0, 1, 0, 1]; % V1
 
 % l4s = [21, 22, 20, 22]; % V4
 % lflip = [0, 0, 0, 1];
@@ -60,7 +56,7 @@ lflip = [0, 0, 0, 0, 0]; % V1
 tdxsup = cell(12, 1);
 tdxdeep = cell(12, 1);
 
-for ik = 1:4
+for ik = 1:Nfiles
 
     if lflip(ik)
 
@@ -134,7 +130,7 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     im1 = tfrdata{2} + tfrdata{6} + tfrdata{10};
     % im1 = tfrdata{3} + tfrdata{7} + tfrdata{11};
     
-    tbaselinex = tset.tbands{3};
+    tbaselinex = tset.tbands{2}(end-20:end);
 
     if ~exist("vflipx", "var")
 
@@ -172,7 +168,7 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     tctx1 = tset.tbands{4};
     imx1x = squeeze(mean(im1(:, :, tctx1), 3));
     imx1 = 10*log(imx1x);
-    imx1 = smoothdata2(imx1, "movmedian", 10);
+    % imx1 = smoothdata2(imx1, "movmedian", 10);
     
     subplot(2, 2, 1);
     imagesc(imx1, "XData", fmapx, "YData", locx);
@@ -206,7 +202,6 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     ylabel(cb, "Power vs. baseline (dB)");
     
     imx3x = 100*(imx1x - imx2x);
-    imx3x = smoothdata2(imx3x, "movmedian", 10);
     subplot(2, 1, 2);
     imagesc(imx3x, "XData", fmapx, "YData", locx);
     yline(0);
@@ -214,7 +209,7 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     xlabel("Freq.");
     ylabel("Dist. from L4 in um");
     title(areaname + " (S-x vs S-o)");
-    clim([-50 50]);
+    % clim([-50 50]);
     xlim([0 150]);
     % set(gca, "YDir", "normal");
     cb = colorbar();

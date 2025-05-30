@@ -14,7 +14,7 @@ nwbFiles = {dir(nwbPath).name};
 nwbFiles = nwbFiles(endsWith(nwbFiles, ".nwb"));
 disp("Toolbox setup done.");
 
-%% Ses: sub-C31o_ses-230831 (Probes A,B,C)
+%% Ses: sub-C31o_ses-230901 (Probes A,B,C)
 
 %% Probe A (PFC, laminar)
 
