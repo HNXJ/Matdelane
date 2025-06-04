@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "FEF";
+areax = "MST";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,7 +35,9 @@ end
 
 %% Bench
 
-jTFRLaminarPlotter(tfrData{4}, tsinfo, "V2", 52, 40, 16, 0);
+sigtemp = tfrData{4};
+disp(size(sigtemp{1}));
+jTFRLaminarPlotter(sigtemp, tsinfo, areax, 32, 40, 16, 1);
 
 %%
 
@@ -45,8 +47,8 @@ figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 
 %% Deep vs Sup concat by area
 
-l4s = [16, 15, 22, 20, 20]; % V1
-lflip = [0, 0, 0, 0, 0]; % V1
+% l4s = [16, 15, 22, 20, 20]; % V1
+% lflip = [0, 0, 0, 0, 0]; % V1
 
 % l4s = [21, 22, 20, 22]; % V4
 % lflip = [0, 0, 0, 1];
@@ -54,13 +56,25 @@ lflip = [0, 0, 0, 0, 0]; % V1
 % l4s = [15, 20, 4, 13, 8]; % MT
 % lflip = [1, 0, 1, 1, 1];
 
-% l4s = [50, 10, 80, 40, 30]; % PFC
+l4s = [49, 25, 16, 13, 8]; % MST
+lflip = [0, 0, 0, 1, 1];
+
+% l4s = [40, 40]; % TEO
+% lflip = [1, 1];
+
+% l4s = 20; % FST
+% lflip = 1;
+
+% l4s = [48, 25, 27]; % FEF
+% lflip = [0, 1, 0];
+
+% l4s = [60, 50, 10, 60, 30]; % PFC
 % lflip = [1, 1, 0, 1, 0];
 
 tdxsup = cell(12, 1);
 tdxdeep = cell(12, 1);
 
-for ik = 1:2
+for ik = 1:Nfiles
 
     if lflip(ik)
 
@@ -112,20 +126,32 @@ subplot(2, 2, 4); % Barplot deepCh-supCh X AlphaBeta<8-30>|Gamma<32-150>
 
 fmapx = tsinfo.fmap;
 deepx = mean(a3, 1);
+deepxse = std(a3, 1, 1) / sqrt(size(tdxsup{1}, 1));
+supxse = std(b3, 1, 1) / sqrt(size(tdxdeep{1}, 1));
 supx = mean(b3, 1);
+
+cl1 = [0.3 0.3 0.9];
+cl2 = [0.9 0.3 0.3];
 
 figure;
 subplot(2, 1, 1);
-stem(fmapx, deepx, "DisplayName", "Deep");
-
+plot(fmapx, deepx, "DisplayName", "Deep");
+patch([fmapx; fmapx(end:-1:1)], [deepx + 2*deepxse, deepx(end:-1:1) - 2*deepxse(end:-1:1)], cl1, "EdgeColor", "none", "FaceColor", cl1, "FaceAlpha", 0.5, "HandleVisibility", "off");
+yline(0, "--", "HandleVisibility", "off");
 hold("on");
-stem(fmapx, supx, "DisplayName", "Sup");
+plot(fmapx, supx, "DisplayName", "Sup");
+patch([fmapx; fmapx(end:-1:1)], [supx + 2*supxse, supx(end:-1:1) - 2*supxse(end:-1:1)], cl2, "EdgeColor", "none", "FaceColor", cl2, "FaceAlpha", 0.5, "HandleVisibility", "off");
 legend();
 title("Stim after omission vs stim after fixation power change");
 
+diffx = deepx - supx;
 subplot(2, 1, 2);
-stem(fmapx, deepx-supx);
+plot(fmapx, diffx);
+yline(0, "--");
+patch([fmapx; fmapx(end:-1:1)], [diffx + deepxse + supxse, diffx(end:-1:1) - deepxse(end:-1:1) - supxse(end:-1:1)], cl1, "EdgeColor", "none", "FaceColor", cl1, "FaceAlpha", 0.5, "HandleVisibility", "off");
 title("S(after omission) vs. S(first stim fx) deep + vs sup -");
+
+sgtitle("Population; +-2SE; (nCh ~= 500) | " + areax);
 
 %% Functions
 
