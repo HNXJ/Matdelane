@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "MT";
+areax = "V3d";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,7 +35,7 @@ end
 
 %% Bench
 
-sigtemp = tfrData{4};
+sigtemp = tfrData{1};
 disp(size(sigtemp{1}));
 nChlx = size(sigtemp{1}, 1);
 dSpacing = 40;
@@ -56,17 +56,17 @@ figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 % l4s = [16, 15, 22, 20, 20]; % V2
 % lflip = [0, 0, 0, 0, 0]; % V2
 
-% l4s = [16, 15, 22, 20, 20]; % V3d
-% lflip = [0, 0, 0, 0, 0]; % V3d
+l4s = [16, 15, 22, 20, 20, 20]; % V3d
+lflip = [0, 0, 0, 0, 0, 0]; % V3d
 
-% l4s = [16, 15, 22, 20, 20]; % V3a
-% lflip = [0, 0, 0, 0, 0]; % V3a
+% l4s = [18, 18, 30]; % V3a
+% lflip = [0, 1, 1]; % V3a
 
 % l4s = [30, 30, 28, 32]; % V4
 % lflip = [1, 0, 0, 0];
 
-l4s = [20, 30, 4, 36, 2]; % MT
-lflip = [0, 0, 1, 0, 0];
+% l4s = [20, 30, 4, 36, 2]; % MT
+% lflip = [0, 0, 1, 0, 0];
 
 % l4s = [49, 25, 20, 24, 18]; % MST
 % lflip = [0, 0, 0, 0, 1];
