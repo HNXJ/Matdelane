@@ -322,7 +322,7 @@ q2.channelinfo{2} = channel_in_layer2;
 
 %% E.2: LFP info plot
 
-q2.jLFPprobeINFO(channel_in_layer.goodch);
+% q2.jLFPprobeINFO(channel_in_layer.goodch);
 q2.jLFPprobeINFO(channel_in_layer2.goodch);
 
 %% E.3: Evaluate vFLIP

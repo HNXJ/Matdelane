@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "MST";
+areax = "MT";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -37,7 +37,10 @@ end
 
 sigtemp = tfrData{4};
 disp(size(sigtemp{1}));
-jTFRLaminarPlotter(sigtemp, tsinfo, areax, 32, 40, 16, 1);
+nChlx = size(sigtemp{1}, 1);
+dSpacing = 40;
+l4Ch = 30;
+jTFRLaminarPlotter(sigtemp, tsinfo, areax, nChlx, dSpacing, l4Ch, 1);
 
 %%
 
@@ -50,14 +53,23 @@ figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 % l4s = [16, 15, 22, 20, 20]; % V1
 % lflip = [0, 0, 0, 0, 0]; % V1
 
-% l4s = [21, 22, 20, 22]; % V4
-% lflip = [0, 0, 0, 1];
+% l4s = [16, 15, 22, 20, 20]; % V2
+% lflip = [0, 0, 0, 0, 0]; % V2
 
-% l4s = [15, 20, 4, 13, 8]; % MT
-% lflip = [1, 0, 1, 1, 1];
+% l4s = [16, 15, 22, 20, 20]; % V3d
+% lflip = [0, 0, 0, 0, 0]; % V3d
 
-l4s = [49, 25, 16, 13, 8]; % MST
-lflip = [0, 0, 0, 1, 1];
+% l4s = [16, 15, 22, 20, 20]; % V3a
+% lflip = [0, 0, 0, 0, 0]; % V3a
+
+% l4s = [30, 30, 28, 32]; % V4
+% lflip = [1, 0, 0, 0];
+
+l4s = [20, 30, 4, 36, 2]; % MT
+lflip = [0, 0, 1, 0, 0];
+
+% l4s = [49, 25, 20, 24, 18]; % MST
+% lflip = [0, 0, 0, 0, 1];
 
 % l4s = [40, 40]; % TEO
 % lflip = [1, 1];
@@ -140,6 +152,8 @@ patch([fmapx; fmapx(end:-1:1)], [deepx + 2*deepxse, deepx(end:-1:1) - 2*deepxse(
 yline(0, "--", "HandleVisibility", "off");
 hold("on");
 plot(fmapx, supx, "DisplayName", "Sup");
+xlabel("Frequency (Hz)");
+ylabel("Percentage change");
 patch([fmapx; fmapx(end:-1:1)], [supx + 2*supxse, supx(end:-1:1) - 2*supxse(end:-1:1)], cl2, "EdgeColor", "none", "FaceColor", cl2, "FaceAlpha", 0.5, "HandleVisibility", "off");
 legend();
 title("Stim after omission vs stim after fixation power change");
@@ -147,6 +161,8 @@ title("Stim after omission vs stim after fixation power change");
 diffx = deepx - supx;
 subplot(2, 1, 2);
 plot(fmapx, diffx);
+xlabel("Frequency (Hz)");
+ylabel("Percentage change");
 yline(0, "--");
 patch([fmapx; fmapx(end:-1:1)], [diffx + deepxse + supxse, diffx(end:-1:1) - deepxse(end:-1:1) - supxse(end:-1:1)], cl1, "EdgeColor", "none", "FaceColor", cl1, "FaceAlpha", 0.5, "HandleVisibility", "off");
 title("S(after omission) vs. S(first stim fx) deep + vs sup -");
