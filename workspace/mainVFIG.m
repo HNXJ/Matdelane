@@ -35,7 +35,7 @@ end
 
 %% Bench
 
-sigtemp = tfrData{1};
+sigtemp = tfrData{6};
 disp(size(sigtemp{1}));
 nChlx = size(sigtemp{1}, 1);
 dSpacing = 40;
@@ -56,8 +56,8 @@ figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 % l4s = [16, 15, 22, 20, 20]; % V2
 % lflip = [0, 0, 0, 0, 0]; % V2
 
-l4s = [16, 15, 22, 20, 20, 20]; % V3d
-lflip = [0, 0, 0, 0, 0, 0]; % V3d
+l4s = [25, 30, 22, 40, 16, 30]; % V3d
+lflip = [1, 0, 1, 0, 0, 0]; % V3d
 
 % l4s = [18, 18, 30]; % V3a
 % lflip = [0, 1, 1]; % V3a
