@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "V2";
+areax = "V1";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -35,11 +35,11 @@ end
 
 %% Bench
 
-sigtemp = tfrData{4};
+sigtemp = tfrData{5};
 disp(size(sigtemp{1}));
 nChlx = size(sigtemp{1}, 1);
 dSpacing = 40;
-l4Ch = 28;
+l4Ch = 12;
 jTFRLaminarPlotter(sigtemp, tsinfo, areax, nChlx, dSpacing, l4Ch, 1);
 
 %%
@@ -50,11 +50,11 @@ figure;imagesc(log(immx), "XData", linspace(0, 200, 801));
 
 %% Deep vs Sup concat by area
 
-% l4s = [16, 15, 22, 20, 20]; % V1
-% lflip = [0, 0, 0, 0, 0]; % V1
+l4s = [17, 15, 22, 10, 12]; % V1
+lflip = [0, 0, 0, 0, 0]; % V1
 
-l4s = [22, 12, 30, 28]; % V2
-lflip = [0, 0, 1, 1]; % V2
+% l4s = [22, 12, 30, 28]; % V2
+% lflip = [0, 0, 1, 1]; % V2
 
 % l4s = [25, 30, 22, 40, 16, 30]; % V3d
 % lflip = [1, 0, 1, 0, 0, 0]; % V3d
