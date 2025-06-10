@@ -32,7 +32,7 @@ q1.jMUAplot(9, [-500 4000]);
 
 %% E.0.3: SUA plot
 
-q1.jSUAplot(9, [100 4000], 100:120);
+q1.jSUAplot(6, [-100 4000], 1:90);
 
 %% E.0.4: Rastrogram
 
@@ -47,6 +47,17 @@ channel_in_layer.sup = [87:111, 112:2:128];
 channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_in_layer.sup];
 
 q1.channelinfo{1} = channel_in_layer;
+
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q1.xs;
+xset.chids = q1.cs{1}.ids;
+xset.peakch = q1.cs{1}.peaks;
+xset.lfpch = q1.channelinfo;
+
+fname = "10_PFC_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 
@@ -390,7 +401,7 @@ q2.jMUAplot(12, [2500 4500]);
 %% E.0.3: SUA plot
 
 % q2.jSUAplot(3, [1000 3000], 109:110, 1:1);
-q2.jSUAplot(3, [1000 1500], 109:110, 1:1);
+q2.jSUAplot(3, [-300 4000], 1:110);
 
 %% E.0.4: Rastrogram
 
@@ -412,6 +423,26 @@ channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channe
 
 q2.channelinfo{1} = channel_in_layer;
 q2.channelinfo{2} = channel_in_layer2;
+
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q2.xs;
+xset.chids = q2.cs{2}.ids;
+xset.peakch = q2.cs{2}.peaks;
+xset.lfpch = q2.channelinfo{1};
+
+fname = "05_V4_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q2.xs;
+xset.chids = q2.cs{2}.ids;
+xset.peakch = q2.cs{2}.peaks;
+xset.lfpch = q2.channelinfo{2};
+
+fname = "06_MT_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 
@@ -768,6 +799,17 @@ channel_in_layer.sup = 12:28;
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q3.channelinfo{1} = channel_in_layer;
+
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q3.xs;
+xset.chids = q3.cs{3}.ids;
+xset.peakch = q3.cs{3}.peaks;
+xset.lfpch = q3.channelinfo{1};
+
+fname = "01_V1_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 

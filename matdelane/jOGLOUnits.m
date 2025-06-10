@@ -62,6 +62,7 @@ function [signalListL, signalList] = jOGLOUnits(nwb, task, t_pre_ms, t_post_ms, 
            
             areaN = areaN + 1;  
             signalListL{areaN}.ids = find(chidUnits > channelL & chidUnits < channelR);
+            signalListL{areaN}.peaks = mod(chidUnits(signalListL{areaN}.ids), 128) + 1;
             signalListL{areaN}.name = area;      
 
         end
