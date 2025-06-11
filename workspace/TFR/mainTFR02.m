@@ -54,7 +54,7 @@ xset = struct();
 xset.xs = q1.xs;
 xset.chids = q1.cs{1}.ids;
 xset.peakch = q1.cs{1}.peaks;
-xset.lfpch = q1.channelinfo;
+xset.lfpch = q1.channelinfo{1};
 
 fname = "10_PFC_convspk_1.mat";
 save("spkSet\" + fname, "xset", "-v7.3");

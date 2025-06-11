@@ -44,6 +44,17 @@ channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_i
 
 q1.channelinfo{1} = channel_in_layer;
 
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q1.xs;
+xset.chids = q1.cs{1}.ids;
+xset.peakch = q1.cs{1}.peaks;
+xset.lfpch = q1.channelinfo{1};
+
+fname = "09_FEF_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch);

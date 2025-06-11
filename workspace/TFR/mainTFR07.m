@@ -51,6 +51,26 @@ channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channe
 q1.channelinfo{1} = channel_in_layer;
 q1.channelinfo{2} = channel_in_layer2;
 
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q1.xs;
+xset.chids = q1.cs{1}.ids;
+xset.peakch = q1.cs{1}.peaks;
+xset.lfpch = q1.channelinfo{1};
+
+fname = "09_FEF_convspk_2.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q1.xs;
+xset.chids = q1.cs{1}.ids;
+xset.peakch = q1.cs{1}.peaks;
+xset.lfpch = q1.channelinfo{2};
+
+fname = "09_FEF_convspk_3.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
 %% E.2: LFP info plot
 
 q1.jLFPprobeINFO(channel_in_layer.goodch);
@@ -81,7 +101,7 @@ tset = struct();
 tset.pgx = q1.pgx2;
 tset.fmap = q1.fmap;
 tset.tmap = q1.tmap;
-tset.chan = q1.channelinfo;
+tset.chan = q1.channelinfo2;
 
 fname = "09_FEF_tFRch_3.mat";
 save("tfrSet\" + fname, "tset", "-v7.3");
