@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% SPK unifier
 
-areax = "PFC";
+areax = "FEF";
 spkpath = "spkSet\";
 spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
@@ -35,31 +35,33 @@ end
 
 %% Bench
 
+% FEF : 44-45-53 (+> 19-70 )
+
 isx09 = spkData{1}.xs{9};
 isx10 = spkData{1}.xs{10};
 
-im1 = squeeze(mean(isx09(:, 1:70, 1500:2500), 1));
-im2 = squeeze(mean(isx10(:, 1:70, 1500:2500), 1));
+im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
+im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
 
 for ik = 1:size(im1, 1)
 
-    im1(ik, :) = (im1(ik, :) - mean(im1(ik, :))) / std(im1(ik, :));
-    im2(ik, :) = (im2(ik, :) - mean(im2(ik, :))) / std(im2(ik, :));
-    im1(ik, :) = smooth(im1(ik, :), 20);
-    im2(ik, :) = smooth(im2(ik, :), 20);
+    % im1(ik, :) = (im1(ik, :) - mean(im1(ik, :))) / std(im1(ik, :));
+    % im2(ik, :) = (im2(ik, :) - mean(im2(ik, :))) / std(im2(ik, :));
+    im1(ik, :) = smooth(im1(ik, :), 50);
+    im2(ik, :) = smooth(im2(ik, :), 50);
 
 end
 
 figure;
 subplot(2, 2, 1);
 imagesc(im1);
-clim([-2 2]);
+% clim([-2 2]);
 subplot(2, 2, 2);
 imagesc(im2);
-clim([-2 2]);
+% clim([-2 2]);
 subplot(2, 2, 3);
 imagesc(im1 - im2);
-clim([-5 5]);
+% clim([-2 2]);
 subplot(2, 2, 4);
 imagesc(im1 ./ im2);
 clim([-5 5]);
