@@ -1,6 +1,6 @@
 %% SET Data
 
-% Format : 
+
 
 % lfp :
 % 
@@ -9,59 +9,10 @@
 %        fsample: 1000 
 %          trial: {1×nTrial cell} of {nCh×nTime}
 %           time: {1×nTrial cell} of {1×nTime}
-%     sampleinfo: [nTrial×2 double] ~ <i_l , i_r>
-%          label: {nCh×1 strings} ~ <'ch_k'>
-%            cfg: [1×1 struct] ~ : struct with fields:
+%     sampleinfo: [nTrial×2 double] of <i_l , i_r>
+%          label: {1×nCh strings} of <'ch_id
+%            cfg: [1×1 struct] ?
 
-                        %           channel: {nCh×1 strings}
-                        %           latency: [1.0000e-03 2]
-                        %         checkpath: 'pedantic'
-                        %          showlogo: 'yes'
-                        %      keepprevious: 'yes'
-                        %           keepcfg: 'yes'
-                        % outputfilepresent: 'overwrite'
-                        %     tracktimeinfo: 'yes'
-                        %      trackmeminfo: 'yes'
-                        %           toolbox: [1×1 struct]
-                        %          callinfo: [1×1 struct]
-                        %           version: [1×1 struct]
-                        %         tolerance: 1.0000e-05
-                        %            select: 'intersect'
-                        %            trials: 'all'
-                        %         frequency: 'all'
-                        %           nanmean: 'no'
-                        %          previous: []
-
-
-% dataspike : 
-% 
-%   struct with fields:
-% 
-%        fsample: 1000
-%          trial: {1×nTrial cell} of {nNeuron×nTrial}
-%           time: {1×nTrial cell} of {1×nTime}
-%     sampleinfo: [nTrial×2 double] ~ <i_l , i_r>
-%          label: {nNeuron×1 cell} ~ <'nrn_k'>
-%            cfg: [1×1 struct] ~ : struct with fields:
-                        % 
-                        %             channel: {nNeuron×1 strings}
-                        %             latency: [1.0000e-03 2]
-                        %           checkpath: 'pedantic'
-                        %            showlogo: 'yes'
-                        %        keepprevious: 'yes'
-                        %             keepcfg: 'yes'
-                        %   outputfilepresent: 'overwrite'
-                        %       tracktimeinfo: 'yes'
-                        %        trackmeminfo: 'yes'
-                        %             toolbox: [1×1 struct]
-                        %            callinfo: [1×1 struct]
-                        %             version: [1×1 struct]
-                        %           tolerance: 1.0000e-05
-                        %              select: 'intersect'
-                        %              trials: 'all'
-                        %           frequency: 'all'
-                        %             nanmean: 'no'
-                        %            previous: [1×1 struct]
 
 %% PART 1: LOAD IN THE DATA
     %% % to load real data from area AIP in monkey to look at beta 
