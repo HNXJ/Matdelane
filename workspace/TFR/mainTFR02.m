@@ -48,7 +48,7 @@ channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_
 
 q1.channelinfo{1} = channel_in_layer;
 
-%% E.1.1: Save single units and muas
+%% E.1.1: Save single units or muas
 
 xset = struct();
 xset.xs = q1.xs;
@@ -58,6 +58,16 @@ xset.lfpch = q1.channelinfo{1};
 
 fname = "10_PFC_convspk_1.mat";
 save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q1.x;
+xset.mdata = q1.c{1};
+xset.lfpch = q1.channelinfo{1};
+
+fname = "10_PFC_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 
