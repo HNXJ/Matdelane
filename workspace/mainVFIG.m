@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "FEF";
+areax = "PFC";
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));

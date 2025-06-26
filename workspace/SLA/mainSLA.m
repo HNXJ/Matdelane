@@ -23,12 +23,31 @@ spkfiles = spkfiles(contains(spkfiles, areax));
 Nfiles = length(spkfiles);
 spkData = cell(Nfiles, 1);
 
+%% LFP unifier
+
+areax = "FEF";
+lfppath = "lfpSet\";
+lfpfiles = {dir(lfppath).name};
+lfpfiles = lfpfiles(contains(lfpfiles, areax));
+Nfiles = length(lfpfiles);
+lfpData = cell(Nfiles, 1);
+
 %%
 
 for ik = 1:Nfiles
 
     tsetx = load(spkpath + spkfiles{ik});
     spkData{ik} = tsetx.xset;
+    fprintf(num2str(ik));
+
+end
+
+%%
+
+for ik = 1:Nfiles
+
+    tsetx = load(lfppath + lfpfiles{ik});
+    lfpData{ik} = tsetx.xset;
     fprintf(num2str(ik));
 
 end

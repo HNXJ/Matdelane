@@ -64,31 +64,92 @@
                         %            previous: [1×1 struct]
 
 %% PART 1: LOAD IN THE DATA
+
+%% 1.1: jNWB to ft_lfp
+
+jlfp1 = struct();
+jlfp1.fsample = 1000;
+ises = 1;
+icond = 10;
+
+nTr = size(lfpData{ises}.xs{icond}, 1);
+nCh = size(lfpData{ises}.xs{icond}, 2);
+nTs = size(lfpData{ises}.xs{icond}, 3);
+pTs = 1;
+
+for iCh = 1:nCh
+
+    jlfp1.label{iCh} = ['ch_', num2str(iCh)];
+
+end
+
+jlfp1.cfg.channel = jlfp1.label;
+
+for iTr = 1:nTr
+
+    jlfp1.trial{iTr} = squeeze(lfpData{ises}.xs{icond}(iTr, :, :));
+    jlfp1.time{iTr} = linspace(-500, 4250, nTs);
+    jlfp1.sampleinfo(iTr, :) = [pTs, pTs + 4750 - 1];
+    pTs = pTs + 4750;
+
+end
+
+%% 1.2: jNWB to ft_spk
+
+jspk1 = struct();
+jspk1.fsample = 1000;
+ises = 1;
+icond = 10;
+
+nTr = size(spkData{ises}.xs{icond}, 1);
+nNr = size(spkData{ises}.xs{icond}, 2);
+nTs = size(spkData{ises}.xs{icond}, 3);
+pTs = 1;
+
+for iNr = 1:nNr
+
+    jspk1.label{iNr} = ['nrn_', num2str(iNr)];
+
+end
+
+jspk1.cfg.channel = jspk1.label;
+
+for iTr = 1:nTr
+
+    jspk1.trial{iTr} = squeeze(spkData{ises}.xs{icond}(iTr, :, :));
+    jspk1.time{iTr} = linspace(-500, 4250, nTs);
+    jspk1.sampleinfo(iTr, :) = [pTs, pTs + 4750 - 1];
+    pTs = pTs + 4750;
+
+end
+
     %% % to load real data from area AIP in monkey to look at beta 
     % phase coupling, 
-    load('data_AIP.mat')
+    % load('workspace\SFC\data_AIP.mat')
     % TO LOOK AT SYNTHETIC DATA [lfp, dataspike] = create_data(); % to change parameters adjust the function
     %% create a spike structure from the continuous structure
-    spike = ft_checkdata(dataspike, 'datatype', 'spike', 'feedback', 'yes');
+    spike = ft_checkdata(jspk1, 'datatype', 'spike', 'feedback', 'yes');
 
 %% PART 2: COMPUTE THE SPIKE TRIGGERED SPECTRA
 
     % 
     cfg = []; 
-    cfg.foi = 10:100; 
+    cfg.foi = 1:100; 
     cfg.taper = 'hann'; 
     cfg.t_ftimwin = 5./cfg.foi;     
-    sts = ft_spiketriggeredspectrum_convol(cfg,lfp,spike);
+    sts = ft_spiketriggeredspectrum_convol(cfg, jlfp1, spike);
 
 %% PART 3: COMPUTE MEASURE OF SPIKE-FIELD ASSOCIATION
 
     %% compute the measure of phase locking strength
+
     nNeurons = length(spike.label); 
+    % nNeurons = 10;
     ppc_all = NaN(nNeurons, length(sts.freq)); 
     n_spikes = NaN(nNeurons, length(sts.freq)); 
     for iNeuron = 1:nNeurons
 
-        if length(sts.time{iNeuron})<3, continue,end
+        if length(sts.time{iNeuron})<100, continue,end
         
         % the code to compute for a single neuron
         cfg = []; 
@@ -97,20 +158,20 @@
         stat_ppc = ft_spiketriggeredspectrum_stat(cfg, sts); % this function takes only one input at a time
         
         % collect the data in some array for all neurons
-        ppc_all(iNeuron,:) = stat_ppc.ppc1; % collect the ppc values across units
-        n_spikes(iNeuron,:) = stat_ppc.nspikes; % collect the number of spikes for each neuron
+        ppc_all(iNeuron,:) = mean(stat_ppc.ppc1, 1); % collect the ppc values across units
+        n_spikes(iNeuron,:) = mean(stat_ppc.nspikes, 1); % collect the number of spikes for each neuron
     end
 
 %% PART 4: VISUALIZE INDIVIDUAL NEURONS AND COMPUTE THE PHASE HISTOGRAM
 
     % Note: this function still expects spike data to come in continuous
     % format, as one structure. 
-    data_all = ft_appenddata([],lfp, dataspike); 
+    data_all = ft_appenddata([], jlfp1, jspk1); 
     sta_all = []; 
     for iNeuron = 1:nNeurons
         cfg = []; 
-        cfg.spikechannel = dataspike.label{iNeuron};   
-        cfg.channel = lfp.label{1};
+        cfg.spikechannel = jspk1.label{iNeuron};   
+        cfg.channel = jlfp1.label{1};
         sta = ft_spiketriggeredaverage(cfg,data_all);
         sta_all(iNeuron,:) = sta.avg; 
     end   
@@ -120,8 +181,8 @@
 
 %% PART 5: VISUALIZE INDIVIDUAL NEURONS AND COMPUTE THE PHASE HISTOGRAM    
     % plot the angles, rayleigh test, ppc for one neuron
-    for iNeuron = 1:10
-        if length(sts.time{iNeuron})<3, continue,end
+    for iNeuron = 1:nNeurons
+        if length(sts.time{iNeuron}) < 100, continue,end
     
         f_ind = nearest(sts.freq, 20); 
         neuron_ind = iNeuron; 
@@ -143,7 +204,7 @@
         subplot(2,2,1)
         % visualize the angles for this neuron
         angles = angle(sts.fourierspctrm{iNeuron}(:,:,f_ind));        
-        rose(angles,20)        
+        polarhistogram(angles,20)        
         
         % visualize the sta
         subplot(2,2,2)
