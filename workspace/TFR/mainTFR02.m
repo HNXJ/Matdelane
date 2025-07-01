@@ -454,6 +454,24 @@ xset.lfpch = q2.channelinfo{2};
 fname = "06_MT_convspk_1.mat";
 save("spkSet\" + fname, "xset", "-v7.3");
 
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q2.x;
+xset.mdata = q2.c{1};
+xset.lfpch = q2.channelinfo{1};
+
+fname = "05_V4_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q2.x;
+xset.mdata = q2.c{2};
+xset.lfpch = q2.channelinfo{2};
+
+fname = "06_MT_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
 %% E.2: LFP info plot
 
 q2.jLFPprobeINFO(channel_in_layer.goodch);
@@ -820,6 +838,16 @@ xset.lfpch = q3.channelinfo{1};
 
 fname = "01_V1_convspk_1.mat";
 save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q3.x;
+xset.mdata = q3.c{1};
+xset.lfpch = q3.channelinfo{1};
+
+fname = "01_V1_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 

@@ -65,10 +65,7 @@
 
 %% PART 1: LOAD IN THE DATA
 
-% 1 : Stimulus time vs. omission time
-% 2 : Pre-omission vs. post-omission
-% 3 : Lower-area-spk vs. higher-area-lfp
-% 4 : Higher-area-spk vs. lower-area-lfp
+% : Stimulus time 
 
 %% 1.1: jNWB to ft_lfp
 
