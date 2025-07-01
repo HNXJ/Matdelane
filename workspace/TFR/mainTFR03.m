@@ -426,6 +426,27 @@ channel_in_layer.goodch = [channel_in_layer.deep, channel_in_layer.mid, channel_
 
 q2.channelinfo{1} = channel_in_layer;
 
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q2.xs;
+xset.chids = q2.cs{2}.ids;
+xset.peakch = q2.cs{2}.peaks;
+xset.lfpch = q2.channelinfo{1};
+
+fname = "11_FST_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q2.x;
+xset.mdata = q2.c{1};
+xset.lfpch = q2.channelinfo{1};
+
+fname = "11_FST_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
 %% E.2: LFP info plot
 
 q2.jLFPprobeINFO(channel_in_layer.goodch);
