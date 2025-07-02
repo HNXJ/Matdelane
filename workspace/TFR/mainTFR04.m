@@ -637,7 +637,7 @@ save("spkSet\" + fname, "xset", "-v7.3");
 
 xset = struct();
 xset.xs = q3.x;
-xset.mdata = q3.c{1};
+xset.mdata = q3.c{3};
 xset.lfpch = q3.channelinfo{1};
 
 fname = "02_V2_lfp_1.mat";
@@ -645,7 +645,7 @@ save("lfpSet\" + fname, "xset", "-v7.3");
 
 xset = struct();
 xset.xs = q3.x;
-xset.mdata = q3.c{2};
+xset.mdata = q3.c{3};
 xset.lfpch = q3.channelinfo{2};
 
 fname = "03_V3d_lfp_1.mat";
