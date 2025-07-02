@@ -324,7 +324,7 @@ q2.jMUAplot(2, [-400 4200]);
 
 q2.jSUAplot(9, [100 4000], 100:120);
 
-%% E.2: Channel and layer identification
+%% E.1: Channel and layer identification
 
 channel_in_layer = struct();
 channel_in_layer.deep = 73:2:110;
@@ -333,6 +333,27 @@ channel_in_layer.sup = [41:2:43, 43, 47:2:64];
 channel_in_layer.goodch = [channel_in_layer.sup, channel_in_layer.mid, channel_in_layer.deep];
 
 q2.channelinfo{1} = channel_in_layer;
+
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q2.xs;
+xset.chids = q2.cs{2}.ids;
+xset.peakch = q2.cs{2}.peaks;
+xset.lfpch = q2.channelinfo{1};
+
+fname = "07_MST_convspk_2.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q2.x;
+xset.mdata = q2.c{1};
+xset.lfpch = q2.channelinfo{1};
+
+fname = "07_MST_lfp_2.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 
@@ -591,6 +612,44 @@ channel_in_layer2.deep = 80:103;
 channel_in_layer2.goodch = [channel_in_layer2.deep, channel_in_layer2.mid, channel_in_layer2.sup];
 
 q3.channelinfo{2} = channel_in_layer2;
+
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q3.xs;
+xset.chids = q3.cs{3}.ids;
+xset.peakch = q3.cs{3}.peaks;
+xset.lfpch = q3.channelinfo{1};
+
+fname = "02_V2_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q3.xs;
+xset.chids = q3.cs{3}.ids;
+xset.peakch = q3.cs{3}.peaks;
+xset.lfpch = q3.channelinfo{2};
+
+fname = "03_V3d_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q3.x;
+xset.mdata = q3.c{1};
+xset.lfpch = q3.channelinfo{1};
+
+fname = "02_V2_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q3.x;
+xset.mdata = q3.c{2};
+xset.lfpch = q3.channelinfo{2};
+
+fname = "03_V3d_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
 
 %% E.2: LFP info plot
 

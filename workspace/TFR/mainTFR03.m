@@ -865,6 +865,44 @@ channel_in_layer2.goodch = [channel_in_layer2.sup, channel_in_layer2.mid, channe
 q3.channelinfo{1} = channel_in_layer;
 q3.channelinfo{2} = channel_in_layer2;
 
+%% E.1.1: Save single units and muas
+
+xset = struct();
+xset.xs = q3.xs;
+xset.chids = q3.cs{3}.ids;
+xset.peakch = q3.cs{3}.peaks;
+xset.lfpch = q3.channelinfo{1};
+
+fname = "06_MT_convspk_2.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q3.xs;
+xset.chids = q3.cs{3}.ids;
+xset.peakch = q3.cs{3}.peaks;
+xset.lfpch = q3.channelinfo{2};
+
+fname = "07_MST_convspk_1.mat";
+save("spkSet\" + fname, "xset", "-v7.3");
+
+%% E.1.2: Save LFPs
+
+xset = struct();
+xset.xs = q3.x;
+xset.mdata = q3.c{1};
+xset.lfpch = q3.channelinfo{1};
+
+fname = "06_MT_lfp_2.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
+xset = struct();
+xset.xs = q3.x;
+xset.mdata = q3.c{2};
+xset.lfpch = q3.channelinfo{2};
+
+fname = "07_MST_lfp_1.mat";
+save("lfpSet\" + fname, "xset", "-v7.3");
+
 %% E.2: LFP info plot
 
 q3.jLFPprobeINFO(channel_in_layer.goodch);
