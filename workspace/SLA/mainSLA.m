@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% SPK unifier
 
-areax = "FEF";
+areax = "MST";
 spkpath = "spkSet\";
 spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
@@ -25,14 +25,14 @@ spkData = cell(Nfiles, 1);
 
 %% LFP unifier
 
-areax = "FEF";
+areax = "PFC";
 lfppath = "lfpSet\";
 lfpfiles = {dir(lfppath).name};
 lfpfiles = lfpfiles(contains(lfpfiles, areax));
 Nfiles = length(lfpfiles);
 lfpData = cell(Nfiles, 1);
 
-%%
+%% Load
 
 for ik = 1:Nfiles
 
@@ -42,7 +42,7 @@ for ik = 1:Nfiles
 
 end
 
-%%
+%
 
 for ik = 1:Nfiles
 
