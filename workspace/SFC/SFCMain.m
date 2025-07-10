@@ -109,6 +109,7 @@ icond = 10;
 nTr = size(spkData{ises}.xs{icond}, 1);
 nNr = size(spkData{ises}.xs{icond}, 2);
 nTs = size(spkData{ises}.xs{icond}, 3);
+
 pTs = 1;
 
 for iNr = 1:nNr
