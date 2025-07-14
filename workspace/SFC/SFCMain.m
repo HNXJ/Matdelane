@@ -70,6 +70,10 @@
 % 3 : Lower-area-spk vs. higher-area-lfp
 % 4 : Higher-area-spk vs. lower-area-lfp
 
+%% 1.0: Trial Shuffle
+
+
+
 %% 1.1: jNWB to ft_lfp
 
 jlfp1 = struct();
@@ -106,7 +110,7 @@ jspk1.fsample = 1000;
 ises = 1;
 icond = 10;
 
-nTr = size(spkData{ises}.xs{icond}, 1);
+% nTr = size(spkData{ises}.xs{icond}, 1);
 nNr = size(spkData{ises}.xs{icond}, 2);
 nTs = size(spkData{ises}.xs{icond}, 3);
 
@@ -255,7 +259,7 @@ end
     cfg.foilim = [10 100]; 
     cfg.taper = 'hann'; 
     cfg.spikechannel = 1:length(spike.trial); 
-    sts_fft = ft_spiketriggeredspectrum_fft(cfg, lfp, spike); 
+    sts_fft = ft_spiketriggeredspectrum_fft(cfg, jlfp1, spike); 
     
     % 
     nNeurons = length(spike.label); 
