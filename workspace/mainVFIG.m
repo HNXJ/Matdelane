@@ -35,7 +35,7 @@ end
 
 %% Bench
 
-sigtemp = tfrData{5};
+sigtemp = tfrData{4};
 disp(size(sigtemp{1}));
 nChlx = size(sigtemp{1}, 1);
 dSpacing = 40;
