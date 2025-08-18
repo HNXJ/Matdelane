@@ -25,7 +25,7 @@ spkData = cell(Nfiles, 1);
 
 %% LFP unifier
 
-areax = "PFC";
+areax = "FEF";
 lfppath = "lfpSet\";
 lfpfiles = {dir(lfppath).name};
 lfpfiles = lfpfiles(contains(lfpfiles, areax));
@@ -42,7 +42,7 @@ for ik = 1:Nfiles
 
 end
 
-%
+%%
 
 for ik = 1:Nfiles
 

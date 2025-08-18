@@ -341,7 +341,7 @@ q2 = jnwb(nwbFile, "V3d-V3a/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+q2.jMUAplot(12, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 

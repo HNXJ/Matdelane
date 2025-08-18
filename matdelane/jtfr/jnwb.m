@@ -168,7 +168,7 @@ classdef jnwb < handle
 
         end
 
-        function jMUAplot(obj, condid, timewindow)
+        function jMUAplot(obj, condid, timewindow, smoothw, saveflag)
 
             if ~exist("timewindow", "var")
 
@@ -177,14 +177,33 @@ classdef jnwb < handle
 
             end
 
+            if ~exist("smoothw", "var")
+
+                smoothw = 2;
+
+            end
+
+            if ~exist("saveflag", "var")
+
+                saveflag = 0;
+
+            end
+
             figure;
             
             imxm = squeeze(mean(obj.xm{condid}, 1));
+            imxmse = squeeze(std(imxm)) / sqrt(size(imxm, 1));
             imxm = squeeze(mean(imxm, 1));
-            imxm = (imxm - mean(imxm)) / std(imxm);
+            imxm = (imxm - mean(imxm(250:500))) / std(imxm(500:2000));
+            imxm = smooth(imxm, smoothw);
+            imxmse = smooth(imxmse, smoothw);
             plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
             
             hold("on");
+
+            ximxmt = linspace(-500, 4250, 4750);
+            patch([ximxmt ximxmt(end:-1:1)], [imxmse + imxm; imxm(end:-1:1) - imxmse(end:-1:1)], [.4 .5 .7], "FaceAlpha",  .2, "HandleVisibility", "off");
+
             xline(0, HandleVisibility="off");
             xline(1031, HandleVisibility="off");
             xline(2062, HandleVisibility="off");
@@ -196,6 +215,13 @@ classdef jnwb < handle
             xlim(timewindow);
             
             legend;
+
+            if saveflag
+
+                fname = replace(obj.areainf, "/", "") + "_mua_" + string(obj.condinflabel(condid));
+                print(gcf,'-vector','-dsvg', fname +".svg");
+
+            end
 
         end
 

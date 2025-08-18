@@ -410,7 +410,7 @@ q2 = jnwb(nwbFile, "FST/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+q2.jMUAplot(12, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 
@@ -842,7 +842,7 @@ q3 = jnwb(nwbFile, "MT-MST/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
-q3.jMUAplot(9, [1000 3000]);
+q3.jMUAplot(12, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 

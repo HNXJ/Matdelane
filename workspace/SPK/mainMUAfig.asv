@@ -1,0 +1,93 @@
+%% Setup
+
+clear;clc;close all;
+
+cd('D:\Electrophysiology\Matdelane\');
+addpath(genpath('matnwb'));
+addpath(genpath('matdelane'));
+addpath(genpath('flipv2'));
+
+generateCore();
+addpath('fieldtrip');
+ft_defaults;
+disp("Setup done.");
+
+load("tfrSet\info.mat");
+
+%%
+
+areax = "FEF";
+spkpath = "spkSet\";
+spkfiles = {dir(spkpath).name};
+spkfiles = spkfiles(contains(spkfiles, areax));
+Nfiles = length(spkfiles);
+spkData = cell(Nfiles, 1);
+
+%%
+
+for ik = 1:Nfiles
+
+    tsetx = load(spkpath + spkfiles{ik});
+    spkData{ik} = tsetx.xset;
+    fprintf(num2str(ik));
+
+end
+
+%%
+
+xs1 = zeros(4, 4750);
+xs1e = zeros(4, 4750);
+
+for ik = 1:Nfiles
+
+    for jk = 1:4
+
+        tmp_xs1 = squeeze(mean(spkData{ik}.xs{+jk}(:, 1:200, :), 1));
+        tmp_xs1e = std(tmp_xs1) / sqrt(size(spkData{ik}.xs{0+jk}(:, 42:44, :), 1));
+        tmp_xs1 = mean(tmp_xs1, 1);
+        tmp_xs1 = tmp_xs1 - mean(tmp_xs1(250:500));
+        tmp_xs1 = smooth(tmp_xs1, 100);
+        xs1(jk, :) = xs1(jk, :) + tmp_xs1';
+        xs1e(jk, :) = xs1e(jk, :) + tmp_xs1e/Nfiles;
+
+    end
+
+end
+
+for ik = 1:4
+
+    xs1(ik, :) = smooth(xs1(ik, :), 100);
+    scale_temp_au = max(xs1(ik, 500:1500));
+    xs1(ik, :) = xs1(ik, :) / scale_temp_au;
+    xs1e(ik, :) = smooth(xs1e(ik, :), 100);
+    xs1e(ik, :) = xs1e(ik, :) / scale_temp_au/10;
+
+end
+
+%%
+% TODO: MUA fig for all areas - RRRRvsRXRRvsRRXR
+% TODO: add patch
+
+colorsets = {[0 .2 1.], [1. .2 0], [.1 1 .1], [.7 .4 .1]};
+xs1e_x = linspace(-500, 4250, 4750);
+xs1e_xp = xs1e_x(end:-1:1);
+
+figure;
+
+for jk = 1:4
+
+    plot(xs1e_x, xs1(jk, :), "Color", colorsets{jk});
+    patch([xs1e_x, xs1e_xp], [xs1e(jk, :) + xs1(jk, :), -xs1e(jk, end:-1:1) + xs1(jk, end:-1:1)], colorsets{jk}, "FaceAlpha", 0.2, "HandleVisibility", "off");
+    hold("on");
+
+end
+
+title(areax);
+xlabel("Time (ms)");
+ylabel("MUA-avg-a.u. change from bslne");
+legend("RRRR", "RXRR", "RRXR", "RRRX");
+
+fname = string(areax + "_mua3RX");
+print(gcf,'-vector','-dsvg', fname +".svg");
+
+%%

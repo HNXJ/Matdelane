@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "V1-V2/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(7, [-500 4000]);
+q1.jMUAplot(12, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 
@@ -341,7 +341,7 @@ q2 = jnwb(nwbFile, "V3d-V3a/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [100 4000]);
+q2.jMUAplot(9, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 

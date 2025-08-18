@@ -28,7 +28,7 @@ q1 = jnwb(nwbFile, "PFC/", 500, 4250, 0, 0);
 
 %% E.0.2: MUA plot
 
-q1.jMUAplot(9, [-500 4000]);
+q1.jMUAplot(9, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 
@@ -404,9 +404,7 @@ q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 1);
 
 %% E.0.2: MUA plot
 
-% q2.jMUAplot(11, [-400 4200]);
-q2.jMUAplot(12, [2500 4500]);
-% q2.jMUAplotAll([1000 3000]);
+q2.jMUAplot(12, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 
@@ -812,7 +810,7 @@ q3 = jnwb(nwbFile, "V1-V2/", 500, 4250, 2, 0);
 
 %% E.0.2: MUA plot
 
-q3.jMUAplot(3, [-400 4000]);
+q3.jMUAplot(10, [-500 4000], 100, 1);
 
 %% E.0.3: SUA plot
 
