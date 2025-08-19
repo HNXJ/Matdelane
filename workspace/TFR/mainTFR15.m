@@ -340,11 +340,11 @@ q2 = jnwb(nwbFile, "V3d-V3a/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 
-q2.jMUAplot(9, [1000 3000]);
+q2.jMUAplot(5:8, [-500 4000], 400, 1, 1:128);
 
 %% E.0.3: SUA plot
 
-q2.jSUAplot(9, [100 4000], 100:120);
+q2.jSUAplot(10, [100 4000], 100:120);
 
 %% E.1: Channel and layer identification
 

@@ -168,7 +168,7 @@ classdef jnwb < handle
 
         end
 
-        function jMUAplot(obj, condid, timewindow, smoothw, saveflag)
+        function jMUAplot(obj, condid, timewindow, smoothw, saveflag, channelsoi)
 
             if ~exist("timewindow", "var")
 
@@ -189,36 +189,79 @@ classdef jnwb < handle
 
             end
 
+            if ~exist("channelsoi", "var")
+
+                channelsoi = 1:128;
+
+            end
+
             figure;
-            
-            imxm = squeeze(mean(obj.xm{condid}, 1));
-            imxmse = squeeze(std(imxm)) / sqrt(size(imxm, 1));
-            imxm = squeeze(mean(imxm, 1));
-            imxm = (imxm - mean(imxm(250:500))) / std(imxm(500:2000));
-            imxm = smooth(imxm, smoothw);
-            imxmse = smooth(imxmse, smoothw);
-            plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
-            
-            hold("on");
 
-            ximxmt = linspace(-500, 4250, 4750);
-            patch([ximxmt ximxmt(end:-1:1)], [imxmse + imxm; imxm(end:-1:1) - imxmse(end:-1:1)], [.4 .5 .7], "FaceAlpha",  .2, "HandleVisibility", "off");
+            if length(condid) > 1
 
-            xline(0, HandleVisibility="off");
-            xline(1031, HandleVisibility="off");
-            xline(2062, HandleVisibility="off");
-            xline(3093, HandleVisibility="off");
-            
-            title("MUAenv/Zsc/" + obj.condinflabel(condid));
-            xlabel("Time (ms)");
-            ylabel("Z-score");
-            xlim(timewindow);
-            
-            legend;
+                clrx = obj.jMultiColors(length(condid));
+
+                for condix = 1:length(condid)
+
+                    imxm = squeeze(mean(obj.xm{condid(condix)}(:, channelsoi, :), 1));
+                    imxmse = 2*squeeze(std(imxm)) / sqrt(size(imxm, 2));
+                    imxm = squeeze(mean(imxm, 1));
+                    imxm = (imxm - mean(imxm(250:500))) / std(imxm(500:2000));
+                    imxm = smooth(imxm, smoothw);
+                    imxmse = smooth(imxmse, smoothw);
+                    plot(linspace(-500, 4250, 4750), imxm, "color", clrx{condix}, "DisplayName", obj.areainf + obj.condinflabel(condid(condix)));
+                    
+                    hold("on");
+        
+                    ximxmt = linspace(-500, 4250, 4750);
+                    patch([ximxmt ximxmt(end:-1:1)], [imxmse + imxm; imxm(end:-1:1) - imxmse(end:-1:1)], clrx{condix}, "FaceAlpha",  .2, "HandleVisibility", "off");
+        
+                    xline(0, HandleVisibility="off");
+                    xline(1031, HandleVisibility="off");
+                    xline(2062, HandleVisibility="off");
+                    xline(3093, HandleVisibility="off");
+                    
+                    title("MUAenv/Zsc/");
+                    xlabel("Time (ms)");
+                    ylabel("Z-score");
+                    xlim(timewindow);
+
+                end
+
+                legend;
+
+            else
+
+                imxm = squeeze(mean(obj.xm{condid}(:, channelsoi, :), 1));
+                imxmse = squeeze(std(imxm)) / sqrt(size(imxm, 1));
+                imxm = squeeze(mean(imxm, 1));
+                imxm = (imxm - mean(imxm(250:500))) / std(imxm(500:2000));
+                imxm = smooth(imxm, smoothw);
+                imxmse = smooth(imxmse, smoothw);
+                plot(linspace(-500, 4250, 4750), imxm, "DisplayName", obj.areainf);
+                
+                hold("on");
+    
+                ximxmt = linspace(-500, 4250, 4750);
+                patch([ximxmt ximxmt(end:-1:1)], [imxmse + imxm; imxm(end:-1:1) - imxmse(end:-1:1)], [.4 .5 .7], "FaceAlpha",  .2, "HandleVisibility", "off");
+    
+                xline(0, HandleVisibility="off");
+                xline(1031, HandleVisibility="off");
+                xline(2062, HandleVisibility="off");
+                xline(3093, HandleVisibility="off");
+                
+                title("MUAenv/Zsc/" + obj.condinflabel(condid));
+                xlabel("Time (ms)");
+                ylabel("Z-score");
+                xlim(timewindow);
+                
+                legend;
+
+            end
 
             if saveflag
 
-                fname = replace(obj.areainf, "/", "") + "_mua_" + string(obj.condinflabel(condid));
+                fname = replace(obj.areainf, "/", "") + "_mua_" + string(obj.condinflabel(condid(1)));
                 print(gcf,'-vector','-dsvg', fname +".svg");
 
             end
@@ -751,6 +794,18 @@ classdef jnwb < handle
 
             end
            
+        end
+
+        function clrxs = jMultiColors(~, N)
+
+            clrxs = cell(1, N);
+
+            for ik = 1:N
+
+                clrxs{ik} = [mod(ik, 2) mod(floor(ik/2), 2), mod(floor(ik/4), 2)]/2 + 0.5;
+
+            end
+
         end
 
     end
