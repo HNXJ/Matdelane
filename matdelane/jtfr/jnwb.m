@@ -204,7 +204,7 @@ classdef jnwb < handle
                 for condix = 1:length(condid)
 
                     imxm = squeeze(mean(obj.xm{condid(condix)}(:, channelsoi, :), 1));
-                    imxmse = 2*squeeze(std(imxm)) / sqrt(size(imxm, 2));
+                    imxmse = 5*squeeze(std(imxm)) / sqrt(size(imxm, 2));
                     imxm = squeeze(mean(imxm, 1));
                     imxm = (imxm - mean(imxm(250:500))) / std(imxm(500:2000));
                     imxm = smooth(imxm, smoothw);

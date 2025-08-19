@@ -66,6 +66,34 @@ end
 
 save("tfrSetBand\" + areax, "tfrsx", "-v7.3");
 
+%% TFR coherence (CorrXspearman)
+
+tfrpath = "tfrSetBand\";
+tfrfiles = {dir(tfrpath).name};
+tfrfiles = tfrfiles(contains(tfrfiles, ".mat"));
+Nfiles = length(tfrfiles);
+tfrData = cell(Nfiles, 1);
+
+%%
+
+for ik = 1:Nfiles
+
+    tfrx = load(tfrpath + tfrfiles{ik});
+    tfrData{ik} = tfrx.tset.pgx;
+    fprintf(num2str(ik));
+
+end
+
+%%
+
+% 1. Stim1 corr vs Omission corr
+
+
+
+% 2. Omission1 corr vs Omission2 corr
+
+
+
 %% Bench
 
 sigtemp = tfrData{4};
