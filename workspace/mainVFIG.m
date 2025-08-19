@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "V4"; % V1-V2-V3d-V3a- | V4 | -MT-MST-TEO-FST-FEF-PFC
+areax = "MT"; % V1-V2-V3d-V3a-V4- |MT| -MST-TEO-FST-FEF-PFC
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
