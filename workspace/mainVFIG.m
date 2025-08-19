@@ -16,14 +16,14 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "PFC";
+areax = "V4"; % V1-V2-V3d-V3a- | V4 | -MT-MST-TEO-FST-FEF-PFC
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
 Nfiles = length(tfrfiles);
 tfrData = cell(Nfiles, 1);
 
-%%
+%
 
 for ik = 1:Nfiles
 
@@ -32,6 +32,39 @@ for ik = 1:Nfiles
     fprintf(num2str(ik));
 
 end
+
+%
+
+tfrsx = cell(5, 12);
+foidx = {[11:28], [32:48], [52:100], [140:320], [321:800]};
+
+for ik = 1:Nfiles
+
+    for jk = 1:5
+
+        for kk = 1:12
+        
+            tfrsx_temp = tfrData{ik}{kk}(:, foidx{jk}, :);
+
+            if ik == 1
+            
+                tfrsx{jk, kk} = tfrsx_temp;
+
+            else
+
+                tfrsx{jk, kk} = cat(1, tfrsx{jk, kk}, tfrsx_temp);
+
+            end
+
+        end
+
+    end
+
+    disp(ik);
+
+end
+
+save("tfrSetBand\" + areax, "tfrsx", "-v7.3");
 
 %% Bench
 
