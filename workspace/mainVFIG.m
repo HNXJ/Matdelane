@@ -79,9 +79,66 @@ tfrData = cell(Nfiles, 1);
 for ik = 1:Nfiles
 
     tfrx = load(tfrpath + tfrfiles{ik});
-    tfrData{ik} = tfrx.tset.pgx;
+    tfrData{ik} = tfrx.tfrsx;
     fprintf(num2str(ik));
 
+end
+
+%%
+
+gcorr = cell(1, 5);
+% toix = tsinfo.tbands{2};
+toix = 1:299;
+cond = 10;
+
+for fband = 1:5
+
+    gcorr{fband} = zeros(1, length(toix));
+    lcnt = 0;
+
+    areacnt = zeros(1, Nfiles);
+    
+    for ik = 1:Nfiles
+    
+        ncnt = size(tfrData{ik}{fband, cond}, 1);
+        nbands = size(tfrData{ik}{fband, cond}, 2);
+    
+        temp_gmat = squeeze(mean(tfrData{ik}{fband, cond}(:, :, toix), 2));
+        sub_temp_gmat = mean(corr(temp_gmat'), 2);
+        [~, indxsorted] = sort(sub_temp_gmat, "descend");
+        temp_gmat = temp_gmat(indxsorted, :);
+
+        gcorr{fband}(lcnt+1:lcnt+ncnt, :) = temp_gmat;
+    
+        lcnt = lcnt + ncnt;
+        areacnt(ik) = lcnt;
+
+    end
+
+end
+
+%%
+
+
+fbandlabels = {"Theta[2.5-7Hz]", "Alpha[8-12Hz]", "Beta[13-30Hz]", "L-Gamma[32-80Hz]", "H-Gamma[80-200Hz]"};
+figure;
+for fbandx = 1:4
+
+    imx1 = corr(gcorr{fbandx}');
+
+    subplot(2, 2, fbandx);
+
+    imagesc(imx1);
+    
+    for ik = 1:Nfiles
+    
+        xline(areacnt(ik), "Color", [1 0 0], "LineWidth", 1);
+        yline(areacnt(ik), "Color", [1 0 0], "LineWidth", 1);
+    
+    end
+    
+    title("Spectral power corr" + fbandlabels{fbandx})
+    colormap("parula");
 end
 
 %%
@@ -324,6 +381,9 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     ylabel(cb, "Change (%)");
 
 end
+
+%%
+
 
 %%
 

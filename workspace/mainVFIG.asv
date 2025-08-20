@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% TFR unifier
 
-areax = "MST"; % V1-V2-V3d-V3a-V4-MT-MST- TEO-FST-FEF-PFC
+areax = "PFC"; % V1-V2-V3d-V3a-V4-MT-MST-TEO-FST-FEF-PFC
 tfrpath = "tfrSet\";
 tfrfiles = {dir(tfrpath).name};
 tfrfiles = tfrfiles(contains(tfrfiles, areax));
@@ -65,6 +65,104 @@ for ik = 1:Nfiles
 end
 
 save("tfrSetBand\" + areax, "tfrsx", "-v7.3");
+
+%% TFR coherence (CorrXspearman)
+
+tfrpath = "tfrSetBand\";
+tfrfiles = {dir(tfrpath).name};
+tfrfiles = tfrfiles(contains(tfrfiles, ".mat"));
+Nfiles = length(tfrfiles);
+tfrData = cell(Nfiles, 1);
+
+%%
+
+for ik = 1:Nfiles
+
+    tfrx = load(tfrpath + tfrfiles{ik});
+    tfrData{ik} = tfrx.tfrsx;
+    fprintf(num2str(ik));
+
+end
+
+%%
+
+gcorr = cell(1, 5);
+toix = tsinfo.tbands{1};
+cond = 10;
+
+for fband = 1:5
+
+
+    gcorr{fband} = zeros(1, length(toix));
+    lcnt = 0;
+
+    areacnt = zeros(1, Nfiles);
+    
+    for ik = 1:Nfiles
+    
+        ncnt = size(tfrData{ik}{fband, cond}, 1);
+        nbands = size(tfrData{ik}{fband, cond}, 2);
+    
+        gcorr{fband}(lcnt+1:lcnt+ncnt, :) = squeeze(mean(tfrData{ik}{fband, cond}(:, :, toix), 2));
+        lcnt = lcnt + ncnt;
+    
+        areacnt(ik) = lcnt;
+    
+    end
+
+end
+
+%%
+
+
+fbandlabels = {"Theta[2.5-7Hz]", "Alpha[8-12Hz]", "Beta[13-30Hz]", "L-Gamma[32-80Hz]", "H-Gamma[80-200Hz]"};
+figure;
+for fbandx = 1:4
+
+    imx1 = corr(gcorr{fbandx}');
+
+    for ik = 1:Nfiles
+
+        if ik == 1
+
+            lcntx = 0;
+
+        else
+
+            lcntx = areacnt(ik-1);
+
+        end
+
+        submean = mean(imx1(lcntx+1:areacnt(ik), :), ;
+        [~, sortedIndices] = sort(submean, 'descend');
+        imx1()
+
+    end
+
+    subplot(2, 2, fbandx);
+
+    imagesc(imx1);
+    
+    for ik = 1:Nfiles
+    
+        xline(areacnt(ik), "Color", [1 0 0], "LineWidth", 1);
+        yline(areacnt(ik), "Color", [1 0 0], "LineWidth", 1);
+    
+    end
+    
+    title("Spectral power corr" + fbandlabels{fbandx})
+    colormap("parula");
+end
+
+%%
+
+% 1. Stim1 corr vs Omission corr
+
+
+
+% 2. Omission1 corr vs Omission2 corr
+
+
 
 %% Bench
 
@@ -296,6 +394,9 @@ function [imx1x, imx2x, imx3x] = jTFRLaminarPlotter(tfrdata, tset, areaname, chn
     ylabel(cb, "Change (%)");
 
 end
+
+%%
+
 
 %%
 
