@@ -86,8 +86,8 @@ end
 
 %%
 
-gcorr = cell(1, 5);
-toix = tsinfo.tbands{2};
+% toix = tsinfo.tbands{2}(1:45);
+% toix = tsinfo.tbands{3}(16:60);
 % toix = 1:299;
 cond = 10;
 
@@ -104,10 +104,17 @@ for fband = 1:5
         % nbands = size(tfrData{ik}{fband, cond}, 2);
     
         temp_gmat = squeeze(mean(tfrData{ik}{fband, cond}(:, :, toix), 2));
+        
+        for jk = 1:ncnt
+
+            temp_gmat(jk, :) = temp_gmat(jk, :) / mean(temp_gmat(jk, end-10:end));
+
+        end
 
         sub_temp_gmat = sum(corr(temp_gmat', "Type", "Spearman"));
         [~, indxsorted] = sort(sub_temp_gmat, "descend");
         temp_gmat = temp_gmat(indxsorted, :);
+        % temp_gmat = smoothdata2(temp_gmat, "movmean", {51 15});
 
         gcorr{fband}(lcnt+1:lcnt+ncnt, :) = temp_gmat;
     
@@ -118,6 +125,9 @@ for fband = 1:5
 
 end
 
+% gcorr_stim = gcorr;
+% gcorr_omxn = gcorr;
+
 %%
 
 
@@ -127,7 +137,8 @@ figure;
 for fbandx = 1:4
 
     imx1 = corr(gcorr{fbandx}', "Type", "Spearman");
-    imx1 = smoothdata2(imx1, "gaussian");
+    % imx1 = smoothdata2(imx1, "movmean", 51);
+    imx1(abs(imx1) < 0.5);
 
     subplot(2, 2, fbandx);
 
@@ -142,17 +153,267 @@ for fbandx = 1:4
     
     title("Spectral power corr" + fbandlabels{fbandx})
     colormap("parula");
+
 end
+
+sgtitle("Omission time xcorr"); % TODO make |r| < .25 0
 
 %%
 
-% 1. Stim1 corr vs Omission corr
+fbandlabels = {"Theta[2.5-7Hz]", "Alpha[8-12Hz]", "Beta[13-30Hz]", "L-Gamma[32-80Hz]", "H-Gamma[80-200Hz]"};
+areanames = {"V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"};
+
+figure("Position", [0 0 1200 2200]);
+
+for fbandx = 1:4
+
+    imx1 = corr(gcorr_stim{fbandx}', "Type", "Spearman");
+
+    gcorr_a = zeros(11, 11);
+
+    for ik = 1:Nfiles
+
+        if ik == 1
+
+            lcntx = 0;
+
+        else
+
+            lcntx = areacnt(ik-1);
+
+        end
+        
+        for jk = 1:ik
+
+            if jk == 1
+    
+                rcntx = 0;
+    
+            else
+    
+                rcntx = areacnt(jk-1);
+    
+            end
+
+            gcorr_a(ik, jk) = mean(imx1(lcntx+1:areacnt(ik), rcntx+1:areacnt(jk)), "all");
+
+        end
+
+    end
+
+    % imx1(abs(imx1) < 0.5);
+
+    subplot(2, 2, fbandx);
+
+    gcorr_a(abs(gcorr_a) < 0.01) = 0;
+    gcorr_a = gcorr_a*100;
+
+    imagesc(gcorr_a);
+
+    for ik = 1:Nfiles
+
+        for jk = 1:ik
+            
+            text(jk-.3, ik, num2str(gcorr_a(ik, jk), 3))
+            
+        end
+
+    end
+    clim([-100 100]);
+    
+    title("Spectral power corr" + fbandlabels{fbandx});
+    xticks(1:11);
+    xticklabels(areanames);
+    yticks(1:11);
+    yticklabels(areanames);
+    colormap("parula");
+
+end
 
 
+sgtitle("Sx time Corr "); % TODO make |r| < .25 0
+fname = "allareatfr_corr" + "stim";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
-% 2. Omission1 corr vs Omission2 corr
+%%
 
+fbandlabels = {"Theta[2.5-7Hz]", "Alpha[8-12Hz]", "Beta[13-30Hz]", "L-Gamma[32-80Hz]", "H-Gamma[80-200Hz]"};
+areanames = {"V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"};
 
+figure("Position", [0 0 1200 2200]);
+
+for fbandx = 1:4
+
+    imx1 = corr(gcorr_stim{fbandx}', "Type", "Spearman");
+    imx2 = corr(gcorr_omxn{fbandx}', "Type", "Spearman");
+
+    gcorr_a = zeros(11, 11);
+    gcorr_b = zeros(11, 11);
+
+    for ik = 1:Nfiles
+
+        if ik == 1
+
+            lcntx = 0;
+
+        else
+
+            lcntx = areacnt(ik-1);
+
+        end
+        
+        for jk = 1:ik
+
+            if jk == 1
+    
+                rcntx = 0;
+    
+            else
+    
+                rcntx = areacnt(jk-1);
+    
+            end
+
+            gcorr_a(ik, jk) = mean(imx1(lcntx+1:areacnt(ik), rcntx+1:areacnt(jk)), "all");
+            gcorr_b(ik, jk) = mean(imx2(lcntx+1:areacnt(ik), rcntx+1:areacnt(jk)), "all");
+
+        end
+
+    end
+
+    % imx1(abs(imx1) < 0.5);
+
+    subplot(2, 2, fbandx);
+
+    gcorr_c = 100*(gcorr_b.^2 - gcorr_a.^2);
+    gcorr_c(isnan(gcorr_c)) = 0;
+    gcorr_c(abs(gcorr_c) < 1) = 0;
+
+    imagesc(gcorr_c);
+
+    for ik = 1:Nfiles
+
+        for jk = 1:ik
+
+            if gcorr_c(ik, jk)
+                
+                text(jk-.3, ik, num2str(gcorr_c(ik, jk), 3));
+
+            else
+
+                text(jk-.3, ik, "n.s");
+
+            end
+
+        end
+
+    end
+    clim([-20 20]);
+    
+    title("Spectral power corr ratio stim to omission" + fbandlabels{fbandx});
+    xticks(1:11);
+    xticklabels(areanames);
+    yticks(1:11);
+    yticklabels(areanames);
+    colormap("parula");
+
+end
+
+sgtitle("R2 change (omxn - stim)"); % TODO make |r| < .25 0
+fname = "allareatfr_corr" + "_r2change";
+print(gcf,'-vector','-dsvg', fname +".svg");
+
+%% Barplot
+
+fbandlabels = {"Theta[2.5-7Hz]", "Alpha[8-12Hz]", "Beta[13-30Hz]", "L-Gamma[32-80Hz]", "H-Gamma[80-200Hz]"};
+areanames = {"V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"};
+
+% figure("Position", [0 0 1200 2200]);
+
+gcorr_g = zeros(11, 11);
+
+for fbandx = 5:5
+
+    imx1 = corr(gcorr_stim{fbandx}', "Type", "Spearman");
+    imx2 = corr(gcorr_omxn{fbandx}', "Type", "Spearman");
+
+    gcorr_a = zeros(11, 11);
+    gcorr_b = zeros(11, 11);
+
+    for ik = 1:Nfiles
+
+        if ik == 1
+
+            lcntx = 0;
+
+        else
+
+            lcntx = areacnt(ik-1);
+
+        end
+        
+        for jk = 1:Nfiles
+
+            if jk == 1
+    
+                rcntx = 0;
+    
+            else
+    
+                rcntx = areacnt(jk-1);
+    
+            end
+
+            gcorr_a(ik, jk) = mean(imx1(lcntx+1:areacnt(ik), rcntx+1:areacnt(jk)), "all");
+            gcorr_b(ik, jk) = mean(imx2(lcntx+1:areacnt(ik), rcntx+1:areacnt(jk)), "all");
+
+        end
+
+    end
+
+    % imx1(abs(imx1) < 0.5);
+
+    % subplot(2, 2, fbandx);
+
+    gcorr_c = 100*(gcorr_a.^2 + gcorr_b.^2);
+    gcorr_c(isnan(gcorr_c)) = 0;
+    gcorr_c(abs(gcorr_c) < 1) = 0;
+
+    gcorr_g = gcorr_g + gcorr_c;
+    % 
+    % bar(mean(gcorr_a, 1));
+    % 
+    % % for ik = 1:Nfiles
+    % % 
+    % %     for jk = 1:ik
+    % % 
+    % %         text(jk-.3, ik, num2str(gcorr_a(ik, jk), 3))
+    % % 
+    % %     end
+    % % 
+    % % end
+    % ylim([0 30]);
+    % 
+    % title("Spectral power corr" + fbandlabels{fbandx});
+    % xticks(1:11);
+    % xticklabels(areanames);
+    % % yticks(1:11);
+    % % yticklabels(areanames);
+    % colormap("parula");
+
+end
+ 
+figure;
+
+barrsq = mean(abs(gcorr_g));
+
+bar(barrsq);
+xticks(1:11);
+xticklabels(areanames);
+
+sgtitle("Sx time Corr "); % TODO make |r| < .25 0
+fname = "allareatfr_corr" + "stimbar";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Bench
 
