@@ -414,6 +414,8 @@ xticklabels(areanames);
 sgtitle("Sx time Corr "); % TODO make |r| < .25 0
 fname = "allareatfr_corr" + "stimbar";
 print(gcf,'-vector','-dsvg', fname +".svg");
+%%
+a = [1024 384 128 384 384 512 640 512 512 1152 1280]
 
 %% Bench
 
