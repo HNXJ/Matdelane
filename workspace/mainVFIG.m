@@ -10,7 +10,7 @@ addpath(genpath('flipv2'));
 generateCore();
 addpath('fieldtrip');
 ft_defaults;
-disp("Setup done.");
+disp(">Setup done.");
 
 load("tfrSet\info.mat");
 
