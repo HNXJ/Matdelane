@@ -14,6 +14,8 @@ disp(">Setup done.");
 
 load("tfrSet\info.mat");
 
+% cd /D/Electrophysiology/Matdelane
+
 %% TFR unifier
 
 areax = "PFC"; % V1-V2-V3d-V3a-V4-MT-MST-TEO-FST-FEF-PFC
