@@ -16,7 +16,7 @@ load("tfrSet\info.mat");
 
 %% SPK unifier
 
-areax = "MST";
+areax = "V1";
 spkpath = "spkSet\";
 spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
