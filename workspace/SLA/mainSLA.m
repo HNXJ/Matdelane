@@ -22,6 +22,7 @@ spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
 
 Nfiles = length(spkfiles);
+spkArea = cell(Nfiles, 1);
 spkData = cell(Nfiles, 1);
 sspkData1 = cell(Nfiles, 1);
 sspkData2 = cell(Nfiles, 1);
@@ -40,8 +41,10 @@ lfpData = cell(Nfiles, 1);
 for ik = 1:Nfiles
 
     tsetx = load(spkpath + spkfiles{ik});
+    tsetf = strsplit(spkfiles{ik}, "_");
+    spkArea{ik} = tsetf{2};
     spkData{ik} = tsetx.xset;
-    fprintf(num2str(ik));
+    fprintf(num2str(ik) + "-");
 
 end
 
@@ -53,9 +56,13 @@ scond2 = 10;
 for ik = 1:Nfiles
 
     tsetx = load(spkpath + spkfiles{ik});
-    sspkData1{ik} = tsetx.xset.xs{scond1};
-    sspkData2{ik} = tsetx.xset.xs{scond2};
-    fprintf(num2str(ik));
+    tsetf = strsplit(spkfiles{ik}, "_");
+    spkArea{ik} = tsetf{2};
+    chidx = tsetx.xset.chids;
+    
+    sspkData1{ik} = tsetx.xset.xs{scond1}(:, chidx, :);
+    sspkData2{ik} = tsetx.xset.xs{scond2}(:, chidx, :);
+    fprintf(num2str(ik) + "-");
 
 end
 
@@ -65,7 +72,7 @@ for ik = 1:Nfiles
 
     tsetx = load(lfppath + lfpfiles{ik});
     lfpData{ik} = tsetx.xset;
-    fprintf(num2str(ik));
+    fprintf(num2str(ik) + "-");
 
 end
 
