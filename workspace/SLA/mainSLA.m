@@ -16,12 +16,15 @@ load("tfrSet\info.mat");
 
 %% SPK unifier
 
-areax = "V1";
+areax = "conv";
 spkpath = "spkSet\";
 spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
+
 Nfiles = length(spkfiles);
 spkData = cell(Nfiles, 1);
+sspkData1 = cell(Nfiles, 1);
+sspkData2 = cell(Nfiles, 1);
 
 %% LFP unifier
 
@@ -32,7 +35,7 @@ lfpfiles = lfpfiles(contains(lfpfiles, areax));
 Nfiles = length(lfpfiles);
 lfpData = cell(Nfiles, 1);
 
-%% Load
+%% Load spk
 
 for ik = 1:Nfiles
 
@@ -42,7 +45,21 @@ for ik = 1:Nfiles
 
 end
 
-%%
+%% Load spk specific condition
+
+scond1 = 9;
+scond2 = 10;
+
+for ik = 1:Nfiles
+
+    tsetx = load(spkpath + spkfiles{ik});
+    sspkData1{ik} = tsetx.xset.xs{scond1};
+    sspkData2{ik} = tsetx.xset.xs{scond2};
+    fprintf(num2str(ik));
+
+end
+
+%% Load lfp
 
 for ik = 1:Nfiles
 
@@ -83,10 +100,27 @@ imagesc(im1 - im2);
 % clim([-2 2]);
 subplot(2, 2, 4);
 imagesc(im1 ./ im2);
-clim([-5 5]);
+% clim([-5 5]);
 
+%% Spike scatter
 
-%% Spike
+% xrefs = 
+% xrefx = 
+isx09 = spkData{1}.xs{7};
+
+mspkx = squeeze(sum(isx09, 1));
+mspkx = smoothdata2(mspkx, "gaussian", {1, 20});
+
+kg = 3;
+[i1, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
+
+figure;
+for ik = 1:kg
+    subplot(kg, 1, ik);
+    plot(mean(mspkx(i1 == ik, :)));
+    cntx = sum(i1 == ik);
+    title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
+end
 
 %%
 
