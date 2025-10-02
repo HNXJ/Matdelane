@@ -24,8 +24,7 @@ spkfiles = spkfiles(contains(spkfiles, areax));
 Nfiles = length(spkfiles);
 spkArea = cell(Nfiles, 1);
 spkData = cell(Nfiles, 1);
-sspkData1 = cell(Nfiles, 1);
-sspkData2 = cell(Nfiles, 1);
+sspkData = cell(Nfiles, 12);
 
 %% LFP unifier
 
@@ -48,10 +47,7 @@ for ik = 1:Nfiles
 
 end
 
-%% Load spk specific condition
-
-scond1 = 9;
-scond2 = 10;
+%% Load all spk condition specific
 
 for ik = 1:Nfiles
 
@@ -59,10 +55,15 @@ for ik = 1:Nfiles
     tsetf = strsplit(spkfiles{ik}, "_");
     spkArea{ik} = tsetf{2};
     chidx = tsetx.xset.chids;
-    
-    sspkData1{ik} = tsetx.xset.xs{scond1}(:, chidx, :);
-    sspkData2{ik} = tsetx.xset.xs{scond2}(:, chidx, :);
-    fprintf(num2str(ik) + "-");
+
+    for icond = 1:12
+
+        sspkData{ik, icond} = tsetx.xset.xs{icond}(:, chidx, :);
+        fprintf(num2str(icond) + "-");
+
+    end
+
+    fprintf(">" + num2str(ik) + "\n");
 
 end
 
@@ -75,6 +76,10 @@ for ik = 1:Nfiles
     fprintf(num2str(ik) + "-");
 
 end
+
+%% Labels
+
+areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
 
 %% Bench
 
