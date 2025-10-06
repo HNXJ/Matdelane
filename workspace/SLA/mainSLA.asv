@@ -80,29 +80,78 @@ end
 %% Labels
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
+aaab = 1;
+axab = 2;
+aaxb = 3;
+aaax = 4;
+bbba = 5;
+bxba = 6;
+bbxa = 7;
+bbbx = 8;
+rrrr = 9;
+rxrr = 10;
+rrxr = 11;
+rrrx = 12;
+
+ncntn = 0;
+
+for ik = 1:Nfiles
+        
+    disp(spkArea{ik});
+    ncnt = size(sspkData{ik, 1}, 2);
+    disp(size(sspkData{ik, 1}));
+    ncntn = ncntn + ncnt;
+
+end
 
 %% Grand matrix concatenation 
 
 tN = size(sspkData{1, 1}, 3);
-icond = 1;
-gmatrix = zeros(100, 100, tN);
+icond1 = aaab;
+icond2 = bbba;
+
+gmatrix1 = zeros(250, 1, tN);
+gmatrix2 = zeros(250, 1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
 
-    ncnt = size(sspkData{ik, icond}, 2);
-    tempSig = sspkData{ik, icond};
-    iTrials = mod()
-    gmatrix(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+    tempSig = sspkData{ik, icond1};
+    ncnt = size(tempSig, 2);
+    tcnt = size(tempSig, 1);
+    iTrials = mod(randperm(250), tcnt) + 1;
+    gmatrix1(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+
+    tempSig = sspkData{ik, icond2};
+    ncnt = size(tempSig, 2);
+    tcnt = size(tempSig, 1);
+    iTrials = mod(randperm(250), tcnt) + 1;
+    gmatrix2(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
 
 end
+
+%% Grand PEVs
+
+
+
+%% Spike scatter / Information / Information
+% data = zeros(N*2, n1, 1500);
+% data(1:N, :, :) = x1;
+% data(N+1:2*N, :, :) = x2;
+% % data(2*N+1:end, :, :) = x3;
+% 
+% % data = jSmooth(data, 100);
+% % data(:, :, 1:500) = data(:, :, randperm(500, 500));
+% 
+% groupIDs = [ones(1, N), ones(1, N)*2];%, ones(1, N)*3];
+% [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+% expvard{k}(ntotal+1:ntotal+n1, :) = squeeze(expv);
 % {cond}[trial,neuron,time]
 % PCA<
 % Kmeans<
-
-%% Spike scatter / Information / Information
-
-
 % PEV(x^) | PEV(s>) (2Dscatter, color on area)
 % xrefs = 
 % xrefx = 

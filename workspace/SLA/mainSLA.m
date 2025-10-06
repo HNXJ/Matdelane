@@ -93,21 +93,28 @@ rxrr = 10;
 rrxr = 11;
 rrrx = 12;
 
+ncntn = 0;
+
 for ik = 1:Nfiles
         
     disp(spkArea{ik});
+    ncnt = size(sspkData{ik, 1}, 2);
     disp(size(sspkData{ik, 1}));
+    ncntn = ncntn + ncnt;
 
 end
+
+disp(ncntn);
 
 %% Grand matrix concatenation 
 
 tN = size(sspkData{1, 1}, 3);
 icond1 = aaab;
 icond2 = bbba;
+nTrials = 200;
 
-gmatrix1 = zeros(250, 1, tN);
-gmatrix2 = zeros(250, 1, tN);
+gmatrix1 = zeros(nTrials, 1, tN);
+gmatrix2 = zeros(nTrials, 1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
@@ -115,13 +122,13 @@ for ik = 1:Nfiles
     tempSig = sspkData{ik, icond1};
     ncnt = size(tempSig, 2);
     tcnt = size(tempSig, 1);
-    iTrials = mod(randperm(250), tcnt) + 1;
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
     gmatrix1(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
 
     tempSig = sspkData{ik, icond2};
     ncnt = size(tempSig, 2);
     tcnt = size(tempSig, 1);
-    iTrials = mod(randperm(250), tcnt) + 1;
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
     gmatrix2(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
 
     neuronCnt = neuronCnt + ncnt;
