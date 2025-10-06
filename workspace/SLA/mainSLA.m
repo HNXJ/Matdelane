@@ -80,49 +80,74 @@ end
 %% Labels
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
+aaab = 1;
+axab = 2;
+aaxb = 3;
+aaax = 4;
+bbba = 5;
+bxba = 6;
+bbxa = 7;
+bbbx = 8;
+rrrr = 9;
+rxrr = 10;
+rrxr = 11;
+rrrx = 12;
 
-%% Bench
-
-% FEF : 44-45-53 (+> 19-70 )
-
-isx09 = sspkData{1, 9};
-isx10 = sspkData{1, 10};
-
-im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
-im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
-
-for ik = 1:size(im1, 1)
-
-    % im1(ik, :) = (im1(ik, :) - mean(im1(ik, :))) / std(im1(ik, :));
-    % im2(ik, :) = (im2(ik, :) - mean(im2(ik, :))) / std(im2(ik, :));
-    im1(ik, :) = smooth(im1(ik, :), 50);
-    im2(ik, :) = smooth(im2(ik, :), 50);
+for ik = 1:Nfiles
+        
+    disp(spkArea{ik});
+    disp(size(sspkData{ik, 1}));
 
 end
 
-figure;
-subplot(2, 2, 1);
-imagesc(im1);
-% clim([-2 2]);
-subplot(2, 2, 2);
-imagesc(im2);
-% clim([-2 2]);
-subplot(2, 2, 3);
-imagesc(im1 - im2);
-% clim([-2 2]);
-subplot(2, 2, 4);
-imagesc(im1 ./ im2);
-% clim([-5 5]);
+%% Grand matrix concatenation 
 
-%% Grand matrix formation
+tN = size(sspkData{1, 1}, 3);
+icond1 = aaab;
+icond2 = bbba;
 
+gmatrix1 = zeros(250, 1, tN);
+gmatrix2 = zeros(250, 1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig = sspkData{ik, icond1};
+    ncnt = size(tempSig, 2);
+    tcnt = size(tempSig, 1);
+    iTrials = mod(randperm(250), tcnt) + 1;
+    gmatrix1(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+
+    tempSig = sspkData{ik, icond2};
+    ncnt = size(tempSig, 2);
+    tcnt = size(tempSig, 1);
+    iTrials = mod(randperm(250), tcnt) + 1;
+    gmatrix2(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
+
+%% Grand PEVs
+
+
+
+%% Spike scatter / Information / Information
+% data = zeros(N*2, n1, 1500);
+% data(1:N, :, :) = x1;
+% data(N+1:2*N, :, :) = x2;
+% % data(2*N+1:end, :, :) = x3;
+% 
+% % data = jSmooth(data, 100);
+% % data(:, :, 1:500) = data(:, :, randperm(500, 500));
+% 
+% groupIDs = [ones(1, N), ones(1, N)*2];%, ones(1, N)*3];
+% [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+% expvard{k}(ntotal+1:ntotal+n1, :) = squeeze(expv);
 % {cond}[trial,neuron,time]
 % PCA<
 % Kmeans<
-
-%% Spike scatter / Information / Information
-
-
 % PEV(x^) | PEV(s>) (2Dscatter, color on area)
 % xrefs = 
 % xrefx = 
@@ -211,3 +236,40 @@ for i = 1:numberOfTabs
 end
 
 % --- End of Script ---
+
+%%
+
+%% Bench
+
+% FEF : 44-45-53 (+> 19-70 )
+
+isx09 = sspkData{1, 9};
+isx10 = sspkData{1, 10};
+
+im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
+im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
+
+for ik = 1:size(im1, 1)
+
+    % im1(ik, :) = (im1(ik, :) - mean(im1(ik, :))) / std(im1(ik, :));
+    % im2(ik, :) = (im2(ik, :) - mean(im2(ik, :))) / std(im2(ik, :));
+    im1(ik, :) = smooth(im1(ik, :), 50);
+    im2(ik, :) = smooth(im2(ik, :), 50);
+
+end
+
+figure;
+subplot(2, 2, 1);
+imagesc(im1);
+% clim([-2 2]);
+subplot(2, 2, 2);
+imagesc(im2);
+% clim([-2 2]);
+subplot(2, 2, 3);
+imagesc(im1 - im2);
+% clim([-2 2]);
+subplot(2, 2, 4);
+imagesc(im1 ./ im2);
+% clim([-5 5]);
+
+%%
