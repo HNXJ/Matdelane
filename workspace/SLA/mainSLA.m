@@ -85,8 +85,8 @@ areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "P
 
 % FEF : 44-45-53 (+> 19-70 )
 
-isx09 = spkData{1}.xs{9};
-isx10 = spkData{1}.xs{10};
+isx09 = sspkData{1, 9};
+isx10 = sspkData{1, 10};
 
 im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
 im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
@@ -114,22 +114,42 @@ subplot(2, 2, 4);
 imagesc(im1 ./ im2);
 % clim([-5 5]);
 
-%% Spike scatter
+%% Grand matrix formation
 
+% {cond}[trial,neuron,time]
+% PCA<
+% Kmeans<
+
+%% Spike scatter / Information / Information
+
+
+% PEV(x^) | PEV(s>) (2Dscatter, color on area)
 % xrefs = 
 % xrefx = 
-isx09 = spkData{1}.xs{7};
+
+ia = 1;
+icond = 8;
+isx09 = sspkData{ia, icond};
+disp(spkArea{ia});
 
 mspkx = squeeze(sum(isx09, 1));
-mspkx = smoothdata2(mspkx, "gaussian", {1, 20});
+mspkxo = mspkx;
+mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
+mspkx = smoothdata2(mspkx, "gaussian", {1, 40});
 
-kg = 3;
+kg = 7;
 [i1, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
 
 figure;
+sgtitle(spkArea{ia} + ">cond>" + num2str(icond));
+
 for ik = 1:kg
     subplot(kg, 1, ik);
-    plot(mean(mspkx(i1 == ik, :)));
+    plot(mean(mspkxo(i1 == ik, :)));
+    xline(500, "Color", "#DD0000");
+    xline(1530, "Color", "#DD0000");
+    xline(2560, "Color", "#DD0000");
+    xline(3590, "Color", "#DD0000");
     cntx = sum(i1 == ik);
     title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
 end

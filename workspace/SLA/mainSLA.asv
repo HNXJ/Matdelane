@@ -22,9 +22,9 @@ spkfiles = {dir(spkpath).name};
 spkfiles = spkfiles(contains(spkfiles, areax));
 
 Nfiles = length(spkfiles);
+spkArea = cell(Nfiles, 1);
 spkData = cell(Nfiles, 1);
-sspkData1 = cell(Nfiles, 1);
-sspkData2 = cell(Nfiles, 1);
+sspkData = cell(Nfiles, 12);
 
 %% LFP unifier
 
@@ -41,23 +41,29 @@ for ik = 1:Nfiles
 
     tsetx = load(spkpath + spkfiles{ik});
     tsetf = strsplit(spkfiles{ik}, "_");
-    spk
+    spkArea{ik} = tsetf{2};
     spkData{ik} = tsetx.xset;
-    fprintf(num2str(ik));
+    fprintf(num2str(ik) + "-");
 
 end
 
-%% Load spk specific condition
-
-scond1 = 9;
-scond2 = 10;
+%% Load all spk condition specific
 
 for ik = 1:Nfiles
 
     tsetx = load(spkpath + spkfiles{ik});
-    sspkData1{ik} = tsetx.xset.xs{scond1};
-    sspkData2{ik} = tsetx.xset.xs{scond2};
-    fprintf(num2str(ik));
+    tsetf = strsplit(spkfiles{ik}, "_");
+    spkArea{ik} = tsetf{2};
+    chidx = tsetx.xset.chids;
+
+    for icond = 1:12
+
+        sspkData{ik, icond} = tsetx.xset.xs{icond}(:, chidx, :);
+        fprintf(num2str(icond) + "-");
+
+    end
+
+    fprintf(">" + num2str(ik) + "\n");
 
 end
 
@@ -67,16 +73,20 @@ for ik = 1:Nfiles
 
     tsetx = load(lfppath + lfpfiles{ik});
     lfpData{ik} = tsetx.xset;
-    fprintf(num2str(ik));
+    fprintf(num2str(ik) + "-");
 
 end
+
+%% Labels
+
+areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
 
 %% Bench
 
 % FEF : 44-45-53 (+> 19-70 )
 
-isx09 = spkData{1}.xs{9};
-isx10 = spkData{1}.xs{10};
+isx09 = sspkData{1, 9};
+isx10 = sspkData{1, 10};
 
 im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
 im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
@@ -108,18 +118,27 @@ imagesc(im1 ./ im2);
 
 % xrefs = 
 % xrefx = 
-isx09 = spkData{1}.xs{7};
+ia = 36;
+icond = 10;
+isx09 = sspkData{ia, icond};
+disp(spkArea{ia});
 
 mspkx = squeeze(sum(isx09, 1));
-mspkx = smoothdata2(mspkx, "gaussian", {1, 20});
+mspkx = smoothdata2(mspkx, "gaussian", {1, 50});
 
-kg = 3;
+kg = 7;
 [i1, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
 
 figure;
+sgtitle(spkArea{ia} + ">cond>" + num2str(icond));
+
 for ik = 1:kg
     subplot(kg, 1, ik);
     plot(mean(mspkx(i1 == ik, :)));
+    xline(500, "Color", "#DD0000");
+    xline(1530, "Color", "#DD0000");
+    xline(2560, "Color", "#DD0000");
+    xline(3590, "Color", "#DD0000");
     cntx = sum(i1 == ik);
     title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
 end
