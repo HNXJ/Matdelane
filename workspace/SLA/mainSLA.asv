@@ -111,12 +111,14 @@ disp(ncntn);
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
+gkernel = ones(1, 1, 30); 
+
 tN = size(sspkData{1, 1}, 3);
 icond1 = aaab;
 icond2 = bbba;
 nTrials = 100;
 
-gmatrix1 = zeros(nTrials, tN);
+gmatrix1 = zeros(1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
@@ -137,8 +139,9 @@ for ik = 1:Nfiles
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
+    data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.05));
+    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -149,7 +152,7 @@ end
 tN = 1000;
 icond1 = rrrx;
 icond2 = rxrr;
-nTrials = 50;
+nTrials = 20;
 
 gmatrix2 = zeros(nTrials, tN);
 neuronCnt = 0;
@@ -172,8 +175,9 @@ for ik = 1:Nfiles
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
+    data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.05));
+    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -182,19 +186,25 @@ end
 %% Spike scatter / Information / Information
 % PEV(x^) | PEV(s>) (2Dscatter, color on area)
 
-sPEVtime = 501:2500;
-xPEVtime = 1:1000;
+% sPEVtime = 1:4500;
+% xPEVtime = 1:1000;
+
 
 sPEVs = zeros(1, size(gmatrix1, 1));
 xPEVs = zeros(1, size(gmatrix2, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = max(gmatrix1(iN, sPEVtime)) - min(gmatrix1(iN, :));
-    xPEVs(iN) = max(gmatrix2(iN, :)) - min(gmatrix2(iN, :));
+    sPEVs(iN) = 100*max(smooth(gmatrix1(iN, :), 50)) - min(gmatrix1(iN, :));
+    xPEVs(iN) = 100*max(smooth(gmatrix2(iN, :), 50)) - min(gmatrix2(iN, :));
 end
 
 figure;
-scatter(100*sPEVs, 100*xPEVs, 20*ones(1, 4099), categorical(areaIDs, 1:areaList), "filled");
+for iA = 1:11
+    if iA < 
+    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), , "filled", DisplayName=areaList(iA));
+    hold("on");
+end
+legend;
 
 %%
 

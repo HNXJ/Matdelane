@@ -111,12 +111,14 @@ disp(ncntn);
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
+gkernel = ones(1, 1, 30); 
+
 tN = size(sspkData{1, 1}, 3);
 icond1 = aaab;
 icond2 = bbba;
 nTrials = 100;
 
-gmatrix1 = zeros(nTrials, tN);
+gmatrix1 = zeros(1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
@@ -137,6 +139,7 @@ for ik = 1:Nfiles
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
+    data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
     gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
     neuronCnt = neuronCnt + ncnt;
@@ -148,7 +151,7 @@ end
 
 tN = 1000;
 icond1 = rrrx;
-icond2 = rxrr;
+icond2 = rrrx;
 nTrials = 20;
 
 gmatrix2 = zeros(nTrials, tN);
@@ -165,13 +168,14 @@ for ik = 1:Nfiles
     ncnt = size(tempSig2, 2);
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, 1441:2440);
+    tempSig2 = tempSig2(iTrials, :, 3601:4600);
 
     data = zeros(nTrials*2, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
+    data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
     gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
     neuronCnt = neuronCnt + ncnt;
@@ -186,18 +190,29 @@ end
 % xPEVtime = 1:1000;
 
 
-
 sPEVs = zeros(1, size(gmatrix1, 1));
 xPEVs = zeros(1, size(gmatrix2, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*max(smooth(gmatrix1(iN, :), 50)) - min(gmatrix1(iN, :));
-    xPEVs(iN) = 100*max(smooth(gmatrix2(iN, :), 50)) - min(gmatrix2(iN, :));
+    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)) - min(gmatrix1(iN, :)));
+    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)) - min(gmatrix2(iN, :)));
 end
 
+colmap = ones(neuronCnt, 1);
+
 figure;
+
 for iA = 1:11
-    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), "filled", DisplayName=areaList(iA));
+
+    if iA < 5
+        color_t = [1 0 0];
+    elseif iA < 9
+        color_t = [0 1 0];
+    else
+        color_t = [0 0 1];
+    end
+
+    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*5, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
     hold("on");
 end
 legend;
