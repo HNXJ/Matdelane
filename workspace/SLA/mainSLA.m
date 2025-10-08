@@ -94,11 +94,14 @@ rrxr = 11;
 rrrx = 12;
 
 ncntn = 0;
+areaIDs = zeros(1, 1);
 
 for ik = 1:Nfiles
         
     disp(spkArea{ik});
+    areaIDtemp = find(strcmpi(spkArea{ik}, areaList));
     ncnt = size(sspkData{ik, 1}, 2);
+    areaIDs(ncntn+1:ncntn+ncnt) = areaIDtemp;
     disp(size(sspkData{ik, 1}));
     ncntn = ncntn + ncnt;
 
@@ -106,83 +109,132 @@ end
 
 disp(ncntn);
 
-%% Grand matrix concatenation 
+%% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
 tN = size(sspkData{1, 1}, 3);
 icond1 = aaab;
 icond2 = bbba;
-nTrials = 200;
+nTrials = 100;
 
-gmatrix1 = zeros(nTrials, 1, tN);
-gmatrix2 = zeros(nTrials, 1, tN);
+gmatrix1 = zeros(nTrials, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
 
-    tempSig = sspkData{ik, icond1};
-    ncnt = size(tempSig, 2);
-    tcnt = size(tempSig, 1);
+    tempSig1 = sspkData{ik, icond1};
+    tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    gmatrix1(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+    tempSig1 = tempSig1(iTrials, :, :);
 
-    tempSig = sspkData{ik, icond2};
-    ncnt = size(tempSig, 2);
-    tcnt = size(tempSig, 1);
+    tempSig2 = sspkData{ik, icond2};
+    ncnt = size(tempSig2, 2);
+    tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    gmatrix2(:, neuronCnt+1:neuronCnt+ncnt, :) = tempSig(iTrials, :, :);
+    tempSig2 = tempSig2(iTrials, :, :);
 
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
+
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
 end
 
-%% Grand PEVs
+%% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
+tN = 1000;
+icond1 = rrrx;
+icond2 = rxrr;
+nTrials = 20;
 
+gmatrix2 = zeros(nTrials, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    tcnt = size(tempSig1, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = tempSig1(iTrials, :, 3501:4500);
+
+    tempSig2 = sspkData{ik, icond2};
+    ncnt = size(tempSig2, 2);
+    tcnt = size(tempSig2, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = tempSig2(iTrials, :, 1441:2440);
+
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
+
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
 
 %% Spike scatter / Information / Information
-% data = zeros(N*2, n1, 1500);
-% data(1:N, :, :) = x1;
-% data(N+1:2*N, :, :) = x2;
-% % data(2*N+1:end, :, :) = x3;
-% 
-% % data = jSmooth(data, 100);
-% % data(:, :, 1:500) = data(:, :, randperm(500, 500));
-% 
-% groupIDs = [ones(1, N), ones(1, N)*2];%, ones(1, N)*3];
-% [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-% expvard{k}(ntotal+1:ntotal+n1, :) = squeeze(expv);
+% PEV(x^) | PEV(s>) (2Dscatter, color on area)
+
+% sPEVtime = 1:4500;
+% xPEVtime = 1:1000;
+
+
+
+sPEVs = zeros(1, size(gmatrix1, 1));
+xPEVs = zeros(1, size(gmatrix2, 1));
+
+for iN = 1:size(gmatrix1, 1)
+    sPEVs(iN) = 100*max(smooth(gmatrix1(iN, :), 50)) - min(gmatrix1(iN, :));
+    xPEVs(iN) = 100*max(smooth(gmatrix2(iN, :), 50)) - min(gmatrix2(iN, :));
+end
+
+figure;
+for iA = 1:11
+    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), "filled", DisplayName=areaList(iA));
+    hold("on");
+end
+legend;
+
+%%
+
 % {cond}[trial,neuron,time]
 % PCA<
 % Kmeans<
-% PEV(x^) | PEV(s>) (2Dscatter, color on area)
+
 % xrefs = 
 % xrefx = 
 
 ia = 1;
-icond = 8;
-isx09 = sspkData{ia, icond};
-disp(spkArea{ia});
+icond = 1;
+isx09 = gmatrix2;
 
-mspkx = squeeze(sum(isx09, 1));
+mspkx = isx09;
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
 mspkx = smoothdata2(mspkx, "gaussian", {1, 40});
 
-kg = 7;
+kg = 12;
 [i1, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
 
 figure;
-sgtitle(spkArea{ia} + ">cond>" + num2str(icond));
+sgtitle("All neurons>XA?XB>PEV>Kmeans");
 
 for ik = 1:kg
     subplot(kg, 1, ik);
-    plot(mean(mspkxo(i1 == ik, :)));
+    plot(100*mean(mspkxo(i1 == ik, :)));
     xline(500, "Color", "#DD0000");
     xline(1530, "Color", "#DD0000");
     xline(2560, "Color", "#DD0000");
     xline(3590, "Color", "#DD0000");
     cntx = sum(i1 == ik);
+    ylabel("PEV%");
     title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
 end
 
