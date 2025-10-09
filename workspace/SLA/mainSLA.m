@@ -184,7 +184,7 @@ for ik = 1:Nfiles
 end
 
 %% Spike scatter / Information / Information
-% PEV(x^) | PEV(s>) (2Dscatter, color on area)
+% PEV(x^) | PEV(s>) (2Dscatter, color on area,)
 
 % sPEVtime = 1:4500;
 % xPEVtime = 1:1000;
