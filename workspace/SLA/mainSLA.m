@@ -113,7 +113,7 @@ disp(ncntn);
 
 gkernel = ones(1, 1, 30); 
 
-tN = size(sspkData{1, 1}, 3);
+tN = 1000;
 icond1 = aaab;
 icond2 = bbba;
 nTrials = 100;
@@ -126,13 +126,13 @@ for ik = 1:Nfiles
     tempSig1 = sspkData{ik, icond1};
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, :);
+    tempSig1 = tempSig1(iTrials, :, 501:1500);
 
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, :);
+    tempSig2 = tempSig2(iTrials, :, 501:1500);
 
     data = zeros(nTrials*2, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -141,7 +141,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
+    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -150,11 +150,11 @@ end
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
 tN = 1000;
-icond1 = rrrx;
-icond2 = rrrx;
-nTrials = 20;
+icond1 = aaax;
+icond2 = bbbx;
+nTrials = 100;
 
-gmatrix2 = zeros(nTrials, tN);
+gmatrix2 = zeros(1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
@@ -168,7 +168,7 @@ for ik = 1:Nfiles
     ncnt = size(tempSig2, 2);
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, 3601:4600);
+    tempSig2 = tempSig2(iTrials, :, 3501:4500);
 
     data = zeros(nTrials*2, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -177,7 +177,38 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.1));
+    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
+
+%% Grand matrix concatenation (iFR)
+
+tN = 500;
+icond1 = rrrr;
+icond2 = rrrx;
+nTrials = 100;
+
+gmatrix3 = zeros(1, tN);
+gmatrix4 = zeros(1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    % tcnt = size(tempSig1, 1);
+    % iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = mean(tempSig1(:, :, 3501:4000), 1) / mean(tempSig1(:, :, :), "all");
+
+    tempSig2 = sspkData{ik, icond2};
+    ncnt = size(tempSig2, 2);
+    % tcnt = size(tempSig2, 1);
+    % iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = mean(tempSig2(:, :, 3501:4000), 1) / mean(tempSig2(:, :, :), "all");
+
+    gmatrix3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig1);
+    gmatrix4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig2);
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -189,33 +220,67 @@ end
 % sPEVtime = 1:4500;
 % xPEVtime = 1:1000;
 
-
 sPEVs = zeros(1, size(gmatrix1, 1));
 xPEVs = zeros(1, size(gmatrix2, 1));
+sAFR = zeros(1, size(gmatrix3, 1));
+xAFR = zeros(1, size(gmatrix4, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)) - min(gmatrix1(iN, :)));
-    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)) - min(gmatrix2(iN, :)));
+    sPEVs(iN) = 100*(mean(smooth(gmatrix1(iN, :), 1)));
+    xPEVs(iN) = 100*(mean(smooth(gmatrix2(iN, :), 1)));
+    sAFR(iN) = mean(gmatrix3(iN, :));
+    xAFR(iN) = mean(gmatrix4(iN, :));
 end
 
 colmap = ones(neuronCnt, 1);
 
 figure;
 
-for iA = 1:11
+subplot(2, 1, 1);
+for iA = 3:4
 
     if iA < 5
         color_t = [1 0 0];
     elseif iA < 9
         color_t = [0 1 0];
-    else
+    elseif iA < 10
         color_t = [0 0 1];
+    else
+        color_t = [0 0 0];
     end
 
     scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*5, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
+    % xlim([-1 1]);
     hold("on");
 end
+xlabel("Stim-PEV");ylabel("OXM-PEV");
 legend;
+
+subplot(2, 1, 2);
+for iA = 3:4
+
+    if iA < 5
+        color_t = [1 0 0];
+    elseif iA < 9
+        color_t = [0 1 0];
+    elseif iA < 10
+        color_t = [0 0 1];
+    else
+        color_t = [0 0 0];
+    end
+
+    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*5, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
+    xlim([0 20]);
+    ylim([0 20]);
+    line(1:20, 1:20);
+    hold("on");
+end
+xlabel("Stim-AFR");ylabel("OXM-AFR");
+legend;
+
+%%
+
+
 
 %%
 
@@ -226,10 +291,22 @@ legend;
 % xrefs = 
 % xrefx = 
 
-ia = 1;
-icond = 1;
-isx09 = gmatrix2;
+isx04 = sspkData{3, 2};
+isx08 = sspkData{3, 10};
 
+imx1 = squeeze(mean(isx04, 1));
+imagesc(imx1);
+
+%%
+temp_sig1 = isx04(:, 50, :);
+temp_sig2 = isx08(:, 50, :);
+temp_sig1 = smooth(squeeze(mean(temp_sig1, 1)), 50);
+temp_sig2 = smooth(squeeze(mean(temp_sig2, 1)), 50);
+plot(temp_sig1 - mean(temp_sig1));
+hold("on");
+plot(temp_sig2 - mean(temp_sig2));
+
+%%
 mspkx = isx09;
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});

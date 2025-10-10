@@ -5,7 +5,7 @@ if (nargin < 3) || isempty(dim)
   else            dim = 1; end
 end
 if (nargin < 5) || isempty(GrandMeanMethod),  GrandMeanMethod = 0;  end
-if (nargin < 6) || isempty(CalcOmega2ExpVar), CalcOmega2ExpVar = false;  end
+if (nargin < 6) || isempty(CalcOmega2ExpVar), CalcOmega2ExpVar = true;  end
 
 if (nargin < 4) || isempty(grps)              % If expected group labels were not input as arg, ...
   grps  = sort( unique(groupIDs(:)) );        % Find number of groups in dataset 
