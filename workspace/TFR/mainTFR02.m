@@ -400,7 +400,7 @@ nwbFile = nwbPath + nwbFiles{2};
 
 %% E.0.1: jNWB object
 
-q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 1);
+q2 = jnwb(nwbFile, "V4-MT/", 500, 4250, 1, 0);
 
 %% E.0.2: MUA plot
 

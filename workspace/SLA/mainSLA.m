@@ -23,7 +23,6 @@ spkfiles = spkfiles(contains(spkfiles, areax));
 
 Nfiles = length(spkfiles);
 spkArea = cell(Nfiles, 1);
-spkData = cell(Nfiles, 1);
 sspkData = cell(Nfiles, 12);
 
 %% LFP unifier
@@ -36,6 +35,8 @@ Nfiles = length(lfpfiles);
 lfpData = cell(Nfiles, 1);
 
 %% Load spk
+
+spkData = cell(Nfiles, 1);
 
 for ik = 1:Nfiles
 
@@ -95,6 +96,7 @@ rrrx = 12;
 
 ncntn = 0;
 areaIDs = zeros(1, 1);
+fileIDs = zeros(1, 1);
 
 for ik = 1:Nfiles
         
@@ -102,6 +104,7 @@ for ik = 1:Nfiles
     areaIDtemp = find(strcmpi(spkArea{ik}, areaList));
     ncnt = size(sspkData{ik, 1}, 2);
     areaIDs(ncntn+1:ncntn+ncnt) = areaIDtemp;
+    fileIDs(ncntn+1:ncntn+ncnt) = ik;
     disp(size(sspkData{ik, 1}));
     ncntn = ncntn + ncnt;
 
@@ -113,10 +116,12 @@ disp(ncntn);
 
 gkernel = ones(1, 1, 30); 
 
-tN = 1000;
+tOi1 = 501:4500;
+tOi2 = 501:4500;
+tN = length(tOi1);
 icond1 = aaab;
 icond2 = bbba;
-nTrials = 100;
+nTrials = 200;
 
 gmatrix1 = zeros(1, tN);
 neuronCnt = 0;
@@ -126,13 +131,13 @@ for ik = 1:Nfiles
     tempSig1 = sspkData{ik, icond1};
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, 501:1500);
+    tempSig1 = tempSig1(iTrials, :, tOi1);
 
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, 501:1500);
+    tempSig2 = tempSig2(iTrials, :, tOi2);
 
     data = zeros(nTrials*2, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -140,8 +145,8 @@ for ik = 1:Nfiles
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
+    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -149,9 +154,14 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-tN = 1000;
-icond1 = aaax;
-icond2 = bbbx;
+tOi1 = 501:1500;
+tOi2 = 1531:2530;
+tOi3 = 2561:3560;
+tOi4 = 3591:4590;
+
+tN = length(tOi1);
+% icond1 = axab;
+% icond2 = aaxb;
 nTrials = 100;
 
 gmatrix2 = zeros(1, tN);
@@ -159,10 +169,10 @@ neuronCnt = 0;
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
+    tempSig1 = sspkData{ik, axab};
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, 3501:4500);
+    tempSig1 = tempSig1(iTrials, :, tOi2);
 
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
@@ -199,14 +209,17 @@ for ik = 1:Nfiles
     tempSig1 = sspkData{ik, icond1};
     % tcnt = size(tempSig1, 1);
     % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = mean(tempSig1(:, :, 3501:4000), 1) / mean(tempSig1(:, :, :), "all");
-
+    tempSig1 = sum(tempSig1(:, :, 3501:4000), 1);
+   
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
     % tcnt = size(tempSig2, 1);
     % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = mean(tempSig2(:, :, 3501:4000), 1) / mean(tempSig2(:, :, :), "all");
+    tempSig2 = sum(tempSig2(:, :, 3501:4000), 1);
 
+    disp(ik);
+    disp(length(unique(tempSig1)));
+    disp(length(unique(tempSig2)));
     gmatrix3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig1);
     gmatrix4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig2);
     neuronCnt = neuronCnt + ncnt;
@@ -226,10 +239,10 @@ sAFR = zeros(1, size(gmatrix3, 1));
 xAFR = zeros(1, size(gmatrix4, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(mean(smooth(gmatrix1(iN, :), 1)));
-    xPEVs(iN) = 100*(mean(smooth(gmatrix2(iN, :), 1)));
-    sAFR(iN) = mean(gmatrix3(iN, :));
-    xAFR(iN) = mean(gmatrix4(iN, :));
+    sPEVs(iN) = 100*(median(smooth(gmatrix1(iN, :), 10)));
+    xPEVs(iN) = 100*(median(smooth(gmatrix2(iN, :), 10)));
+    sAFR(iN) = median(gmatrix3(iN, :));
+    xAFR(iN) = median(gmatrix4(iN, :));
 end
 
 colmap = ones(neuronCnt, 1);
@@ -237,7 +250,7 @@ colmap = ones(neuronCnt, 1);
 figure;
 
 subplot(2, 1, 1);
-for iA = 3:4
+for iA = 1:11
 
     if iA < 5
         color_t = [1 0 0];
@@ -257,7 +270,7 @@ xlabel("Stim-PEV");ylabel("OXM-PEV");
 legend;
 
 subplot(2, 1, 2);
-for iA = 3:4
+for iA = 1:11
 
     if iA < 5
         color_t = [1 0 0];
