@@ -105,6 +105,7 @@ for ik = 1:Nfiles
     ncnt = size(sspkData{ik, 1}, 2);
     areaIDs(ncntn+1:ncntn+ncnt) = areaIDtemp;
     fileIDs(ncntn+1:ncntn+ncnt) = ik;
+    infileIDs(ncntn+1:ncntn+ncnt) = 1:ncnt;
     disp(size(sspkData{ik, 1}));
     ncntn = ncntn + ncnt;
 
@@ -114,10 +115,10 @@ disp(ncntn);
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-gkernel = ones(1, 1, 30); 
+gkernel = ones(1, 1, 20); 
 
-tOi1 = 501:4500;
-tOi2 = 501:4500;
+tOi1 = 501:1100;
+tOi2 = 501:1100;
 tN = length(tOi1);
 icond1 = aaab;
 icond2 = bbba;
@@ -154,14 +155,12 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-tOi1 = 501:1500;
-tOi2 = 1531:2530;
-tOi3 = 2561:3560;
-tOi4 = 3591:4590;
+% tOi1 = 501:1500; %Azzz
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
 
-tN = length(tOi1);
-% icond1 = axab;
-% icond2 = aaxb;
+tN = length(tOi2);
 nTrials = 100;
 
 gmatrix2 = zeros(1, tN);
@@ -173,21 +172,46 @@ for ik = 1:Nfiles
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig1 = tempSig1(iTrials, :, tOi2);
+    ncnt = size(tempSig1, 2);
 
-    tempSig2 = sspkData{ik, icond2};
-    ncnt = size(tempSig2, 2);
+    tempSig2 = sspkData{ik, aaxb};
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, 3501:4500);
+    tempSig2 = tempSig2(iTrials, :, tOi3);
 
-    data = zeros(nTrials*2, ncnt, tN);
+    tempSig3 = sspkData{ik, bbbx};
+    tcnt = size(tempSig3, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig3 = tempSig3(iTrials, :, tOi4);
+
+    tempSig4 = sspkData{ik, bxba};
+    tcnt = size(tempSig4, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig4 = tempSig4(iTrials, :, tOi2);
+
+    tempSig5 = sspkData{ik, bbxa};
+    tcnt = size(tempSig5, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig5 = tempSig5(iTrials, :, tOi3);
+
+    tempSig6 = sspkData{ik, aaax};
+    tcnt = size(tempSig6, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig6 = tempSig6(iTrials, :, tOi4);
+
+    data = zeros(nTrials*6, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
+    data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
+    data(3*nTrials+1:4*nTrials, :, :) = tempSig4;
+    data(4*nTrials+1:5*nTrials, :, :) = tempSig5;
+    data(5*nTrials+1:6*nTrials, :, :) = tempSig6;
+
+    groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
+    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -195,33 +219,34 @@ end
 
 %% Grand matrix concatenation (iFR)
 
-tN = 500;
+tOi1 = 1531:2030;
+tOi2 = 1:500;
+tN = length(tOi1);
 icond1 = rrrr;
-icond2 = rrrx;
+icond2 = rxrr;
 nTrials = 100;
 
 gmatrix3 = zeros(1, tN);
 gmatrix4 = zeros(1, tN);
+gmatrix5 = zeros(1, length(tOi2));
 neuronCnt = 0;
 
 for ik = 1:Nfiles
 
     tempSig1 = sspkData{ik, icond1};
-    % tcnt = size(tempSig1, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = sum(tempSig1(:, :, 3501:4000), 1);
+    tempSig1 = mean(tempSig1(:, :, tOi1), 1);
    
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
-    % tcnt = size(tempSig2, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = sum(tempSig2(:, :, 3501:4000), 1);
+    tempSig2 = mean(tempSig2(:, :, tOi1), 1);
+    
+    tempSig3 = sspkData{ik, icond1};
+    tempSig3 = mean(tempSig3(:, :, tOi2), 1);
 
     disp(ik);
-    disp(length(unique(tempSig1)));
-    disp(length(unique(tempSig2)));
     gmatrix3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig1);
     gmatrix4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig2);
+    gmatrix5(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig3);
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -239,10 +264,11 @@ sAFR = zeros(1, size(gmatrix3, 1));
 xAFR = zeros(1, size(gmatrix4, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(median(smooth(gmatrix1(iN, :), 10)));
-    xPEVs(iN) = 100*(median(smooth(gmatrix2(iN, :), 10)));
-    sAFR(iN) = median(gmatrix3(iN, :));
-    xAFR(iN) = median(gmatrix4(iN, :));
+    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 10)));
+    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 10)));
+    tW = size(gmatrix3, 2) / 1000;
+    sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
+    xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
 end
 
 colmap = ones(neuronCnt, 1);
@@ -250,6 +276,7 @@ colmap = ones(neuronCnt, 1);
 figure;
 
 subplot(2, 1, 1);
+
 for iA = 1:11
 
     if iA < 5
@@ -262,14 +289,16 @@ for iA = 1:11
         color_t = [0 0 0];
     end
 
-    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*5, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
+    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*25, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
+
     % xlim([-1 1]);
     hold("on");
 end
+
 xlabel("Stim-PEV");ylabel("OXM-PEV");
 legend;
-
 subplot(2, 1, 2);
+
 for iA = 1:11
 
     if iA < 5
@@ -282,42 +311,35 @@ for iA = 1:11
         color_t = [0 0 0];
     end
 
-    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*5, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
+    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*25, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
     xlim([0 20]);
     ylim([0 20]);
-    line(1:20, 1:20);
+    line(1:20, 1:20, "HandleVisibility", "off");
     hold("on");
+
 end
 xlabel("Stim-AFR");ylabel("OXM-AFR");
 legend;
 
 %%
 
+icond1 = 1;
+neuronID = 1:200;
+fileID = 30;
+neuronIDs = sum(fileIDs < fileID) + neuronID;
 
+for nID = 1:length(neuronIDs)
+    if nID == 1
+        temp_sigx = squeeze(mean(sspkData{fileIDs(neuronIDs(nID)), icond1}(:, infileIDs(neuronIDs(nID)), :), 1));
+        temp_sig1 = zeros([1, size(temp_sigx)]);
+        temp_sig1(1, :, :) = temp_sigx;
+    else
+        temp_sig1(nID, :) = squeeze(mean(sspkData{fileIDs(neuronIDs(nID)), icond1}(:, infileIDs(neuronIDs(nID)), :), 1));
+    end
+end
 
-%%
-
-% {cond}[trial,neuron,time]
-% PCA<
-% Kmeans<
-
-% xrefs = 
-% xrefx = 
-
-isx04 = sspkData{3, 2};
-isx08 = sspkData{3, 10};
-
-imx1 = squeeze(mean(isx04, 1));
-imagesc(imx1);
-
-%%
-temp_sig1 = isx04(:, 50, :);
-temp_sig2 = isx08(:, 50, :);
-temp_sig1 = smooth(squeeze(mean(temp_sig1, 1)), 50);
-temp_sig2 = smooth(squeeze(mean(temp_sig2, 1)), 50);
-plot(temp_sig1 - mean(temp_sig1));
-hold("on");
-plot(temp_sig2 - mean(temp_sig2));
+figure;
+imagesc(temp_sig1);
 
 %%
 mspkx = isx09;
