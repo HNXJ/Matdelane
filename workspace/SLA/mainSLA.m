@@ -202,6 +202,103 @@ for ik = 1:Nfiles
     disp(neuronCnt);
 
 end
+
+%% Grand matrix concatenation (PEV) Omission Identity (A?B)
+
+gkernel = ones(1, 1, 100); 
+
+tOi1 = 1:4500;
+tOi2 = 1:4500;
+% tOi3 = 1:4500;
+tN = length(tOi1);
+icond1 = axab;
+icond2 = bxba;
+% icond3 = rrrx;
+nTrials = 100;
+
+gmatrixN3 = zeros(1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    ncnt = size(tempSig1, 2);
+    tcnt = size(tempSig1, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = tempSig1(iTrials, :, tOi1);
+
+    tempSig2 = sspkData{ik, icond2};
+    tcnt = size(tempSig2, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = tempSig2(iTrials, :, tOi2);
+
+    % tempSig3 = sspkData{ik, icond3};
+    % tcnt = size(tempSig3, 1);
+    % iTrials = mod(randperm(nTrials), tcnt) + 1;
+    % tempSig3 = tempSig3(iTrials, :, tOi3);
+
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
+
+    data = convn(data, gkernel, 'same');
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    gmatrixN3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
+
+% Grand matrix concatenation (PEV) Omission Identity (A?B)
+
+gkernel = ones(1, 1, 100); 
+
+tOi1 = 1:4500;
+tOi2 = 1:4500;
+% tOi3 = 1:4500;
+tN = length(tOi1);
+icond1 = aaxb;
+icond2 = bbxa;
+% icond3 = rrrx;
+nTrials = 100;
+
+gmatrixN4 = zeros(1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    ncnt = size(tempSig1, 2);
+    tcnt = size(tempSig1, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = tempSig1(iTrials, :, tOi1);
+
+    tempSig2 = sspkData{ik, icond2};
+    tcnt = size(tempSig2, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = tempSig2(iTrials, :, tOi2);
+
+    % tempSig3 = sspkData{ik, icond3};
+    % tcnt = size(tempSig3, 1);
+    % iTrials = mod(randperm(nTrials), tcnt) + 1;
+    % tempSig3 = tempSig3(iTrials, :, tOi3);
+
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
+
+    data = convn(data, gkernel, 'same');
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    gmatrixN4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
+
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
 gkernel = ones(1, 1, 20); 
@@ -400,14 +497,23 @@ kW = 10;
 
 figure;
 
-temp_sigx = gmatrixN1(nID, :);
-temp_sig1 = squeeze(mean(temp_sigx, 1));
-plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBXvsRRRX)", "LineWidth", 2);
-hold("on");
-
 temp_sigx = gmatrixN2(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAABvsBBBA)", "LineWidth", 2);
+hold("on");
+
+temp_sigx = gmatrixN1(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBX)", "LineWidth", 2);
+
+temp_sigx = gmatrixN3(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AXABvsBXBA)", "LineWidth", 2);
+
+temp_sigx = gmatrixN4(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAXBvsBBXA)", "LineWidth", 2);
+
 
 xline(500, "HandleVisibility", "off");
 xline(1530, "HandleVisibility", "off");
