@@ -82,6 +82,7 @@ end
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
 condNames = ["aaab", "axab", "aaxb", "aaax", "bbba", "bxba", "bbxa", "bbbx", "rrrr", "rxrr", "rrxr", "rrrx"];
+
 aaab = 1;
 axab = 2;
 aaxb = 3;
@@ -113,6 +114,46 @@ for ik = 1:Nfiles
 end
 
 disp(ncntn);
+
+%% Grand matrix concatenation (PEV) Stim Identity (A?B)
+
+gkernel = ones(1, 1, 10); 
+
+tOi1 = 1:4500;
+tOi2 = 1:4500;
+tN = length(tOi1);
+icond1 = aaab;
+icond2 = bbba;
+nTrials = 200;
+
+gmatrix0 = zeros(1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    tcnt = size(tempSig1, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = tempSig1(iTrials, :, tOi1);
+
+    tempSig2 = sspkData{ik, icond2};
+    ncnt = size(tempSig2, 2);
+    tcnt = size(tempSig2, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = tempSig2(iTrials, :, tOi2);
+
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
+
+    data = convn(data, gkernel, 'same');
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 0);
+    gmatrix0(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
@@ -253,75 +294,6 @@ for ik = 1:Nfiles
 
 end
 
-%% Spike scatter / Information / Information
-% PEV(x^) | PEV(s>) (2Dscatter, color on area,)
-
-% sPEVtime = 1:4500;
-% xPEVtime = 1:1000;
-
-sPEVs = zeros(1, size(gmatrix1, 1));
-xPEVs = zeros(1, size(gmatrix2, 1));
-sAFR = zeros(1, size(gmatrix3, 1));
-xAFR = zeros(1, size(gmatrix4, 1));
-
-for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 10)));
-    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 10)));
-    tW = size(gmatrix3, 2) / 1000;
-    sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
-    xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
-end
-
-colmap = ones(neuronCnt, 1);
-
-figure;
-
-subplot(2, 1, 1);
-
-for iA = 1:11
-
-    if iA < 5
-        color_t = [1 0 0];
-    elseif iA < 9
-        color_t = [0 1 0];
-    elseif iA < 10
-        color_t = [0 0 1];
-    else
-        color_t = [0 0 0];
-    end
-
-    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*25, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
-
-    % xlim([-1 1]);
-    hold("on");
-end
-
-xlabel("Stim-PEV");ylabel("OXM-PEV");
-legend;
-subplot(2, 1, 2);
-
-for iA = 1:11
-
-    if iA < 5
-        color_t = [1 0 0];
-    elseif iA < 9
-        color_t = [0 1 0];
-    elseif iA < 10
-        color_t = [0 0 1];
-    else
-        color_t = [0 0 0];
-    end
-
-    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*25, colmap(areaIDs == iA)*color_t, "filled", DisplayName=areaList(iA));
-    xlim([0 20]);
-    ylim([0 20]);
-    line(1:20, 1:20, "HandleVisibility", "off");
-    hold("on");
-
-end
-xlabel("Stim-AFR");ylabel("OXM-AFR");
-legend;
-
 %% Neuron iFR plot (A)
 
 icond1 = 1;
@@ -344,32 +316,24 @@ imagesc(temp_sig1);
 
 %% Single neuron iFR (N)
 
-nID = 3171;
-icond1 = 5;
-icond2 = 6;
-icond3 = 7;
-icond4 = 8;
-kW = 1000;
+nID = 4099; % Grand neuron ID
 
-temp_sigx = sspkData{fileIDs(nID), icond1}(:, infileIDs(nID), :);
-temp_sig1 = squeeze(mean(temp_sigx, 1));
-
-temp_sigx = sspkData{fileIDs(nID), icond2}(:, infileIDs(nID), :);
-temp_sig2 = squeeze(mean(temp_sigx, 1));
-
-temp_sigx = sspkData{fileIDs(nID), icond3}(:, infileIDs(nID), :);
-temp_sig3 = squeeze(mean(temp_sigx, 1));
-
-temp_sigx = sspkData{fileIDs(nID), icond4}(:, infileIDs(nID), :);
-temp_sig4 = squeeze(mean(temp_sigx, 1));
-
+icond1 = 1;
+icond2 = 2;
+icond3 = 3;
+icond4 = 4;
+kW = 500;
 tN = 1000;%length(temp_sig1);
+
 figure;
 
-plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond1), "LineWidth", 4);hold("on");
-plot(tN*smoothdata(temp_sig2, "gaussian", kW), "DisplayName", condNames(icond2), "LineWidth", 4);
-plot(tN*smoothdata(temp_sig3, "gaussian", kW), "DisplayName", condNames(icond3), "LineWidth", 4);
-plot(tN*smoothdata(temp_sig4, "gaussian", kW), "DisplayName", condNames(icond4), "LineWidth", 4);
+for icond = 1:4
+    
+    temp_sigx = sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :);
+    temp_sig1 = squeeze(mean(temp_sigx, 1));
+    plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);hold("on");
+
+end
 
 xline(500, "HandleVisibility", "off");
 xline(1530, "HandleVisibility", "off");
@@ -377,7 +341,40 @@ xline(2560, "HandleVisibility", "off");
 xline(3590, "HandleVisibility", "off");
 
 legend();
+xlabel("Time(ms)");ylabel("FR(Spk/s)");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
+%% Single neuron PEV in time (N)
+
+nID = 4099; % Grand neuron ID
+
+kW = 1;
+
+figure;
+
+temp_sigx = gmatrix0(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "AAABvsBBBA", "LineWidth", 2);hold("on");
+
+xline(500, "HandleVisibility", "off");
+xline(1530, "HandleVisibility", "off");
+xline(2560, "HandleVisibility", "off");
+xline(3590, "HandleVisibility", "off");
+
+legend();
+xlabel("Time(ms)");ylabel("PEV%");
+sgtitle("Neuron no." + num2str(nID) + " PEV(AAAB?BBBA) > " + areaList(areaIDs(nID)));
+% >>> For the above neuron can you now plots its PEV time course?
+% gmatrix0 >
+% Same x-axis
+% on y-axis, plot stimPEV (AAAB vs BBBA)
+% and perhaps seperate PEV plots for stim identity:
+% PEV for AXAB vs. BXBA vs. RXRR
+% PEV for AAXB vs. BBXA vs. RRXR
+% PEV for AAAX vs. BBBX vs. RRRX
+% those 3 PEV plots could all be on the same plot
+% maybe even together with the stim identity PEV
+% use the same x axis (see how PEV changes over the trial) <<<
 
 %%
 
@@ -387,19 +384,19 @@ mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
 mspkx = smoothdata2(mspkx, "gaussian", {1, 40});
 
 kg = 12;
-[i1, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
+[idxs3, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
 
 figure;
 sgtitle("All neurons>XA?XB>PEV>Kmeans");
 
 for ik = 1:kg
     subplot(kg, 1, ik);
-    plot(100*mean(mspkxo(i1 == ik, :)));
+    plot(100*mean(mspkxo(idxs3 == ik, :)));
     xline(500, "Color", "#DD0000");
     xline(1530, "Color", "#DD0000");
     xline(2560, "Color", "#DD0000");
     xline(3590, "Color", "#DD0000");
-    cntx = sum(i1 == ik);
+    cntx = sum(idxs3 == ik);
     ylabel("PEV%");
     title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
 end
@@ -407,94 +404,23 @@ end
 %%
 
 % --- Script to Plot a Random Image in Multiple Tabs ---
-
-% Clear workspace, command window, and close all figures
-clear;
-clc;
-close all;
-
-% --- Configuration ---
-imageSize = [100, 100]; % Define the dimensions [height, width] of the image
-numberOfTabs = 4;      % Define how many tabs you want in the figure
-
-% --- Generate Random Image ---
-% Create a 100x100 matrix with random values between 0 and 1
-randomImage = rand(imageSize(1), imageSize(2));
-
 % --- Create Multi-Tab Figure ---
-% Create a new figure window (using uifigure for modern UI components)
-fig = uifigure('Name', 'Multi-Tab Random Image Display', 'Position', [100 100 600 500]);
 
-% Create a tab group that fills most of the figure window
+fig = uifigure('Name', 'Multi-Tab Random Image Display', 'Position', [100 100 1700 1100]);
 tabGroup = uitabgroup(fig, 'Position', [20 20 fig.Position(3)-40 fig.Position(4)-40]);
 
-% --- Populate Tabs with the Image ---
-% Loop through the desired number of tabs
 for i = 1:numberOfTabs
     % Create a new tab within the tab group
     tab = uitab(tabGroup, 'Title', ['Tab ' num2str(i)]);
-
-    % Create an axes object within the current tab
-    % Using uiaxes is recommended with uifigure and uitab
     ax = uiaxes(tab);
+    subplot(ax, 1, 1, 1);
+    scatter(xe1(idxs), ye1(idxs), 1, color_t(iA, :), "filled", DisplayName="name");
+    hold("on");
 
-    % Display the random image in the current axes
-    % imagesc scales the data to use the full colormap, which is often
-    % useful for visualizing data.
-    imagesc(ax, randomImage);
-
-    % Set the colormap to grayscale (common for this type of data)
-    colormap(ax, gray);
-
-    % Ensure the image has the correct aspect ratio (pixels are square)
-    axis(ax, 'image');
-
-    % Turn off the axis ticks for a cleaner image view (optional)
-    ax.XTick = [];
-    ax.YTick = [];
-
-    % Add a title to the plot within the tab
     title(ax, ['Random 100x100 Image - Plot ' num2str(i)]);
 
-    % Add a colorbar to show the mapping of data values to colors
-    colorbar(ax);
 end
 
 % --- End of Script ---
-
-%%
-
-%% Bench
-
-% FEF : 44-45-53 (+> 19-70 )
-
-isx09 = sspkData{1, 9};
-isx10 = sspkData{1, 10};
-
-im1 = squeeze(mean(isx09(:, :, 1:4000), 1));
-im2 = squeeze(mean(isx10(:, :, 1:4000), 1));
-
-for ik = 1:size(im1, 1)
-
-    % im1(ik, :) = (im1(ik, :) - mean(im1(ik, :))) / std(im1(ik, :));
-    % im2(ik, :) = (im2(ik, :) - mean(im2(ik, :))) / std(im2(ik, :));
-    im1(ik, :) = smooth(im1(ik, :), 50);
-    im2(ik, :) = smooth(im2(ik, :), 50);
-
-end
-
-figure;
-subplot(2, 2, 1);
-imagesc(im1);
-% clim([-2 2]);
-subplot(2, 2, 2);
-imagesc(im2);
-% clim([-2 2]);
-subplot(2, 2, 3);
-imagesc(im1 - im2);
-% clim([-2 2]);
-subplot(2, 2, 4);
-imagesc(im1 ./ im2);
-% clim([-5 5]);
 
 %%
