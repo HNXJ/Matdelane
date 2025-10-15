@@ -405,8 +405,8 @@ end
 
 %% Grand matrix concatenation (iFR)
 
-tOi1 = 1531:2030;
-tOi2 = 1:500;
+tOi1 = 1531:2100;
+tOi2 = 1:400;
 tN = length(tOi1);
 icond1 = rrrr;
 icond2 = rxrr;
@@ -441,8 +441,8 @@ end
 %% Neuron iFR plot (A)
 
 icond1 = 1;
-neuronID = 22;
-fileID = 30;
+neuronID = 1:22;
+fileID = 31;
 neuronIDs = sum(fileIDs < fileID) + neuronID;
 
 for nID = 1:length(neuronIDs)
@@ -457,6 +457,9 @@ end
 
 figure;
 imagesc(temp_sig1);
+xlabel("time(ms)");
+ylabel("Neuron no.");
+title("Rastrogram");
 
 %% Single neuron iFR (N)
 
@@ -466,29 +469,85 @@ icond1 = 1;
 icond2 = 2;
 icond3 = 3;
 icond4 = 4;
-kW = 500;
-tN = 1000;%length(temp_sig1);
+
+kW = 200;
+kX = 1;
+tN = 1000; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
 
 figure;
 
 for icond = 1:4
     
-    temp_sigx = sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :);
+    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :));
+    temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+
     temp_sig1 = squeeze(mean(temp_sigx, 1));
     temp_sig2 = squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)));
-    plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);
-    plot(tN*temp_sig2+tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);
+    % temp_sig1 = tN*smoothdata(temp_sig1, "gaussian", kW);
+    % temp_sig2 = tN*smoothdata(temp_sig2, "gaussian", 1);
+
+    xpe1 = timevec;
+    ype1 = temp_sig1 + kX*temp_sig2;
+    xpe2 = timevec(end:-1:1);
+    ype2 = temp_sig1(end:-1:1) - kX*temp_sig2(end:-1:1);
+
+    plot(timevec, temp_sig1, "DisplayName", condNames(icond) + "+-" + num2str(kX) + "SEM", "LineWidth", 2, "Color", color_t(icond, :));
+    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 1.0, "HandleVisibility", "off", "EdgeColor", "none");
     hold("on");
 
 end
 
-xline(500, "HandleVisibility", "off");
-xline(1530, "HandleVisibility", "off");
-xline(2560, "HandleVisibility", "off");
-xline(3590, "HandleVisibility", "off");
+xline(0, "HandleVisibility", "off");
+xline(1030, "HandleVisibility", "off");
+xline(2060, "HandleVisibility", "off");
+xline(3090, "HandleVisibility", "off");
 
+xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
+%% Single neuron rastrogram (N)
+
+nID = 4099; % Grand neuron ID
+
+icond1 = 1;
+icond2 = 2;
+icond3 = 3;
+icond4 = 4;
+
+kW = 1;
+kX = 1;
+tN = 1*kW; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
+
+figure;
+condOi = 9:12;
+ncondOi = length(condOi);
+
+for ik = 1:ncondOi
+    
+    icond = condOi(ik);
+    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :));
+    temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+
+    subplot(ceil(ncondOi/2), 2, ik);
+    imagesc(temp_sigx, "XData", timevec);hold("on");
+    title(condNames(icond));
+    ylabel("Trial no.");
+
+    xline(0, "HandleVisibility", "off", "Color", [1 1 1]);
+    xline(1030, "HandleVisibility", "off", "Color", [0 1 1]);
+    xline(2060, "HandleVisibility", "off", "Color", [0 1 1]);
+    xline(3090, "HandleVisibility", "off", "Color", [0 1 1]);
+
+    % cb = colorbar();
+    % ylabel(cb, "Spk/s");
+
+end
+
+xlabel("Time(ms)");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N)
@@ -499,23 +558,22 @@ kW = 100;
 
 figure;
 
-temp_sigx = gmatrixN2(nID, :);
+temp_sigx = gmatrixN1(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAABvsBBBA)", "LineWidth", 2);
 hold("on");
 
-temp_sigx = gmatrixN1(nID, :);
+temp_sigx = gmatrixN2(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
-plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBX)", "LineWidth", 2);
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AXAXvsBXBA)", "LineWidth", 2);
 
 temp_sigx = gmatrixN3(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
-plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AXABvsBXBA)", "LineWidth", 2);
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAXBvsBBXA)", "LineWidth", 2);
 
 temp_sigx = gmatrixN4(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
-plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAXBvsBBXA)", "LineWidth", 2);
-
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBX)", "LineWidth", 2);
 
 xline(500, "HandleVisibility", "off");
 xline(1530, "HandleVisibility", "off");
@@ -524,7 +582,7 @@ xline(3590, "HandleVisibility", "off");
 
 legend();
 xlabel("Time(ms)");ylabel("PEV%");
-sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoothW = " + num2str(kW));
 
 % >>> For the above neuron can you now plots its PEV time course?
 % gmatrix0 >
@@ -562,6 +620,21 @@ for ik = 1:kg
     ylabel("PEV%");
     title("Kgroup" + num2str(ik) + ", nNeuron = " + num2str(cntx));
 end
+
+%% Coloring
+
+color_t = zeros(11, 3);
+color_t(1, :) = [1 .2 0];
+color_t(2, :) = [.9 .4 0];
+color_t(3, :) = [.8 .6 0];
+color_t(4, :) = [.6 .8 0];
+color_t(5, :) = [.4 .7 0];
+color_t(6, :) = [.2 .8 0];
+color_t(7, :) = [0 .6 .6];
+color_t(8, :) = [0 .4 .8];
+color_t(9, :) = [.3 .2 .7];
+color_t(10, :) = [.6 .1 .8];
+color_t(11, :) = [.5 0 1];
 
 %%
 
