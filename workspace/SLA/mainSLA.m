@@ -115,7 +115,47 @@ end
 
 disp(ncntn);
 
-%% Grand matrix concatenation (PEV) Omission Identity (A?B)
+%% Grand matrix concatenation (PEV) Stim Identity (A?B)
+
+gkernel = ones(1, 1, 100); 
+
+tOi1 = 1:4500;
+tOi2 = 1:4500;
+tN = length(tOi1);
+icond1 = aaab;
+icond2 = bbba;
+nTrials = 200;
+
+gmatrixN1 = zeros(1, tN);
+neuronCnt = 0;
+
+for ik = 1:Nfiles
+
+    tempSig1 = sspkData{ik, icond1};
+    ncnt = size(tempSig1, 2);
+    tcnt = size(tempSig1, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig1 = tempSig1(iTrials, :, tOi1);
+
+    tempSig2 = sspkData{ik, icond2};
+    tcnt = size(tempSig2, 1);
+    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    tempSig2 = tempSig2(iTrials, :, tOi2);
+
+    data = zeros(nTrials*2, ncnt, tN);
+    data(1:nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
+
+    data = convn(data, gkernel, 'same');
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
+    gmatrixN1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
+    neuronCnt = neuronCnt + ncnt;
+    disp(neuronCnt);
+
+end
+
+%% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
 gkernel = ones(1, 1, 100); 
 
@@ -123,12 +163,12 @@ tOi1 = 1:4500;
 tOi2 = 1:4500;
 % tOi3 = 1:4500;
 tN = length(tOi1);
-icond1 = aaax;
-icond2 = bbbx;
+icond1 = axab;
+icond2 = bxba;
 % icond3 = rrrx;
 nTrials = 100;
 
-gmatrixN1 = zeros(1, tN);
+gmatrixN2 = zeros(1, tN);
 neuronCnt = 0;
 
 for ik = 1:Nfiles
@@ -157,53 +197,13 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrixN1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
-    neuronCnt = neuronCnt + ncnt;
-    disp(neuronCnt);
-
-end
-
-%% Grand matrix concatenation (PEV) Stim Identity (A?B)
-
-gkernel = ones(1, 1, 100); 
-
-tOi1 = 1:4500;
-tOi2 = 1:4500;
-tN = length(tOi1);
-icond1 = aaab;
-icond2 = bbba;
-nTrials = 200;
-
-gmatrixN2 = zeros(1, tN);
-neuronCnt = 0;
-
-for ik = 1:Nfiles
-
-    tempSig1 = sspkData{ik, icond1};
-    ncnt = size(tempSig1, 2);
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
-
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
-
-    data = zeros(nTrials*2, ncnt, tN);
-    data(1:nTrials, :, :) = tempSig1;
-    data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
-
-    data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
     gmatrixN2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv);
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
 end
 
-%% Grand matrix concatenation (PEV) Omission Identity (A?B)
+%% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
 gkernel = ones(1, 1, 100); 
 
@@ -211,8 +211,8 @@ tOi1 = 1:4500;
 tOi2 = 1:4500;
 % tOi3 = 1:4500;
 tN = length(tOi1);
-icond1 = axab;
-icond2 = bxba;
+icond1 = aaxb;
+icond2 = bbxa;
 % icond3 = rrrx;
 nTrials = 100;
 
@@ -251,7 +251,7 @@ for ik = 1:Nfiles
 
 end
 
-% Grand matrix concatenation (PEV) Omission Identity (A?B)
+%% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
 gkernel = ones(1, 1, 100); 
 
@@ -259,8 +259,8 @@ tOi1 = 1:4500;
 tOi2 = 1:4500;
 % tOi3 = 1:4500;
 tN = length(tOi1);
-icond1 = aaxb;
-icond2 = bbxa;
+icond1 = aaax;
+icond2 = bbbx;
 % icond3 = rrrx;
 nTrials = 100;
 
@@ -475,7 +475,9 @@ for icond = 1:4
     
     temp_sigx = sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :);
     temp_sig1 = squeeze(mean(temp_sigx, 1));
+    temp_sig2 = squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)));
     plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);
+    plot(tN*temp_sig2+tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);
     hold("on");
 
 end
@@ -493,7 +495,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 nID = 4099; % Grand neuron ID
 
-kW = 10;
+kW = 100;
 
 figure;
 
@@ -523,6 +525,7 @@ xline(3590, "HandleVisibility", "off");
 legend();
 xlabel("Time(ms)");ylabel("PEV%");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
 % >>> For the above neuron can you now plots its PEV time course?
 % gmatrix0 >
 % Same x-axis
@@ -535,7 +538,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 % maybe even together with the stim identity PEV
 % use the same x axis (see how PEV changes over the trial) <<<
 
-%%
+%% Clustering (Kmeans)
 
 mspkx = sspkData{1, 1};
 mspkxo = mspkx;
