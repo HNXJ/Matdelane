@@ -332,7 +332,7 @@ for ik = 1:Nfiles
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
     gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
