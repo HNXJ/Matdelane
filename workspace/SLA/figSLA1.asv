@@ -1,71 +1,69 @@
-%%
+%% Setup
 
 color_t = zeros(11, 3);
 color_t(1, :) = [1 .2 0];
 color_t(2, :) = [.9 .4 0];
 color_t(3, :) = [.8 .6 0];
 color_t(4, :) = [.6 .8 0];
-color_t(5, :) = [.4 1 0];
+color_t(5, :) = [.4 .7 0];
 color_t(6, :) = [.2 .8 0];
 color_t(7, :) = [0 .6 .6];
 color_t(8, :) = [0 .4 .8];
 color_t(9, :) = [.3 .2 .7];
-color_t(10, :) = [.6 0 .8];
-color_t(11, :) = [.9 0 1];
+color_t(10, :) = [.6 .1 .8];
+color_t(11, :) = [.5 0 1];
 
-%% Spike scatter / Information / Information
+%% Scatter vectors
 
-% Fig.1 panels:
-%  Scatter aFR(Oxm) | aFR(Stim)
-
-% sPEVtime = 1:4500;
-% xPEVtime = 1:1000;
-
-sPEVs = zeros(1, size(gmatrix1, 1));
-xPEVs = zeros(1, size(gmatrix2, 1));
+sPEV = zeros(1, size(gmatrix1, 1));
+xPEV = zeros(1, size(gmatrix2, 1));
 sAFR = zeros(1, size(gmatrix3, 1));
 xAFR = zeros(1, size(gmatrix4, 1));
 bAFR = zeros(1, size(gmatrix5, 1));
+sVFR = zeros(1, size(gmatrix3, 1));
+xVFR = zeros(1, size(gmatrix4, 1));
+bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 10)));
-    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 10)));
+    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)));
+    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)));
     tW = size(gmatrix3, 2) / 1000;
     sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
     xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
+    sVFR(iN) = var(gmatrix3(iN, :)) / tW;
+    xVFR(iN) = var(gmatrix4(iN, :)) / tW;
     tW = size(gmatrix5, 2) / 1000;
     bAFR(iN) = sum(gmatrix5(iN, :)) / tW;
+    bVFR(iN) = var(gmatrix5(iN, :)) / tW;
 end
 
 colmap = ones(neuronCnt, 1);
 
-%%  Scatter aFR(Oxm/baseline) | aFR(Stim/baseline)
-%  Scatter variation(Oxm) | variation (Stim)
-%  Sorted Raster (image, 4099neuron in 4500ms, sorted)
+%% Fig.1 A:
+%  Scatter aFR(Oxm) | aFR(Stim)
 
 figure;
 
 for iA = 1:11
 
-    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*1, color_t(iA, :), "filled", DisplayName=areaList(iA));
-    hold("on");
-    
     xe1 = sAFR(areaIDs == iA);
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
-    idxs = be1 > mean(be1);
+    idxs = (xe1.^2 + ye1.^2) > 5.0;
+
+    scatter(xe1(idxs), ye1(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    hold("on");
+    
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
-    plot(xe, ye, "LineWidth", 1, "Color", color_t(iA, :), "HandleVisibility", "off");
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
     re = xe.^2 + ye.^2;
     idtextz = find(re == max(re));
-    text(xe(idtextz), ye(idtextz), [areaList{iA}, ' - S+'], "Color", color_t(iA, :));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
-    [xe, ye] = fitConfidenceEllipse(xe1, ye1, 1000, 0.5);
-    plot(xe, ye, "LineWidth", 1, "Color", color_t(iA, :), "HandleVisibility", "off");
-    re = xe.^2 + ye.^2;
-    idtextz = find(re == max(re));
-    text(xe(idtextz), ye(idtextz), [areaList{iA}, ' - all'], "Color", color_t(iA, :));
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
 
+    line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
     xlim([0 20]);
     ylim([0 20]);
     
@@ -74,39 +72,129 @@ end
 xlabel("Stim-AFR");ylabel("Oxm-AFR");
 legend;
 
-%% PATCH
+%% Fig.1 B:
+%  Relative to baseline scatter aFR(Oxm/b) | aFR(Stim/b)
 
 figure;
 
-for iA = 1:2
+for iA = 5:8
+
+    generalIDs = find(areaIDs == iA);
+    be1 = bAFR(areaIDs == iA);
+    xe1 = sAFR(areaIDs == iA)./be1;
+    ye1 = xAFR(areaIDs == iA)./be1;
+    idxs = be1 > 1.0;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.5, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
+    xlim([0 20]);
+    ylim([0 20]);
+    
+end
+
+xlabel("Stim-AFR/baseline");ylabel("Oxm-AFR/baseline");
+legend;
+
+%% Fig.1 C:
+%  Baseline scatter aFR(Oxm) | aFR(baseline)
+
+figure;
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = bAFR(areaIDs == iA);
+    ye1 = xAFR(areaIDs == iA);
+    ze1 = sAFR(areaIDs == iA);
+    idxs = xe1 > 1 | ye1 > 1;
+    idxs2 = ye1 ./ xe1 > 2;
+    pointsizes = 3*ones(size(generalIDs));
+    pointsizes(idxs2) = 40;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.2);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.5, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
+    xlim([0 20]);
+    ylim([0 20]);
+    
+end
+
+xlabel("Base-AFR");ylabel("Oxm-AFR");
+legend;
+
+%%  Scatter aFR(Oxm) | aFR(Stim) dual group
+
+figure;
+
+for iA = [6, 8]
 
     xe1 = sAFR(areaIDs == iA);
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
-    idxs = be1 > .0;
+    idxs = xe1 > ye1 & be1 > 2.0;
 
-    scatter(xe1(idxs), ye1(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    scatter(xe1, ye1, 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
     hold("on");
     
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 1.0);
-    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off");
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
     re = xe.^2 + ye.^2;
     idtextz = find(re == max(re));
-    text(xe(idtextz), ye(idtextz), [areaList{iA}, ' - S+'], "Color", color_t(iA, :));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, '+S'], "Color", color_t(iA, :));
 
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    
+    idxs = xe1 < ye1  & be1 > 2.0;
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, '+X'], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    
+    % re = xe.^2 + ye.^2;
+    % idtextz = find(re == max(re));
+    % text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
     % [xe, ye] = fitConfidenceEllipse(xe1, ye1, 1000, 0.5);
     % patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off");
     % re = xe.^2 + ye.^2;
     % idtextz = find(re == max(re));
     % text(xe(idtextz), ye(idtextz), [areaList{iA}, ' - all'], "Color", color_t(iA, :));
-
+    line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
     xlim([0 20]);
     ylim([0 20]);
     
 end
 
 xlabel("Stim-AFR");ylabel("Oxm-AFR");
-legend;
 %%
 figure;
 
@@ -134,6 +222,140 @@ end
 xlabel("Stim-AFR");ylabel("OXM-AFR");
 legend;
 
+%%  Scatter variation(Oxm) | variation (Stim)
+%  Sorted Raster (image, 4099neuron in 4500ms, sorted)
+
+%% Fig.2 a:
+%  Baseline scatter PEV(oxm) | PEV(stim)
+
+figure;
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA);
+    ye1 = xPEV(areaIDs == iA);
+    ze1 = bAFR(areaIDs == iA);
+    idxs = xe1 > 1 | ye1 > 1;
+    idxs2 = ye1 ./ xe1 > 2;
+    pointsizes = 1*ones(size(generalIDs));
+    pointsizes(idxs2) = 20;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.2);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.5, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
+    xlim([0 20]);
+    ylim([0 5]);
+    
+end
+
+xlabel("Stim-PEV");ylabel("Oxm-PEV");
+legend;
+
+%% Fig.2 b:
+%  Baseline scatter PEV(oxm) | AFR(oxm/base)
+
+figure;
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = xAFR(areaIDs == iA) ./ bAFR(areaIDs == iA);
+    ye1 = xPEV(areaIDs == iA);
+    ze1 = bAFR(areaIDs == iA);
+    idxs = ze1 > 0.1;
+    idxs2 = xe1 > 2;
+    pointsizes = 1*ones(size(generalIDs));
+    pointsizes(idxs2) = 20;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.2);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.5, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    % line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
+    % xlim([0 20]);
+    % ylim([0 5]);
+    
+end
+
+xlabel("Oxm/base aFR");
+ylabel("Oxm-PEV");
+legend;
+
+%% Fig.2 c
+% Scatter PEV(Oxm) | PEV(Stim) dual group
+
+figure;
+
+for iA = [6, 7, 8, 10, 11]
+
+    xe1 = sPEV(areaIDs == iA);
+    ye1 = xPEV(areaIDs == iA);
+    be1 = bAFR(areaIDs == iA);
+    idxs = xe1 > ye1 & be1 > 2.0;
+
+    scatter(xe1, ye1, 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    hold("on");
+    
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, '+S'], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    
+    idxs = xe1 < ye1  & be1 > 2.0;
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.5);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    re = xe.^2 + ye.^2;
+    idtextz = find(re == max(re));
+    text(xe(idtextz), ye(idtextz), [areaList{iA}, '+X'], "Color", color_t(iA, :));
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 0.8);
+    patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+    
+    % re = xe.^2 + ye.^2;
+    % idtextz = find(re == max(re));
+    % text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+    % [xe, ye] = fitConfidenceEllipse(xe1, ye1, 1000, 0.5);
+    % patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off");
+    % re = xe.^2 + ye.^2;
+    % idtextz = find(re == max(re));
+    % text(xe(idtextz), ye(idtextz), [areaList{iA}, ' - all'], "Color", color_t(iA, :));
+    line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off");
+    xlim([0 20]);
+    ylim([0 10]);
+    
+end
+
+xlabel("Stim-PEV");ylabel("OXM-PEV");
+legend;
+
 %%
 
 function [X, Y] = generateEllipse(x, y, a, b, theta, N)
@@ -155,7 +377,13 @@ function [X, Y] = generateEllipse(x, y, a, b, theta, N)
 
 end
 
-function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, k)
+function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mode)
+    
+    if ~exist('mode', 'var')
+
+        mode = 'stddev';
+
+    end
     dataMatrix = [X_data(:), Y_data(:)];
     
     mu = mean(dataMatrix);
@@ -175,48 +403,29 @@ function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, k)
     
     V_major = V(:, idx(1));
     theta = atan2(V_major(2), V_major(1));
-    
+
+    if strcmpi(mode, 'chi2')
+
+        DEGREES_OF_FREEDOM = 2;
+        chi2_critical_value = chi2inv(CI, DEGREES_OF_FREEDOM);
+        k = sqrt(chi2_critical_value); 
+
+    elseif strcmpi(mode, 'stddev')
+
+        k = CI; 
+
+    else
+
+        k = 2.0;
+
+    end
+
     radius_a = k * sqrt(lambda_a);
     radius_b = k * sqrt(lambda_b);
     
     [X_ellipse, Y_ellipse] = generateEllipse(center_x, center_y, radius_a, radius_b, theta, N);
 
 end
-
-% function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N)
-% 
-%     dataMatrix = [X_data(:), Y_data(:)];
-% 
-%     mu = mean(dataMatrix);
-%     center_x = mu(1);
-%     center_y = mu(2);
-% 
-%     C = cov(dataMatrix);
-% 
-%     [V, D] = eig(C);
-% 
-%     eigenvalues = diag(D);
-% 
-%     [lambda_sorted, idx] = sort(eigenvalues, 'descend');
-% 
-%     lambda_a = lambda_sorted(1);
-%     lambda_b = lambda_sorted(2);
-% 
-%     V_major = V(:, idx(1));
-%     theta = atan2(V_major(2), V_major(1)); 
-% 
-%     CONFIDENCE_LEVEL = 0.20;
-%     DEGREES_OF_FREEDOM = 2;
-% 
-%     chi2_critical_value = chi2inv(CONFIDENCE_LEVEL, DEGREES_OF_FREEDOM);
-%     k = sqrt(chi2_critical_value);
-% 
-%     radius_a = k * sqrt(lambda_a);
-%     radius_b = k * sqrt(lambda_b);
-% 
-%     [X_ellipse, Y_ellipse] = generateEllipse(center_x, center_y, radius_a, radius_b, theta, N);
-% 
-% end
 
 %%
 

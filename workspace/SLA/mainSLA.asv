@@ -81,6 +81,7 @@ end
 %% Labels
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
+condNames = ["aaab", "axab", "aaxb", "aaax", ];
 aaab = 1;
 axab = 2;
 aaxb = 3;
@@ -220,6 +221,7 @@ end
 %% Grand matrix concatenation (iFR)
 
 tOi1 = 1531:2030;
+tOi2 = 1:500;
 tN = length(tOi1);
 icond1 = rrrr;
 icond2 = rxrr;
@@ -227,26 +229,25 @@ nTrials = 100;
 
 gmatrix3 = zeros(1, tN);
 gmatrix4 = zeros(1, tN);
+gmatrix5 = zeros(1, length(tOi2));
 neuronCnt = 0;
 
 for ik = 1:Nfiles
 
     tempSig1 = sspkData{ik, icond1};
-    % tcnt = size(tempSig1, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig1 = mean(tempSig1(:, :, tOi1), 1);
    
     tempSig2 = sspkData{ik, icond2};
     ncnt = size(tempSig2, 2);
-    % tcnt = size(tempSig2, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig2 = mean(tempSig2(:, :, tOi1), 1);
+    
+    tempSig3 = sspkData{ik, icond1};
+    tempSig3 = mean(tempSig3(:, :, tOi2), 1);
 
     disp(ik);
-    disp(length(unique(tempSig1)));
-    disp(length(unique(tempSig2)));
     gmatrix3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig1);
     gmatrix4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig2);
+    gmatrix5(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig3);
     neuronCnt = neuronCnt + ncnt;
     disp(neuronCnt);
 
@@ -321,10 +322,10 @@ end
 xlabel("Stim-AFR");ylabel("OXM-AFR");
 legend;
 
-%%
+%% Neuron iFR plot (A)
 
 icond1 = 1;
-neuronID = 1:200;
+neuronID = 22;
 fileID = 30;
 neuronIDs = sum(fileIDs < fileID) + neuronID;
 
@@ -341,127 +342,28 @@ end
 figure;
 imagesc(temp_sig1);
 
-%% Spike scatter / Information / Information
-% Fig.1 panels:
-%  Scatter aFR(Oxm) | aFR(Stim)
-%  Scatter aFR(Oxm/baseline) | aFR(Stim/baseline)
-%  Scatter variation(Oxm) | variation (Stim)
-%  Sorted Raster (image, 4099neuron in 4500ms, sorted)
+%% Single neuron iFR (N)
 
-% sPEVtime = 1:4500;
-% xPEVtime = 1:1000;
+nID = 1408;
+icond1 = 9;
+icond2 = 10;
+kW = 100;
 
-sPEVs = zeros(1, size(gmatrix1, 1));
-xPEVs = zeros(1, size(gmatrix2, 1));
-sAFR = zeros(1, size(gmatrix3, 1));
-xAFR = zeros(1, size(gmatrix4, 1));
+temp_sigx = squeeze(mean(sspkData{fileIDs(nID), icond1}(:, infileIDs(nID), :), 1));
+temp_sig1 = zeros([1, size(temp_sigx)]);
+temp_sig1(1, :) = temp_sigx;
 
-for iN = 1:size(gmatrix1, 1)
-    sPEVs(iN) = 100*(max(smooth(gmatrix1(iN, :), 10)));
-    xPEVs(iN) = 100*(max(smooth(gmatrix2(iN, :), 10)));
-    tW = size(gmatrix3, 2) / 1000;
-    sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
-    xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
-end
-
-colmap = ones(neuronCnt, 1);
-color_t = zeros(11, 3);
-color_t(1, :) = [1 0 0];
-color_t(2, :) = [.9 .1 0];
-color_t(3, :) = [.8 .4 0];
-color_t(4, :) = [.8 .3 .1];
-color_t(5, :) = [.5 .7 .2];
-color_t(6, :) = [.4 .6 .2];
-color_t(7, :) = [.4 .5 .3];
-color_t(8, :) = [.3 .4 .4];
-color_t(9, :) = [0 .3 .7];
-color_t(10, :) = [0 .1 .9];
-color_t(11, :) = [.2 0 .8];
+temp_sigx = squeeze(mean(sspkData{fileIDs(nID), icond2}(:, infileIDs(nID), :), 1));
+temp_sig2 = zeros([1, size(temp_sigx)]);
+temp_sig2(1, :) = temp_sigx;
 
 figure;
-
-subplot(2, 1, 1);
-
-for iA = 1:11
-
-    scatter(sPEVs(areaIDs == iA), xPEVs(areaIDs == iA), colmap(areaIDs == iA)*1, color_t(iA, :), "filled", DisplayName=areaList(iA));
-    hold("on");
-    vectorXms = sPEVs(areaIDs == iA).^2;
-    vectorYms = xPEVs(areaIDs == iA).^2;
-    center_p = [mean(sPEVs(areaIDs == iA)), mean(xPEVs(areaIDs == iA))];
-    dF1 = sum(areaIDs == iA);
-    a = 2*std(sPEVs(areaIDs == iA));%/ sqrt(dF1);
-    b = 2*std(xPEVs(areaIDs == iA));%/ sqrt(dF1);
-    % theta = atan2(xPEVs(areaIDs == iA), sPEVs(areaIDs == iA));
-    % theta = mean(theta);
-    theta = atan2(sqrt(mean(vectorYms)), sqrt(mean(vectorXms)));
-    % disp(theta);
-    [xe, ye] = generateEllipse(center_p(1), center_p(2), a, b, theta, 1000);
-    plot(xe, ye, "LineWidth", 1, "Color", color_t(iA, :), "HandleVisibility", "off");
-    re = xe.^2 + ye.^2;
-    idtextz = find(re == max(re));
-    text(xe(idtextz), ye(idtextz), areaList{iA}, "Color", color_t(iA, :));
-    xlim([0 30]);
-    ylim([0 10]);
-end
-
-xlabel("Stim-PEV");ylabel("OXM-PEV");
-legend;
-subplot(2, 1, 2);
-
-for iA = 1:11
-
-    scatter(sAFR(areaIDs == iA), xAFR(areaIDs == iA), colmap(areaIDs == iA)*1, color_t(iA, :), "filled", DisplayName=areaList(iA));
-    hold("on");
-    center_p = [mean(sAFR(areaIDs == iA)), mean(xAFR(areaIDs == iA))];
-    dF1 = sum(areaIDs == iA);
-    a = std(sPEVs(areaIDs == iA));%/ sqrt(dF1);
-    b = std(xPEVs(areaIDs == iA));%/ sqrt(dF1);
-    theta = atan(mean(xAFR(areaIDs == iA) > 0.1) / mean(sAFR(areaIDs == iA) > 0.1));
-    [xe, ye] = generateEllipse(center_p(1), center_p(2), a, b, theta, 1000);
-    plot(xe, ye, "LineWidth", 1, "Color", color_t(iA, :), "HandleVisibility", "off");
-    re = xe.^2 + ye.^2;
-    idtextz = find(re == max(re));
-    text(xe(idtextz), ye(idtextz), areaList{iA}, "Color", color_t(iA, :));
-    xlim([0 20]);
-    ylim([0 20]);
-    line(1:20, 1:20, "HandleVisibility", "off");
-    hold("on");
-
-end
-
-xlabel("Stim-AFR");ylabel("OXM-AFR");
-legend;
-
-function [X, Y] = generateEllipse(x, y, a, b, theta, N)
-    N = max(3, round(N));
-
-    t = linspace(0, 2*pi, N);
-
-    x_prime = a * cos(t);
-    y_prime = b * sin(t);
-    
-    cos_t = cos(theta);
-    sin_t = sin(theta);
-
-    x_rotated = x_prime .* cos_t - y_prime .* sin_t;
-    y_rotated = x_prime .* sin_t + y_prime .* cos_t;
-
-    X = x_rotated + x;
-    Y = y_rotated + y;
-
-end
+plot(smooth(temp_sig1, kW), "DisplayName", condNames(icond1));hold("on");
+plot(smooth(temp_sig2, kW), "DisplayName", condNames(icond1));
+title(areaList(areaIDs(nID)));
 
 %%
 
-% Fig.2 panels:
-%  Scatter PEV(Oxm) | PEV(Stim) ; Time-Concat version (to resolve offset / presence issue)
-%  Scatter PEV(Oxm-A?B) | PEV(Stim)
-%  Scatter PEV(Oxm-2?3?4) | PEV(Stim)
-%  Scatter PEV(Stim after omission) | PEV(Stim)
-
-
-%%
 mspkx = isx09;
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});

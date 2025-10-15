@@ -81,6 +81,7 @@ end
 %% Labels
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
+condNames = ["aaab", "axab", "aaxb", "aaax", "bbba", "bxba", "bbxa", "bbbx", "rrrr", "rxrr", "rrxr", "rrrx"];
 aaab = 1;
 axab = 2;
 aaxb = 3;
@@ -321,10 +322,10 @@ end
 xlabel("Stim-AFR");ylabel("OXM-AFR");
 legend;
 
-%%
+%% Neuron iFR plot (A)
 
 icond1 = 1;
-neuronID = 1:200;
+neuronID = 22;
 fileID = 30;
 neuronIDs = sum(fileIDs < fileID) + neuronID;
 
@@ -341,7 +342,45 @@ end
 figure;
 imagesc(temp_sig1);
 
+%% Single neuron iFR (N)
+
+nID = 3171;
+icond1 = 5;
+icond2 = 6;
+icond3 = 7;
+icond4 = 8;
+kW = 1000;
+
+temp_sigx = sspkData{fileIDs(nID), icond1}(:, infileIDs(nID), :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+
+temp_sigx = sspkData{fileIDs(nID), icond2}(:, infileIDs(nID), :);
+temp_sig2 = squeeze(mean(temp_sigx, 1));
+
+temp_sigx = sspkData{fileIDs(nID), icond3}(:, infileIDs(nID), :);
+temp_sig3 = squeeze(mean(temp_sigx, 1));
+
+temp_sigx = sspkData{fileIDs(nID), icond4}(:, infileIDs(nID), :);
+temp_sig4 = squeeze(mean(temp_sigx, 1));
+
+tN = 1000;%length(temp_sig1);
+figure;
+
+plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond1), "LineWidth", 4);hold("on");
+plot(tN*smoothdata(temp_sig2, "gaussian", kW), "DisplayName", condNames(icond2), "LineWidth", 4);
+plot(tN*smoothdata(temp_sig3, "gaussian", kW), "DisplayName", condNames(icond3), "LineWidth", 4);
+plot(tN*smoothdata(temp_sig4, "gaussian", kW), "DisplayName", condNames(icond4), "LineWidth", 4);
+
+xline(500, "HandleVisibility", "off");
+xline(1530, "HandleVisibility", "off");
+xline(2560, "HandleVisibility", "off");
+xline(3590, "HandleVisibility", "off");
+
+legend();
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
 %%
+
 mspkx = isx09;
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
