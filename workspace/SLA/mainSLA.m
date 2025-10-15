@@ -117,7 +117,7 @@ disp(ncntn);
 
 %% Grand matrix concatenation (PEV) Omission Identity (A?B)
 
-gkernel = ones(1, 1, 10); 
+gkernel = ones(1, 1, 100); 
 
 tOi1 = 1:4500;
 tOi2 = 1:4500;
@@ -165,7 +165,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-gkernel = ones(1, 1, 10); 
+gkernel = ones(1, 1, 100); 
 
 tOi1 = 1:4500;
 tOi2 = 1:4500;
@@ -378,7 +378,8 @@ for icond = 1:4
     
     temp_sigx = sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :);
     temp_sig1 = squeeze(mean(temp_sigx, 1));
-    plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);hold("on");
+    plot(tN*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", condNames(icond), "LineWidth", 2);
+    hold("on");
 
 end
 
@@ -395,13 +396,18 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 nID = 4099; % Grand neuron ID
 
-kW = 10;
+kW = 100;
 
 figure;
 
 temp_sigx = gmatrixN1(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
-plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "AAAXvsBBBXvsRRRX", "LineWidth", 2);hold("on");
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBXvsRRRX)", "LineWidth", 2);
+hold("on");
+
+temp_sigx = gmatrixN2(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+plot(100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAABvsBBBA)", "LineWidth", 2);
 
 xline(500, "HandleVisibility", "off");
 xline(1530, "HandleVisibility", "off");
@@ -410,7 +416,7 @@ xline(3590, "HandleVisibility", "off");
 
 legend();
 xlabel("Time(ms)");ylabel("PEV%");
-sgtitle("Neuron no." + num2str(nID) + " PEV(X?) > " + areaList(areaIDs(nID)));
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 % >>> For the above neuron can you now plots its PEV time course?
 % gmatrix0 >
 % Same x-axis
