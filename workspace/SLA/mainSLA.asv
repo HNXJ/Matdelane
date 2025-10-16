@@ -301,7 +301,6 @@ gmatrixN4 = zeros(neuronCnt, tN);
 for ik = 1:Nfiles
 
     tempSig1 = sspkData{ik, icond1};
-    ncnt = 1;
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig1 = tempSig1(iTrials, :, tOi1);
@@ -316,7 +315,7 @@ for ik = 1:Nfiles
     % iTrials = mod(randperm(nTrials), tcnt) + 1;
     % tempSig3 = tempSig3(iTrials, :, tOi3);
 
-    data = zeros(nTrials*2, ncnt, tN);
+    data = zeros(nTrials*2, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
@@ -341,8 +340,7 @@ icond1 = aaab;
 icond2 = bbba;
 nTrials = 200;
 
-gmatrix1 = zeros(1, tN);
-neuronCnt = 0;
+gmatrix1 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
@@ -352,21 +350,19 @@ for ik = 1:Nfiles
     tempSig1 = tempSig1(iTrials, :, tOi1);
 
     tempSig2 = sspkData{ik, icond2};
-    ncnt = size(tempSig2, 2);
     tcnt = size(tempSig2, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig2 = tempSig2(iTrials, :, tOi2);
 
-    data = zeros(nTrials*2, ncnt, tN);
+    data = zeros(nTrials*2, size(tempSig2, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
-    gmatrix1(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
-    neuronCnt = neuronCnt + ncnt;
-    disp(neuronCnt);
+    gmatrix1(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
+    disp(ik);
 
 end
 
@@ -376,23 +372,25 @@ kW = 50;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
-tOi2 = 1531:2030; %zAzz
-tOi3 = 2561:3060; %zzAz
-tOi4 = 3591:4090; %zzzA
+tOi2 = 1531:2130; %zAzz
+tOi3 = 2561:3160; %zzAz
+tOi4 = 3591:4190; %zzzA
 
 tN = length(tOi2);
 nTrials = 100;
 
-gmatrix2 = zeros(1, tN);
-neuronCnt = 0;
+gmatrix2 = zeros(neuronCnt, tN);
+parfor ik = 1:Nfiles
 
+    gmatrix2(ik, :) = 1;
+
+end
 for ik = 1:Nfiles
 
     tempSig1 = sspkData{ik, axab};
     tcnt = size(tempSig1, 1);
     iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig1 = tempSig1(iTrials, :, tOi2);
-    ncnt = size(tempSig1, 2);
 
     tempSig2 = sspkData{ik, aaxb};
     tcnt = size(tempSig2, 1);
@@ -419,21 +417,20 @@ for ik = 1:Nfiles
     iTrials = mod(randperm(nTrials), tcnt) + 1;
     tempSig6 = tempSig6(iTrials, :, tOi4);
 
-    data = zeros(nTrials*6, ncnt, tN);
+    data = zeros(nTrials*6, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
+
     data(3*nTrials+1:4*nTrials, :, :) = tempSig4;
     data(4*nTrials+1:5*nTrials, :, :) = tempSig5;
     data(5*nTrials+1:6*nTrials, :, :) = tempSig6;
-
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
-    gmatrix2(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(expv.*(p < 0.01));
-    neuronCnt = neuronCnt + ncnt;
-    disp(neuronCnt);
+    gmatrix2(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
+    disp(ik);
 
 end
 
@@ -446,18 +443,19 @@ tOi1 = 501:1100; %Azzz
 tOi2 = 1531:2130; %zAzz
 tOi3 = 2561:3160; %zzAz
 tOi4 = 3591:4190; %zzzA
+
 tOib = [1:400, 1101:1400, 2201:2400];
 tN = length(tOi1);
+nTrials = 100;
+
 icond1 = rrrr;
 icond2 = rxrr;
 icond3 = rrxr;
 icond4 = rrrx;
-nTrials = 100;
 
-gmatrix3 = zeros(1, tN);
-gmatrix4 = zeros(1, tN);
-gmatrix5 = zeros(1, length(tOib));
-neuronCnt = 0;
+gmatrix3 = zeros(neuronCnt, tN);
+gmatrix4 = zeros(neuronCnt, tN);
+gmatrix5 = zeros(neuronCnt, length(tOib));
 
 for ik = 1:Nfiles
 
@@ -473,12 +471,10 @@ for ik = 1:Nfiles
     tempSig3 = sspkData{ik, icond1};
     tempSig3 = mean(tempSig3(:, :, tOib), 1);
 
+    gmatrix3(areaIDset{ik}, :) = squeeze(tempSig1);
+    gmatrix4(areaIDset{ik}, :) = squeeze(tempSig2);
+    gmatrix5(areaIDset{ik}, :) = squeeze(tempSig3);
     disp(ik);
-    gmatrix3(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig1);
-    gmatrix4(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig2);
-    gmatrix5(neuronCnt+1:neuronCnt+ncnt, :) = squeeze(tempSig3);
-    neuronCnt = neuronCnt + ncnt;
-    disp(neuronCnt);
 
 end
 

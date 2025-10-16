@@ -372,9 +372,9 @@ kW = 50;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
-tOi2 = 1531:2030; %zAzz
-tOi3 = 2561:3060; %zzAz
-tOi4 = 3591:4090; %zzzA
+tOi2 = 1531:2130; %zAzz
+tOi3 = 2561:3160; %zzAz
+tOi4 = 3591:4190; %zzzA
 
 tN = length(tOi2);
 nTrials = 100;
@@ -477,7 +477,7 @@ end
 %% Neuron iFR plot (A)
 
 icond1 = 1;
-neuronID = 1:22;
+neuronID = 1:1000;
 fileID = 31;
 neuronIDs = sum(fileIDs < fileID) + neuronID;
 
@@ -619,11 +619,8 @@ xlabel("Time(ms)");ylabel("PEV%");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoothW = " + num2str(kW));
 
 %% Single neuron PEV in time (N) with iFR
-% gmatrix0 >
-% AAAX-BBBX-PEV(AAAX?BBBX)
-% -gN4
-% use the same x axis (see how PEV changes over the trial) <<<
-nID = 62;%3461; % Grand neuron ID 4099(FST) | 3461(FEF)
+
+nID = 3461;%3461; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
@@ -631,7 +628,7 @@ tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [4, 8];
+condOi = [3, 7];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -665,7 +662,7 @@ xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4000, 4500);
-temp_sigx = gmatrixN4(nID, :);
+temp_sigx = gmatrixN3(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");
 
