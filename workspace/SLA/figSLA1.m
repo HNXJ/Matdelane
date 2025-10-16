@@ -159,7 +159,7 @@ legend;
 
 figure;
 
-kmeans_gn = 4;
+kmeans_gn = 5;
 
 for iA = 1:11
 
