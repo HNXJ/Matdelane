@@ -1,6 +1,6 @@
 %% Setup
 
-color_t = zeros(11, 3);
+color_t = zeros(12, 3);
 color_t(1, :) = [1 .2 0];
 color_t(2, :) = [.9 .4 0];
 color_t(3, :) = [.8 .6 0];
@@ -12,6 +12,7 @@ color_t(8, :) = [0 .4 .8];
 color_t(9, :) = [.3 .2 .7];
 color_t(10, :) = [.6 .1 .8];
 color_t(11, :) = [.5 0 1];
+color_t(11, :) = [.2 .2 1];
 
 %% Scatter vectors
 
@@ -44,7 +45,7 @@ colmap = ones(neuronCnt, 1);
 
 figure;
 
-for iA = 1:11
+for iA = 1:1
 
     generalIDs = find(areaIDs == iA);
     xe1 = sAFR(areaIDs == iA);
@@ -52,7 +53,7 @@ for iA = 1:11
     be1 = bAFR(areaIDs == iA);
     idxs = be1 > 1.0;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 10, color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
@@ -67,7 +68,7 @@ for iA = 1:11
     patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
    
     line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    xlim([0 20]);
+    % xlim([0 20]);
     ylim([0 20]);
     
 end
@@ -163,9 +164,9 @@ kmeans_gn = 4;
 for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
-    xe1 = sAFR(areaIDs == iA);
-    ye1 = xAFR(areaIDs == iA);
-    be1 = bAFR(areaIDs == iA);
+    xe1 = sAFR(areaIDs == iA); % gm3
+    ye1 = xAFR(areaIDs == iA); % gm4
+    be1 = bAFR(areaIDs == iA); % gm5
 
     % [idxs, c1, sm1, d1] = kmeans(xe1, kmeans_gn, "Distance", "sqeuclidean");
     % TODO for each group / elliptic fit
