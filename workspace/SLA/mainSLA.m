@@ -620,7 +620,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3461;%3461; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;

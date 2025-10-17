@@ -28,6 +28,8 @@ bVFR = zeros(1, size(gmatrix5, 1));
 for iN = 1:size(gmatrix1, 1)
     sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)));
     xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)));
+    svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 50)));
+    xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 50)));
     tW = size(gmatrix3, 2) / 1000;
     sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
     xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
@@ -159,12 +161,73 @@ legend;
 
 figure;
 
-kmeans_gn = 5;
+kmeans_gn = 10;
 
-for iA = 1:11
+for iA = 7:8
 
     generalIDs = find(areaIDs == iA);
     xe1 = sAFR(areaIDs == iA); % gm3
+    ye1 = xAFR(areaIDs == iA); % gm4
+    be1 = sAFR(areaIDs == iA); % gm5
+    ze1 = bVFR(areaIDs == iA);
+    we1 = xVFR(areaIDs == iA);
+
+    pointsizes = 3*ones(size(generalIDs));
+
+    kGx = [xe1; ye1; ze1; we1]';
+    [idxs, c1, sm1, d1] = kmeans(kGx, kmeans_gn, "Distance", "sqeuclidean");
+    
+    for iB = 1:kmeans_gn
+
+        idxs2 = find(idxs == iB);
+        scatter3(xe1(idxs2), ye1(idxs2), idxs2, pointsizes(idxs2), color_t(iA, :), "filled", DisplayName=areaList(iA) + " G." + num2str(iB));
+        view(0, 90);
+        hold("on");
+        
+        if length(idxs2) > 3
+
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            re = xe.^2 + ye.^2;
+            idtextz = find(re == max(re));
+            text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+        
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+        end
+
+    end
+
+    line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    % xlim([0 20]);
+    % ylim([0 20]);
+    
+end
+
+xlim([0.5 100]);
+ylim([0.5 100]);
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
+title("1.d: Omission|Stimulus avg. FR (Kmeans groups = " + num2str(kmeans_gn) + ")");
+xlabel("Stim-AFR");ylabel("Oxm-AFR");
+legend;
+
+%% Fig.1 E:
+%  Kmeans clustered aFR(Oxm) | aFR(Baseline)
+
+figure;
+
+kmeans_gn = 7;
+
+for iA = 10:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = bAFR(areaIDs == iA); % gm3
     ye1 = xAFR(areaIDs == iA); % gm4
     be1 = sAFR(areaIDs == iA); % gm5
     ze1 = bVFR(areaIDs == iA);
@@ -198,63 +261,22 @@ for iA = 1:11
     end
 
     line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    % xlim([0 20]);
-    % ylim([0 20]);
+
     
 end
 
-title("1.d: Omission|Stimulus avg. FR (Kmeans groups = " + num2str(kmeans_gn) + ")");
-xlabel("Stim-AFR");ylabel("Oxm-AFR");
-legend;
-
-%% Fig.1 E:
-%  Kmeans clustered aFR(Oxm) | aFR(Baseline)
-
-figure;
-
-kmeans_gn = 5;
-
-for iA = 1:11
-
-    generalIDs = find(areaIDs == iA);
-    xe1 = bAFR(areaIDs == iA); % gm3
-    ye1 = xAFR(areaIDs == iA); % gm4
-    be1 = sAFR(areaIDs == iA); % gm5
-    ze1 = bVFR(areaIDs == iA);
-    we1 = xVFR(areaIDs == iA);
-
-    kGx = [xe1; ye1; ze1; we1]';
-    [idxs, c1, sm1, d1] = kmeans(kGx, kmeans_gn, "Distance", "cityblock");
-    
-    for iB = 1:kmeans_gn
-
-        idxs2 = find(idxs == iB);
-        scatter(xe1(idxs2), ye1(idxs2), 1, color_t(iA, :), "filled", DisplayName=areaList(iA) + " G." + num2str(iB));
-        hold("on");
-        
-        if length(idxs2) > 3
-
-            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
-            re = xe.^2 + ye.^2;
-            idtextz = find(re == max(re));
-            text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
-        
-            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 2, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
-
-        end
-
-    end
-
-    line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    % xlim([0 20]);
-    % ylim([0 20]);
-    
-end
+xlim([0.5 100]);
+ylim([0.5 100]);
+set(gca, 'XScale', 'log', 'YScale', 'log');
 
 title("1.e: Omission|Baseline avg. FR (Kmeans groups = " + num2str(kmeans_gn) + ")");
 xlabel("Base-AFR");ylabel("Oxm-AFR");
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
 legend;
 
 %% Scatter variation(Oxm) | variation (Stim)
@@ -353,6 +375,130 @@ legend;
 figure;
 title("2.d: Omission position PEV|Omission identity PEV");
 xlabel("Oxm-PEV");ylabel("OxmPos-PEV");
+legend;
+
+%% Fig.2 E:
+%  Kmeans clustered PEV(Oxm) | PEV(Stim)
+
+figure;
+
+kmeans_gn = 3;
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA); % gm3
+    ye1 = xPEV(areaIDs == iA); % gm4
+    be1 = sAFR(areaIDs == iA); % gm5
+    ze1 = bVFR(areaIDs == iA);
+    we1 = xVFR(areaIDs == iA);
+
+    pointsizes = 3*ones(size(generalIDs));
+
+    kGx = [xe1; ye1; ze1; we1]';
+    [idxs, c1, sm1, d1] = kmeans(kGx, kmeans_gn, "Distance", "cityblock");
+    
+    for iB = 1:kmeans_gn
+
+        idxs2 = find(idxs == iB);
+        scatter3(xe1(idxs2), ye1(idxs2), idxs2, pointsizes(idxs2), color_t(iA, :), "filled", DisplayName=areaList(iA) + " G." + num2str(iB));
+        view(0, 90);
+        hold("on");
+        
+        if length(idxs2) > 3
+
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            re = xe + ye;
+            idtextz = find(re == max(re));
+            text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+        
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+        end
+
+    end
+
+    line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+
+    
+end
+
+xlim([0.1 100]);
+ylim([0.1 100]);
+set(gca, 'XScale', 'log', 'YScale', 'log');
+
+title("2.e: Omission|Stim PEV (Kmeans groups = " + num2str(kmeans_gn) + ")");
+xlabel("Stim-PEV");ylabel("Oxm-PEV");
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
+legend;
+
+%% Fig.2 F:
+%  Kmeans clustered PEV(Oxm) | vPEV(Oxm)
+
+figure;
+
+kmeans_gn = 3;
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA); % gm3
+    ye1 = xPEV(areaIDs == iA); % gm4
+    be1 = sAFR(areaIDs == iA); % gm5
+    ze1 = bVFR(areaIDs == iA);
+    we1 = xvPEV(areaIDs == iA);
+
+    pointsizes = 3*ones(size(generalIDs));
+
+    kGx = [xe1; ye1; ze1; we1]';
+    [idxs, c1, sm1, d1] = kmeans(kGx, kmeans_gn, "Distance", "cityblock");
+    
+    for iB = 1:kmeans_gn
+
+        idxs2 = find(idxs == iB);
+        scatter3(xe1(idxs2), ye1(idxs2), idxs2, pointsizes(idxs2), color_t(iA, :), "filled", DisplayName=areaList(iA) + " G." + num2str(iB));
+        view(0, 90);
+        hold("on");
+        
+        if length(idxs2) > 3
+
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            re = xe + ye;
+            idtextz = find(re == max(re));
+            text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
+        
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+
+        end
+
+    end
+
+    line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+
+    
+end
+
+xlim([0.1 100]);
+ylim([0.1 100]);
+set(gca, 'XScale', 'log', 'YScale', 'log');
+
+title("2.e: Omission|Stim PEV (Kmeans groups = " + num2str(kmeans_gn) + ")");
+xlabel("Stim-PEV");ylabel("Oxm-PEV");
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
 legend;
 
 %% Functions
