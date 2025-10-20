@@ -24,6 +24,7 @@ spkfiles = spkfiles(contains(spkfiles, areax));
 Nfiles = length(spkfiles);
 spkArea = cell(Nfiles, 1);
 sspkData = cell(Nfiles, 12);
+sspkDataCleanTrials = cell(Nfiles, 12);
 
 %% LFP unifier
 
@@ -88,13 +89,16 @@ for ik = 1:Nfiles
     tcnt = size(sspkData{ik, 1}, 3) / 1000;
     nafr = 1;
 
-    for jk = 1:ncnt
+    for kk = 1:12
+    
+        trcnt = size(sspkData{ik, kk}, 1);
+        sspkDataCleanTrials{ik, kk} = zeros(trcnt, ncnt);
 
-        for kk = 1:12
+        for jk = 1:ncnt
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
-            trnth = trn < max(mean(trn)*0.2, 1);
-            sspkData{ik, kk}(trnth, jk, :) = [];
+            trnth = trn >= max(mean(trn > 0)*0.2, 1);
+            sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
 
@@ -157,21 +161,28 @@ gkernel = ones(1, 1, kW)/kW;
 tOi1 = 1:4500;
 
 tN = length(tOi1);
-icond1 = aaab;
-nTrials = 200;
 
-gmatrixFR = zeros(neuronCnt, tN);
+gmatrixFR = zeros(12, neuronCnt, tN); 
 
 for ik = 1:Nfiles
 
-    data = sspkData{ik, icond1};
-    ncnt = size(data, 2);
-    tcnt = size(data, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
+    ncnt = size(sspkData{ik, 1}, 2);
 
-    data = data(iTrials, :, tOi1);
-    data = convn(data, gkernel, 'same');
-    gmatrixFR(areaIDset{ik}, :) = squeeze(mean(data, 1));
+    for jk = 1:12
+
+        data = sspkData{ik, jk};
+
+        for kk = 1:ncnt
+            
+            iTrials = squeeze(sspkDataCleanTrials{ik, jk}(:, kk));
+            dataT = data(iTrials == 1, kk, tOi1);
+            dataT = convn(dataT, gkernel, 'same');
+            gmatrixFR(jk, areaIDset{ik}(kk), :) = mean(dataT, 1);
+
+        end
+
+    end
+
     disp(ik);
 
 end

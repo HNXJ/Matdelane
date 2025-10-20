@@ -24,31 +24,32 @@ spkfiles = spkfiles(contains(spkfiles, areax));
 Nfiles = length(spkfiles);
 spkArea = cell(Nfiles, 1);
 sspkData = cell(Nfiles, 12);
+sspkDataCleanTrials = cell(Nfiles, 12);
 
 %% LFP unifier
 
-areax = "FEF";
-lfppath = "lfpSet\";
-lfpfiles = {dir(lfppath).name};
-lfpfiles = lfpfiles(contains(lfpfiles, areax));
-
-Nfiles = length(lfpfiles);
-lfpData = cell(Nfiles, 1);
+% areax = "lfp";
+% lfppath = "lfpSet\";
+% lfpfiles = {dir(lfppath).name};
+% lfpfiles = lfpfiles(contains(lfpfiles, areax));
+% 
+% Nfiles = length(lfpfiles);
+% lfpData = cell(Nfiles, 1);
 
 %% Load spk
 
-spkData = cell(Nfiles, 1);
-
-for ik = 1:Nfiles
-
-    tsetx = load(spkpath + spkfiles{ik});
-    tsetf = strsplit(spkfiles{ik}, "_");
-    spkArea{ik} = tsetf{2};
-    spkData{ik} = tsetx.xset;
-
-    fprintf(num2str(ik) + "-");
-
-end
+% spkData = cell(Nfiles, 1);
+% 
+% for ik = 1:Nfiles
+% 
+%     tsetx = load(spkpath + spkfiles{ik});
+%     tsetf = strsplit(spkfiles{ik}, "_");
+%     spkArea{ik} = tsetf{2};
+%     spkData{ik} = tsetx.xset;
+% 
+%     fprintf(num2str(ik) + "-");
+% 
+% end
 
 %% Load all spk condition specific
 
@@ -72,28 +73,32 @@ end
 
 %% Load lfp
 
-for ik = 1:Nfiles
-
-    tsetx = load(lfppath + lfpfiles{ik});
-    lfpData{ik} = tsetx.xset;
-    fprintf(num2str(ik) + "-");
-
-end
+% for ik = 1:Nfiles
+% 
+%     tsetx = load(lfppath + lfpfiles{ik});
+%     lfpData{ik} = tsetx.xset;
+%     fprintf(num2str(ik) + "-");
+% 
+% end
 
 %% Remove spike-less trials
 
 for ik = 1:Nfiles
 
     ncnt = size(sspkData{ik, 1}, 2);
+    tcnt = size(sspkData{ik, 1}, 3) / 1000;
     nafr = 1;
 
-    for jk = 1:ncnt
+    for kk = 1:12
+    
+        trcnt = size(sspkData{ik, kk}, 1);
+        sspkDataCleanTrials{ik, kk} = zeros(trcnt, ncnt);
 
-        for kk = 1:12
+        for jk = 1:ncnt
 
-            trn = squeeze(mean(sspk{ik, kk}(:, jk, :), 1));
-            trnth = trn < min(mean(trn)*0.25, 1);
-
+            trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
+            trnth = trn >= max(mean(trn > 0)*0.2, 1);
+            sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
 
@@ -159,18 +164,21 @@ tN = length(tOi1);
 icond1 = aaab;
 nTrials = 200;
 
-gmatrixFR = zeros(neuronCnt, tN);
+gmatrixFR = zeros(12, neuronCnt, tN); 
 
 for ik = 1:Nfiles
 
     data = sspkData{ik, icond1};
     ncnt = size(data, 2);
     tcnt = size(data, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
 
-    data = data(iTrials, :, tOi1);
-    data = convn(data, gkernel, 'same');
-    gmatrixFR(areaIDset{ik}, :) = squeeze(mean(data, 1));
+    for jk = 1:12
+
+        iTrials = sspkDataCleanTrials{ik, jk};
+        data = %data(iTrials, :, tOi1);
+        data = convn(data, gkernel, 'same');
+        gmatrixFR(jk, areaIDset{ik}, :) = squeeze(mean(data, 1));\
+    end
     disp(ik);
 
 end
@@ -643,7 +651,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3346; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3348; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
