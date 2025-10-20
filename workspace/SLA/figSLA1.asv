@@ -1,18 +1,31 @@
 %% Setup
 
 color_t = zeros(12, 3);
-color_t(1, :) = [1 .2 0];
-color_t(2, :) = [.9 .4 0];
-color_t(3, :) = [.8 .6 0];
-color_t(4, :) = [.6 .8 0];
-color_t(5, :) = [.4 .7 0];
-color_t(6, :) = [.2 .8 0];
-color_t(7, :) = [0 .6 .6];
-color_t(8, :) = [0 .4 .8];
-color_t(9, :) = [.3 .2 .7];
-color_t(10, :) = [.6 .1 .8];
-color_t(11, :) = [.5 0 1];
-color_t(11, :) = [.2 .2 1];
+color_t(1, :) = [.6 .2 .2];
+color_t(2, :) = [1 0 0];
+color_t(3, :) = [.9 .45 0];
+color_t(4, :) = [.75 .75 0];
+color_t(5, :) = [.2 1 .2];
+color_t(6, :) = [.4 .8 .4];
+color_t(7, :) = [.5 .6 .5];
+color_t(8, :) = [.6 .4 .6];
+color_t(9, :) = [.7 .2 .7];
+color_t(10, :) = [.8 .1 .8];
+color_t(11, :) = [.9 0 1];
+color_t(12, :) = [1 .2 1];
+
+jet_colors = [
+    [0, 0, 128],     # Dark Blue
+    [0, 0, 255],     # Blue
+    [0, 128, 255],   # Light Blue
+    [0, 255, 255],   # Cyan
+    [128, 255, 128], # Light Green
+    [255, 255, 0],   # Yellow
+
+    [128, 0, 128],   # Purple
+    [255, 0, 255],   # Magenta
+    [255, 255, 255]  # White
+]
 
 %% Scatter vectors
 
@@ -47,7 +60,7 @@ colmap = ones(neuronCnt, 1);
 
 figure;
 
-for iA = 1:1
+for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = sAFR(areaIDs == iA);
@@ -440,7 +453,7 @@ set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 legend;
 
 %% Fig.2 F:
-%  Kmeans clustered PEV(Oxm) | vPEV(Stim)
+%  Kmeans clustered PEV(Oxm) | vPEV(Oxm)
 
 figure;
 
@@ -453,7 +466,7 @@ for iA = 1:11
     ye1 = xPEV(areaIDs == iA); % gm4
     be1 = sAFR(areaIDs == iA); % gm5
     ze1 = bVFR(areaIDs == iA);
-    we1 = xVFR(areaIDs == iA);
+    we1 = xvPEV(areaIDs == iA);
 
     pointsizes = 3*ones(size(generalIDs));
 
