@@ -757,7 +757,7 @@ title("Rastrogram");
 
 %% Single neuron iFR (N)
 
-nID = 4099; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 236; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
@@ -802,7 +802,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 3346; % Grand neuron ID
+nID = 236; % Grand neuron ID
 
 icond1 = 1;
 icond2 = 2;
