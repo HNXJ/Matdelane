@@ -18,6 +18,7 @@ color_t(12, :) = [.15 .15 .75];
 
 sPEV = zeros(1, size(gmatrix1, 1));
 xPEV = zeros(1, size(gmatrix2, 1));
+xOPEV = zeros(1, size(gmatrix6, 1));
 sAFR = zeros(1, size(gmatrix3, 1));
 xAFR = zeros(1, size(gmatrix4, 1));
 bAFR = zeros(1, size(gmatrix5, 1));
@@ -28,6 +29,8 @@ bVFR = zeros(1, size(gmatrix5, 1));
 for iN = 1:size(gmatrix1, 1)
     sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)));
     xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)));
+    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 50)));
+    
     svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 50)));
     xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 50)));
     tW = size(gmatrix3, 2) / 1000;
