@@ -173,7 +173,7 @@ for ik = 1:Nfiles
         data = sspkData{ik, jk};
 
         for kk = 1:ncnt
-            
+
             iTrials = squeeze(sspkDataCleanTrials{ik, jk}(:, kk));
             dataT = data(iTrials == 1, kk, tOi1);
             dataT = convn(dataT, gkernel, 'same');
@@ -203,15 +203,28 @@ gmatrixN1 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
+        end
+    end
+
+    tempSig2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi1);
+        end
+    end
 
     data = zeros(nTrials*2, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -243,26 +256,33 @@ gmatrixN2 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
+        end
+    end
 
-    % tempSig3 = sspkData{ik, icond3};
-    % tcnt = size(tempSig3, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    % tempSig3 = tempSig3(iTrials, :, tOi3);
+    tempSig2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
+        end
+    end
 
     data = zeros(nTrials*2, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -289,26 +309,33 @@ gmatrixN3 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
+        end
+    end
 
-    % tempSig3 = sspkData{ik, icond3};
-    % tcnt = size(tempSig3, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    % tempSig3 = tempSig3(iTrials, :, tOi3);
+    tempSig2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
+        end
+    end
 
     data = zeros(nTrials*2, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -335,26 +362,33 @@ gmatrixN4 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
+        end
+    end
 
-    % tempSig3 = sspkData{ik, icond3};
-    % tcnt = size(tempSig3, 1);
-    % iTrials = mod(randperm(nTrials), tcnt) + 1;
-    % tempSig3 = tempSig3(iTrials, :, tOi3);
+    tempSig2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
+        end
+    end
 
     data = zeros(nTrials*2, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    % data(nTrials*2+1:3*nTrials, :, :) = tempSig3;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -379,15 +413,28 @@ gmatrix1 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi1);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, icond2};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi2);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
+        end
+    end
+
+    tempSig2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
+        end
+    end
 
     data = zeros(nTrials*2, size(tempSig2, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -418,35 +465,72 @@ gmatrix2 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, axab};
-    tcnt = size(tempSig1, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig1 = tempSig1(iTrials, :, tOi2);
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
 
-    tempSig2 = sspkData{ik, aaxb};
-    tcnt = size(tempSig2, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig2 = tempSig2(iTrials, :, tOi3);
+    for jk = 1:size(tempSig1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig1(:, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);
+        end
+    end
 
-    tempSig3 = sspkData{ik, bbbx};
-    tcnt = size(tempSig3, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig3 = tempSig3(iTrials, :, tOi4);
+    tempSig2 = zeros(nTrials, ncnt, tN);
 
-    tempSig4 = sspkData{ik, bxba};
-    tcnt = size(tempSig4, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig4 = tempSig4(iTrials, :, tOi2);
+    for jk = 1:size(tempSig2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig2(:, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
+        end
+    end
 
-    tempSig5 = sspkData{ik, bbxa};
-    tcnt = size(tempSig5, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig5 = tempSig5(iTrials, :, tOi3);
+    tempSig3 = zeros(nTrials, ncnt, tN);
 
-    tempSig6 = sspkData{ik, aaax};
-    tcnt = size(tempSig6, 1);
-    iTrials = mod(randperm(nTrials), tcnt) + 1;
-    tempSig6 = tempSig6(iTrials, :, tOi4);
+    for jk = 1:size(tempSig3, 2)
+        ltrials = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig3(:, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
+        end
+    end
+
+    tempSig4 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig4, 2)
+        ltrials = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig4(:, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2);
+        end
+    end
+
+    tempSig5 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig5, 2)
+        ltrials = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig5(:, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3);
+        end
+    end
+
+    tempSig6 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSig6, 2)
+        ltrials = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSig6(:, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4);
+        end
+    end
 
     data = zeros(nTrials*6, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
@@ -490,17 +574,54 @@ gmatrix5 = zeros(neuronCnt, length(tOib));
 
 for ik = 1:Nfiles
 
-    tempSig1 = sspkData{ik, icond1};
-    ncnt = size(tempSig1, 2);
-    tempSig1 = mean(tempSig1(:, :, tOi1), 1);
-   
-    tempSigx1 = sspkData{ik, icond2};
-    tempSigx2 = sspkData{ik, icond3};
-    tempSigx3 = sspkData{ik, icond4};
+    ncnt = length(areaIDset{ik});
+    tempSigG = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSigG, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSigG(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, :);
+        end
+    end
+
+    tempSigx1 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSigx1, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSigx1(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, :);
+        end
+    end
+        
+    tempSigx2 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSigx2, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond3}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSigx2(:, jk, :) = sspkData{ik, icond3}(iTrials, jk, :);
+        end
+    end
+        
+    tempSigx3 = zeros(nTrials, ncnt, tN);
+
+    for jk = 1:size(tempSigx3, 2)
+        ltrials = find(sspkDataCleanTrials{ik, icond4}(:, jk) == 1);
+        tcnt = length(ltrials);
+        if tcnt > 10
+            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            tempSigx3(:, jk, :) = sspkData{ik, icond4}(iTrials, jk, :);
+        end
+    end
+
+    tempSig1 = mean(tempSigG(:, :, tOi1), 1);
     tempSig2 = (mean(tempSigx1(:, :, tOi2), 1) + mean(tempSigx2(:, :, tOi3), 1) + mean(tempSigx3(:, :, tOi4), 1))/3;
-    
-    tempSig3 = sspkData{ik, icond1};
-    tempSig3 = mean(tempSig3(:, :, tOib), 1);
+    tempSig3 = mean(tempSigG(:, :, tOib), 1);
 
     gmatrix3(areaIDset{ik}, :) = squeeze(tempSig1);
     gmatrix4(areaIDset{ik}, :) = squeeze(tempSig2);
