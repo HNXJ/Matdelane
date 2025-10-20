@@ -27,28 +27,28 @@ sspkData = cell(Nfiles, 12);
 
 %% LFP unifier
 
-areax = "FEF";
-lfppath = "lfpSet\";
-lfpfiles = {dir(lfppath).name};
-lfpfiles = lfpfiles(contains(lfpfiles, areax));
-
-Nfiles = length(lfpfiles);
-lfpData = cell(Nfiles, 1);
+% areax = "lfp";
+% lfppath = "lfpSet\";
+% lfpfiles = {dir(lfppath).name};
+% lfpfiles = lfpfiles(contains(lfpfiles, areax));
+% 
+% Nfiles = length(lfpfiles);
+% lfpData = cell(Nfiles, 1);
 
 %% Load spk
 
-spkData = cell(Nfiles, 1);
-
-for ik = 1:Nfiles
-
-    tsetx = load(spkpath + spkfiles{ik});
-    tsetf = strsplit(spkfiles{ik}, "_");
-    spkArea{ik} = tsetf{2};
-    spkData{ik} = tsetx.xset;
-
-    fprintf(num2str(ik) + "-");
-
-end
+% spkData = cell(Nfiles, 1);
+% 
+% for ik = 1:Nfiles
+% 
+%     tsetx = load(spkpath + spkfiles{ik});
+%     tsetf = strsplit(spkfiles{ik}, "_");
+%     spkArea{ik} = tsetf{2};
+%     spkData{ik} = tsetx.xset;
+% 
+%     fprintf(num2str(ik) + "-");
+% 
+% end
 
 %% Load all spk condition specific
 
@@ -72,13 +72,13 @@ end
 
 %% Load lfp
 
-for ik = 1:Nfiles
-
-    tsetx = load(lfppath + lfpfiles{ik});
-    lfpData{ik} = tsetx.xset;
-    fprintf(num2str(ik) + "-");
-
-end
+% for ik = 1:Nfiles
+% 
+%     tsetx = load(lfppath + lfpfiles{ik});
+%     lfpData{ik} = tsetx.xset;
+%     fprintf(num2str(ik) + "-");
+% 
+% end
 
 %% Remove spike-less trials
 
@@ -94,7 +94,7 @@ for ik = 1:Nfiles
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
             trnth = trn < max(mean(trn)*0.2, 1);
-            sspkData{ik, kk}(trnth, :, :) = [];
+            sspkData{ik, kk}(trnth, jk, :) = [];
 
         end
 
@@ -644,7 +644,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3346; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3348; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
