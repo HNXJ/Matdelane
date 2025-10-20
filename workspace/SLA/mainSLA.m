@@ -80,6 +80,30 @@ for ik = 1:Nfiles
 
 end
 
+%% Remove spike-less trials
+
+for ik = 1:Nfiles
+
+    ncnt = size(sspkData{ik, 1}, 2);
+    tcnt = size(sspkData{ik, 1}, 3) / 1000;
+    nafr = 1;
+
+    for jk = 1:ncnt
+
+        for kk = 1:12
+
+            trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
+            trnth = trn < max(mean(trn)*0.2, 1);
+            sspkData{ik, kk}(trnth, :, :) = [];
+
+        end
+
+    end
+
+    disp(ik);
+
+end
+
 %% Labels
 
 areaList = ["V1", "V2", "V3d", "V3a", "V4", "MT", "MST", "TEO", "FST", "FEF", "PFC"];
@@ -544,7 +568,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 62; % Grand neuron ID
+nID = 3346; % Grand neuron ID
 
 icond1 = 1;
 icond2 = 2;
@@ -620,7 +644,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3346; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
@@ -628,7 +652,7 @@ tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [3, 7];
+condOi = [2, 6];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi

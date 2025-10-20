@@ -47,33 +47,41 @@ colmap = ones(neuronCnt, 1);
 
 figure;
 
-for iA = 5:7
+for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
-    xe1 = sAFR(areaIDs == iA);
+    xe1 = xVFR(areaIDs == iA);
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
     idxs = be1 > 1.0;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 10, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 4, color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .2, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
-    re = xe.^2 + ye.^2;
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 1, 'std');
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+
+    re = - 0.5 * ((-1)^ceil(iA/2))* xe + ((-1)^iA)*ye;
     idtextz = find(re == max(re));
     text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.4, "HandleVisibility", "off", "EdgeColor", "none");
    
-    line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    % xlim([0 20]);
-    ylim([0 20]);
+    line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    % xlim([0.2 100]);
+    ylim([0.2 100]);
+    zlim([0 5000]);
     
 end
+
+set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 
 title("1.a: Omission|Stimulus avg. FR");
 xlabel("Stim-AFR");ylabel("Oxm-AFR");
@@ -92,25 +100,32 @@ for iA = 1:11
     ye1 = xAFR(areaIDs == iA)./be1;
     idxs = be1 > 1.0;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 5, color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .2, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
-    re = xe.^2 + ye.^2;
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 1, 'std');
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+
+    re = - 0.5 * ((-1)^ceil(iA/2))* xe + ((-1)^iA)*ye;
     idtextz = find(re == max(re));
     text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
    
-    line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    xlim([0 4]);
-    ylim([0 4]);
+    line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    xlim([0.3 10]);
+    ylim([0.3 10]);
     
 end
+
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 
 title("1.b: Omission/baseline|Stimulus/baseline avg. FR ratio");
 xlabel("Stim-AFR/baseline");ylabel("Oxm-AFR/baseline");
@@ -138,19 +153,25 @@ for iA = 1:11
     
     ze = mean(generalIDs);
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .2, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", "none");
     re = xe.^2 + ye.^2;
     idtextz = find(re == max(re));
     text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
    
     line(1:20, 1:20, "color", [0 0 0], "HandleVisibility", "off");
-    xlim([0 20]);
-    ylim([0 20]);
+    xlim([0.3 30]);
+    ylim([0.3 30]);
     
 end
+
+set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XTick', [0.1 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'YTick', [0.1 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 
 title("1.c: Omission|Baseline avg. FR");
 xlabel("Base-AFR");ylabel("Oxm-AFR");
@@ -161,9 +182,9 @@ legend;
 
 figure;
 
-kmeans_gn = 10;
+kmeans_gn = 2;
 
-for iA = 7:8
+for iA = 1:4
 
     generalIDs = find(areaIDs == iA);
     xe1 = sAFR(areaIDs == iA); % gm3
@@ -186,27 +207,27 @@ for iA = 7:8
         
         if length(idxs2) > 3
 
-            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
             re = xe.^2 + ye.^2;
             idtextz = find(re == max(re));
             text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
         
-            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .5, 'std');
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
 
         end
 
     end
 
     line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    % xlim([0 20]);
-    % ylim([0 20]);
+    xlim([0.3 30]);
+    ylim([0.3 30]);
     
 end
 
-xlim([0.5 100]);
-ylim([0.5 100]);
+xlim([0.3 100]);
+ylim([0.3 100]);
 set(gca, 'XScale', 'log', 'YScale', 'log');
 set(gca, 'XTick', [0.1 1 3 10 30 100]);
 set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
@@ -222,9 +243,9 @@ legend;
 
 figure;
 
-kmeans_gn = 7;
+kmeans_gn = 4;
 
-for iA = 10:11
+for iA = 1:4
 
     generalIDs = find(areaIDs == iA);
     xe1 = bAFR(areaIDs == iA); % gm3
@@ -248,13 +269,13 @@ for iA = 10:11
         if length(idxs2) > 3
 
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
             re = xe.^2 + ye.^2;
             idtextz = find(re == max(re));
             text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
         
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
 
         end
 
@@ -265,8 +286,8 @@ for iA = 10:11
     
 end
 
-xlim([0.5 100]);
-ylim([0.5 100]);
+xlim([0.3 100]);
+ylim([0.3 100]);
 set(gca, 'XScale', 'log', 'YScale', 'log');
 
 title("1.e: Omission|Baseline avg. FR (Kmeans groups = " + num2str(kmeans_gn) + ")");
@@ -295,7 +316,7 @@ for iA = 1:11
     idxs = xe1 > 1 | ye1 > 1;
     idxs2 = ye1 ./ xe1 > 0 & ye1 > 2.19;
     pointsizes = 1*ones(size(generalIDs));
-    pointsizes(idxs2) = 10;
+    pointsizes(idxs2) = 4;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -303,21 +324,21 @@ for iA = 1:11
     
     ze = mean(generalIDs);
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .2, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", "none");
     re = xe.^2 + ye.^2;
     idtextz = find(re == max(re));
     text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
    
     line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     xlim([0 20]);
-    ylim([0 5]);
+    ylim([0 10]);
     
 end
 
-title("2.a: Omission|Baseline avg. FR");
+title("2.a: Omission|Stim PEV");
 xlabel("Stim-PEV");ylabel("Oxm-PEV");
 legend;
 
@@ -343,13 +364,13 @@ for iA = 1:11
     
     ze = mean(generalIDs);
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .2, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.6, "HandleVisibility", "off", "EdgeColor", "none");
     re = xe.^2 + ye.^2;
     idtextz = find(re == max(re));
     text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
    
     line(0:20, 0:20, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     xlim([0 5]);
@@ -408,13 +429,13 @@ for iA = 1:11
         if length(idxs2) > 3
 
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
             re = xe + ye;
             idtextz = find(re == max(re));
             text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
         
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
 
         end
 
@@ -470,13 +491,13 @@ for iA = 1:11
         if length(idxs2) > 3
 
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.3, "HandleVisibility", "off", "EdgeColor", "none");
             re = xe + ye;
             idtextz = find(re == max(re));
             text(xe(idtextz), ye(idtextz), [areaList{iA}, ''], "Color", color_t(iA, :));
         
             [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", [1 1 1]);
+            patch(xe, ye, color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
 
         end
 
@@ -522,11 +543,17 @@ function [X, Y] = generateEllipse(x, y, a, b, theta, N)
 
 end
 
-function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mode)
+function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mode, rect)
     
     if ~exist('mode', 'var')
 
         mode = 'sem';
+
+    end
+
+    if ~exist('rect', 'var')
+
+        rect = 1;
 
     end
 
@@ -574,6 +601,13 @@ function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mo
     radius_b = k * sqrt(lambda_b);
     
     [X_ellipse, Y_ellipse] = generateEllipse(center_x, center_y, radius_a, radius_b, theta, N);
+
+    if rect
+
+        X_ellipse(X_ellipse < 0) = 1e-6;
+        Y_ellipse(Y_ellipse < 0) = 1e-6;
+        
+    end
 
 end
 
