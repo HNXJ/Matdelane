@@ -81,7 +81,7 @@ end
 % 
 % end
 
-%% Remove spike-less trials
+%% Find spike-less trials
 
 for ik = 1:Nfiles
 
@@ -97,7 +97,7 @@ for ik = 1:Nfiles
         for jk = 1:ncnt
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
-            trnth = trn >= max(mean(trn > 0)*0.2, 1);
+            trnth = trn >= max(mean(trn > 0)*0.5, 1);
             sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
@@ -802,7 +802,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 3216; % Grand neuron ID
+nID = 1271; % Grand neuron ID
 
 icond1 = 1;
 icond2 = 2;
@@ -821,7 +821,8 @@ ncondOi = length(condOi);
 for ik = 1:ncondOi
     
     icond = condOi(ik);
-    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :));
+    temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
+    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
     temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
 
     subplot(ceil(ncondOi/2), 2, ik);
