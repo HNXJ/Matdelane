@@ -344,13 +344,14 @@ for iA = 1:11
     generalIDs = find(areaIDs == iA);
     xe1 = sPEV(areaIDs == iA);
     ye1 = xPEV(areaIDs == iA);
-    xrks{1, iA} = xe1;
-    xrks{2, iA} = ye1;
     ze1 = bAFR(areaIDs == iA);
     idxs = xe1 > 1 | ye1 > 1;
     idxs2 = ye1 ./ xe1 > 0 | ye1 > 1;
     pointsizes = 1*ones(size(generalIDs));
     pointsizes(idxs2) = 1;
+
+    xrks{1, iA} = xe1(idxs);
+    xrks{2, iA} = ye1(idxs);
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -686,11 +687,35 @@ end
 
 %% Ranksums
 
+disp("Wilcoxon rank sum test.");
+disp("Oxm vs Stim (PEV vectors)");
+figure;
+
 for iA = 1:11
 
-    [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA});
-    disp(areaList(iA));
-    disp()
+    generalIDs = find(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA);
+    ye1 = xPEV(areaIDs == iA);
+    ze1 = bAFR(areaIDs == iA);
+    idxs = ze1 > 1;
+
+    xrks{1, iA} = xe1(idxs);
+    xrks{2, iA} = ye1(idxs);
+
+    [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA}, 'tail', 'right');
+    disp(areaList(iA) + " ; Mean(Stm,Oxm) = (" + num2str(mean(xrks{1, iA})) + "," + num2str(mean(xrks{2, iA})) + ")");
+    scatter(mean(xrks{1, iA}), mean(xrks{2, iA}), 10, color_t(iA, :), "filled");hold("on")
+    if p < 0.01
+        text(mean(xrks{1, iA}), mean(xrks{2, iA}), num2str(p, 1));
+    else
+        text(mean(xrks{1, iA}), mean(xrks{2, iA}), "n.s");
+    end
+    text(mean(xrks{1, iA}), mean(xrks{2, iA}), area);
+    disp(" p = " + num2str(p) + " / H0-reject(Skewed-right?) : " + num2str(h));
+
+    [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA}, 'tail', 'left');
+    disp(" p = " + num2str(p) + " / H0-reject(Skewed-left?) : " + num2str(h));
 
 end
 
+%%

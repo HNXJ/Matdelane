@@ -201,7 +201,7 @@ legend;
 
 figure;
 
-kmeans_gn = 3;
+kmeans_gn = 7;
 
 for iA = 1:11
 
@@ -267,7 +267,7 @@ legend;
 
 figure;
 
-kmeans_gn = 4;
+kmeans_gn = 7;
 
 for iA = 1:11
 
@@ -356,17 +356,29 @@ for iA = 1:11
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
-    
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
-    
-    xetext = mean(xe);
-    yetext = mean(ye);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .6, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+
+    xetext = max(xe);
+    yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .6, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+   
+    % ze = mean(generalIDs);
+    % [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    % 
+    % xetext = mean(xe);
+    % yetext = mean(ye);
+    % text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
+    % 
+    % [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .5, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
    
     line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     
@@ -689,6 +701,7 @@ end
 
 disp("Wilcoxon rank sum test.");
 disp("Oxm vs Stim (PEV vectors)");
+figure;
 
 for iA = 1:11
 
@@ -696,17 +709,77 @@ for iA = 1:11
     xe1 = sPEV(areaIDs == iA);
     ye1 = xPEV(areaIDs == iA);
     ze1 = bAFR(areaIDs == iA);
-    idxs = ze1 > 1;
+    idxs = ze1 > .1;
 
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
 
     [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA}, 'tail', 'right');
-    disp(areaList(iA));
+    disp(areaList(iA) + " ; Mean(Stm,Oxm) = (" + num2str(mean(xrks{1, iA})) + "," + num2str(mean(xrks{2, iA})) + ")");
+    scatter(mean(xrks{1, iA}), mean(xrks{2, iA}), 40, color_t(iA, :), "filled");hold("on")
+    if p < 0.01
+        text(mean(xrks{1, iA}), mean(xrks{2, iA}), "Stim->" + num2str(p, 1));
+    else
+        text(mean(xrks{1, iA}), mean(xrks{2, iA}), "n.s");
+    end
+    text(mean(xrks{1, iA}), .1+mean(xrks{2, iA}), areaList{iA});
     disp(" p = " + num2str(p) + " / H0-reject(Skewed-right?) : " + num2str(h));
 
     [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA}, 'tail', 'left');
+    if p < 0.01
+        text(mean(xrks{1, iA}), -.1+mean(xrks{2, iA}), "Oxm-^" + num2str(p, 1));
+    else
+        text(mean(xrks{1, iA}), -.1+mean(xrks{2, iA}), "n.s");
+    end
     disp(" p = " + num2str(p) + " / H0-reject(Skewed-left?) : " + num2str(h));
 
 end
 
+%%
+
+for ikA = 1:5
+
+    ar1 = ikA*2 - 1;
+    ar2 = ikA*2;
+    figure;
+    
+    subplot(2, 1, 1);
+    histogram(xrks{1, ar1}, 80, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Stim");    
+    hold("on");
+    xline(mean(xrks{1, ar1}), "Color", "blue");
+
+    histogram(xrks{2, ar1}, 80, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Oxm");
+    xline(mean(xrks{2, ar1}), "Color", "red");
+    title("PEV-PDF" + areaList(ar1));
+    
+    subplot(2, 1, 2);
+    histogram(xrks{1, ar2}, 80, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Stim");
+    hold("on");
+    xline(mean(xrks{1, ar2}), "Color", "blue");
+    histogram(xrks{2, ar2}, 80, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Oxm");
+    xline(mean(xrks{2, ar2}), "Color", "red");
+    title("PEV-PDF" + areaList(ar2));
+    legend;
+
+end
+
+%%
+
+ar1 = 1;
+ar2 = 11;
+figure;
+
+subplot(2, 1, 1);
+histogram(xrks{1, ar1}, 100, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Stim");
+hold("on");
+histogram(xrks{2, ar1}, 100, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Oxm");
+title("PEV-PDF" + areaList(ar1));
+
+subplot(2, 1, 2);
+histogram(xrks{1, ar2}, 100, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Stim");
+hold("on");
+histogram(xrks{2, ar2}, 100, "BinLimits", [0 20], "Normalization", "probability", "DisplayName", "Oxm");
+title("PEV-PDF" + areaList(ar2));
+legend;
+
+    %%
