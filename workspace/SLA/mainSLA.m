@@ -97,7 +97,8 @@ for ik = 1:Nfiles
         for jk = 1:ncnt
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
-            trnth = trn >= max(mean(trn > 0)*0.5, 1);
+            % [trnch, trnst] = ischange(trn);
+            trnth = trn >= max(mean(trn(trn > median(trn))) - std(trn(trn > 0)), 1);
             sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
@@ -209,7 +210,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 4
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -220,7 +221,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 4
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi1);
         end
@@ -262,7 +263,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -273,7 +274,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -315,7 +316,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -326,7 +327,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -368,7 +369,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -379,7 +380,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -419,7 +420,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -430,7 +431,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -443,7 +444,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
-    gmatrix1(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
+    gmatrix1(areaIDset{ik}, :) = squeeze(expv);
     disp(ik);
 
 end
@@ -555,9 +556,9 @@ kW = 50;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
-tOi2 = 1531:2130; %zAzz
-tOi3 = 2561:3160; %zzAz
-tOi4 = 3591:4190; %zzzA
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
 
 tN = length(tOi2);
 nTrials = 100;
@@ -656,10 +657,10 @@ end
 kW = 50;
 gkernel = ones(1, 1, kW)/kW; 
 
-tOi1 = 501:1100; %Azzz
-tOi2 = 1531:2130; %zAzz
-tOi3 = 2561:3160; %zzAz
-tOi4 = 3591:4190; %zzzA
+tOi1 = 501:1000; %Azzz
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
 
 tOib = [1:400, 1101:1400, 2201:2400];
 tN = length(tOi1);
@@ -802,7 +803,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 1271; % Grand neuron ID
+nID = 1272; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
