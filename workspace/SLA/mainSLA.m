@@ -802,7 +802,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 236; % Grand neuron ID
+nID = 1004; % Grand neuron ID
 
 icond1 = 1;
 icond2 = 2;
@@ -878,7 +878,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3348; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3421; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;
