@@ -156,7 +156,7 @@ disp(neuronCnt);
 
 %% Grand matrix iFRkG
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -190,7 +190,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -241,7 +241,7 @@ end
 
 %% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -294,7 +294,7 @@ end
 
 %% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -347,7 +347,7 @@ end
 
 %% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -400,7 +400,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = [501:1100, 1531:2130, 2561:3160];
@@ -451,7 +451,7 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
