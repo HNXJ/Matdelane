@@ -98,7 +98,7 @@ for ik = 1:Nfiles
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
             % [trnch, trnst] = ischange(trn);
-            trnth = trn >= max(mean(trn(trn > median(trn))) - std(trn(trn > 0)), 1);
+            trnth = trn > max(mean(trn(trn > median(trn))) - std(trn(trn > median(trn))), 2);
             sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
@@ -803,7 +803,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 1265; % Grand neuron ID % 1004/1269
+nID = 1271; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
