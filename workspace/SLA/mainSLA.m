@@ -90,16 +90,31 @@ for ik = 1:Nfiles
     nafr = 1;
 
     for kk = 1:12
-    
+
         trcnt = size(sspkData{ik, kk}, 1);
         sspkDataCleanTrials{ik, kk} = zeros(trcnt, ncnt);
 
-        for jk = 1:ncnt
+    end
+
+    for jk = 1:ncnt
+        
+        trnths = zeros(1, 12);
+
+        for kk = 1:12
+
+            trcnt = size(sspkData{ik, kk}, 1);
+            trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
+            trnths(kk) = mean(trn(trn > median(trn))) - std(trn(trn > median(trn)));
+
+        end
+
+        trnth = max(mean(trnths), 2.5);
+
+        for kk = 1:12
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
-            % [trnch, trnst] = ischange(trn);
-            trnth = trn > max(mean(trn(trn > median(trn))) - std(trn(trn > median(trn))), 2);
-            sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
+            trnthidx = trn > trnths;
+            sspkDataCleanTrials{ik, kk}(trnthidx, jk) = 1;
 
         end
 
@@ -210,7 +225,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 4
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -221,7 +236,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 4
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi1);
         end
@@ -263,7 +278,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -274,7 +289,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -316,7 +331,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -327,7 +342,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -369,7 +384,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -380,7 +395,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end
@@ -420,7 +435,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, tOi1);
         end
@@ -431,7 +446,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 3
+        if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, tOi2);
         end

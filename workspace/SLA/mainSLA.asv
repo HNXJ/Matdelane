@@ -89,16 +89,26 @@ for ik = 1:Nfiles
     tcnt = size(sspkData{ik, 1}, 3) / 1000;
     nafr = 1;
 
-    for kk = 1:12
-    
-        trcnt = size(sspkData{ik, kk}, 1);
+    for jk = 1:ncnt
+        
         sspkDataCleanTrials{ik, kk} = zeros(trcnt, ncnt);
+        trnths = zeros(1, 12);
+
+        for kk = 1:12
+
+            trcnt = size(sspkData{ik, kk}, 1);
+            trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
+            % [trnch, trnst] = ischange(trn);
+            trnth = trn > max(mean(trn(trn > median(trn))) - std(trn(trn > median(trn))), 2);
+            sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
+
+        end
 
         for jk = 1:ncnt
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
             % [trnch, trnst] = ischange(trn);
-            trnth = trn >= max(mean(trn(trn > median(trn))) - std(trn(trn > median(trn))), 1);
+            trnth = trn > max(mean(trn(trn > median(trn))) - std(trn(trn > median(trn))), 2);
             sspkDataCleanTrials{ik, kk}(trnth, jk) = 1;
 
         end
@@ -156,7 +166,7 @@ disp(neuronCnt);
 
 %% Grand matrix iFRkG
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -190,7 +200,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -241,7 +251,7 @@ end
 
 %% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -294,7 +304,7 @@ end
 
 %% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -347,7 +357,7 @@ end
 
 %% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -400,7 +410,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = [501:1100, 1531:2130, 2561:3160];
@@ -451,7 +461,7 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-kW = 10;
+kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
