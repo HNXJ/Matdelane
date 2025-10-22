@@ -156,7 +156,7 @@ disp(neuronCnt);
 
 %% Grand matrix iFRkG
 
-kW = 50;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -190,7 +190,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 50;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -241,7 +241,7 @@ end
 
 %% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
-kW = 50;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -294,7 +294,7 @@ end
 
 %% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
-kW = 50;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -347,7 +347,7 @@ end
 
 %% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
-kW = 50;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -400,7 +400,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 50;
+kW = 200;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = [501:1100, 1531:2130, 2561:3160];
@@ -451,13 +451,13 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-kW = 50;
+kW = 200;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
-tOi2 = 1531:2130; %zAzz
-tOi3 = 2561:3160; %zzAz
-tOi4 = 3591:4190; %zzzA
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
 
 tN = length(tOi2);
 nTrials = 100;
@@ -544,8 +544,8 @@ for ik = 1:Nfiles
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
-    gmatrix2(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
+    gmatrix2(areaIDset{ik}, :) = squeeze(expv);
     disp(ik);
 
 end
@@ -736,7 +736,7 @@ end
 %% Neuron iFR plot (A)
 
 icond1 = 1;
-neuronID = 1:1000;
+neuronID = 1:100;
 fileID = 31;
 neuronIDs = sum(fileIDs < fileID) + neuronID;
 
@@ -803,7 +803,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 1272; % Grand neuron ID % 1004/1269
+nID = 1265; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -816,7 +816,7 @@ tN = 1*kW; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = 9:12;
+condOi = 5:8;
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -880,7 +880,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 653; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 1256; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 250;
 kX = 1;

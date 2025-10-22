@@ -27,8 +27,8 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 50)));
-    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 50)));
+    sPEV(iN) = 100*(mean(smooth(gmatrix1(iN, :), 50)));
+    xPEV(iN) = 100*(mean(smooth(gmatrix2(iN, :), 50)));
     xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 50)));
 
     svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 50)));
@@ -109,7 +109,7 @@ for iA = 1:11
     be1 = bAFR(areaIDs == iA);
     xe1 = sAFR(areaIDs == iA)./be1;
     ye1 = xAFR(areaIDs == iA)./be1;
-    idxs = be1 > 1.0;
+    idxs = be1 > 0.1;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -718,23 +718,25 @@ for iA = 1:11
     disp(areaList(iA) + " ; Mean(Stm,Oxm) = (" + num2str(mean(xrks{1, iA})) + "," + num2str(mean(xrks{2, iA})) + ")");
     scatter(mean(xrks{1, iA}), mean(xrks{2, iA}), 40, color_t(iA, :), "filled");hold("on")
     if p < 0.01
-        text(mean(xrks{1, iA}), mean(xrks{2, iA}), "Stim->" + num2str(p, 1));
+        text(1+mean(xrks{1, iA}), mean(xrks{2, iA}), "Stim->" + num2str(p, 1));
     else
-        text(mean(xrks{1, iA}), mean(xrks{2, iA}), "n.s");
+        text(1+mean(xrks{1, iA}), mean(xrks{2, iA}), "n.s");
     end
-    text(mean(xrks{1, iA}), .1+mean(xrks{2, iA}), areaList{iA});
+    text(mean(xrks{1, iA}), mean(xrks{2, iA}), areaList{iA});
     disp(" p = " + num2str(p) + " / H0-reject(Skewed-right?) : " + num2str(h));
 
     [p, h, stt] = ranksum(xrks{1, iA}, xrks{2, iA}, 'tail', 'left');
     if p < 0.01
-        text(mean(xrks{1, iA}), -.1+mean(xrks{2, iA}), "Oxm-^" + num2str(p, 1));
+        text(mean(xrks{1, iA}), 0.1+mean(xrks{2, iA}), "Oxm-^" + num2str(p, 1));
     else
-        text(mean(xrks{1, iA}), -.1+mean(xrks{2, iA}), "n.s");
+        text(mean(xrks{1, iA}), 0.1+mean(xrks{2, iA}), "n.s");
     end
     disp(" p = " + num2str(p) + " / H0-reject(Skewed-left?) : " + num2str(h));
 
 end
 
+xlim([0 20]);
+ylim([1 3]);
 %%
 
 for ikA = 1:5
