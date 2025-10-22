@@ -400,7 +400,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 200;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = [501:1100, 1531:2130, 2561:3160];
@@ -451,7 +451,7 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-kW = 200;
+kW = 10;
 gkernel = ones(1, 1, kW)/kW; 
 
 % tOi1 = 501:1500; %Azzz
