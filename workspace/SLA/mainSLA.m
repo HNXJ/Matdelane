@@ -113,7 +113,7 @@ for ik = 1:Nfiles
         for kk = 1:12
 
             trn = squeeze(sum(sspkData{ik, kk}(:, jk, :), 3)) / tcnt;
-            trnthidx = trn > trnths;
+            trnthidx = trn > trnth;
             sspkDataCleanTrials{ik, kk}(trnthidx, jk) = 1;
 
         end
