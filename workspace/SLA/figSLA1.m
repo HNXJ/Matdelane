@@ -27,9 +27,9 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(mean(smooth(gmatrix1(iN, :), 50)));
-    xPEV(iN) = 100*(mean(smooth(gmatrix2(iN, :), 50)));
-    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 50)));
+    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 100)));
+    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 100)));
+    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 100)));
 
     svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 50)));
     xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 50)));
@@ -345,10 +345,10 @@ for iA = 1:11
     xe1 = sPEV(areaIDs == iA);
     ye1 = xPEV(areaIDs == iA);
     ze1 = bAFR(areaIDs == iA);
-    idxs = xe1 > 1 | ye1 > 1;
+    idxs = xe1 > .5 | ye1 > .5;
     idxs2 = ye1 ./ xe1 > 0 | ye1 > 1;
     pointsizes = 1*ones(size(generalIDs));
-    pointsizes(idxs2) = 1;
+    pointsizes(idxs2) = 5;
 
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
@@ -384,9 +384,9 @@ for iA = 1:11
     
 end
 
-% set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.1 30]);
-ylim([0.1 30]);
+set(gca, 'XScale', 'log', 'YScale', 'log');
+xlim([0.1 100]);
+ylim([0.1 100]);
 
 set(gca, 'XTick', [0.1 1 3 10 30 100]);
 set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);

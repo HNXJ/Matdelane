@@ -205,7 +205,7 @@ end
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-kW = 100;
+kW = 400;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 1:4500;
@@ -657,11 +657,11 @@ for ik = 1:Nfiles
     data(3*nTrials+1:4*nTrials, :, :) = tempSig4;
     data(4*nTrials+1:5*nTrials, :, :) = tempSig5;
     data(5*nTrials+1:6*nTrials, :, :) = tempSig6;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2, ones(1, nTrials)*3 ...
-        , ones(1, nTrials), ones(1, nTrials)*2, ones(1, nTrials)*3];
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*1, ones(1, nTrials)*1 ...
+        , ones(1, nTrials)*2, ones(1, nTrials)*2, ones(1, nTrials)*2];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2, 3], 1);
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
     gmatrix6(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
     disp(ik);
 
@@ -669,7 +669,7 @@ end
 
 %% Grand matrix concatenation (iFR)
 
-kW = 50;
+kW = 400;
 gkernel = ones(1, 1, kW)/kW; 
 
 tOi1 = 501:1000; %Azzz
@@ -816,52 +816,9 @@ legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
-%% Single neuron rastrogram (N)
-
-nID = 1004; % Grand neuron ID % 1004/1269
-
-icond1 = 1;
-icond2 = 2;
-icond3 = 3;
-icond4 = 4;
-
-kW = 1;
-kX = 1;
-tN = 1*kW; % length(temp_sig1);
-timevec = linspace(-500, 4250, 4750);
-
-figure;
-condOi = 5:8;
-ncondOi = length(condOi);
-
-for ik = 1:ncondOi
-    
-    icond = condOi(ik);
-    temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
-    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
-    temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
-
-    subplot(ceil(ncondOi/2), 2, ik);
-    imagesc(temp_sigx, "XData", timevec);hold("on");
-    title(condNames(icond));
-    ylabel("Trial no.");
-
-    xline(0, "HandleVisibility", "off", "Color", [1 1 1]);
-    xline(1030, "HandleVisibility", "off", "Color", [0 1 1]);
-    xline(2060, "HandleVisibility", "off", "Color", [0 1 1]);
-    xline(3090, "HandleVisibility", "off", "Color", [0 1 1]);
-
-    % cb = colorbar();
-    % ylabel(cb, "Spk/s");
-
-end
-
-xlabel("Time(ms)");
-sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
-
 %% Single neuron PEV in time (N)
 
-nID = 3461; % Grand neuron ID
+nID = 3557; % Grand neuron ID
 
 kW = 100;
 
@@ -893,11 +850,54 @@ legend();
 xlabel("Time(ms)");ylabel("PEV%");
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoothW = " + num2str(kW));
 
+%% Single neuron rastrogram (N)
+
+nID = 3461; % Grand neuron ID % 1004/1269
+
+icond1 = 1;
+icond2 = 2;
+icond3 = 3;
+icond4 = 4;
+
+kW = 1;
+kX = 1;
+tN = 1*kW; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
+
+figure;
+condOi = 9:12;
+ncondOi = length(condOi);
+
+for ik = 1:ncondOi
+    
+    icond = condOi(ik);
+    temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
+    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
+    temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+
+    subplot(ceil(ncondOi/2), 2, ik);
+    imagesc(temp_sigx, "XData", timevec);hold("on");
+    title(condNames(icond));
+    ylabel("Trial no.");
+
+    xline(0, "HandleVisibility", "off", "Color", [1 1 1]);
+    xline(1030, "HandleVisibility", "off", "Color", [0 1 1]);
+    xline(2060, "HandleVisibility", "off", "Color", [0 1 1]);
+    xline(3090, "HandleVisibility", "off", "Color", [0 1 1]);
+
+    % cb = colorbar();
+    % ylabel(cb, "Spk/s");
+
+end
+
+xlabel("Time(ms)");
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
 %% Single neuron PEV in time (N) with iFR
 
-nID = 1256; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 3757; % Grand neuron ID 4099(FST) | 3461(FEF)
 
-kW = 250;
+kW = 400;
 kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
@@ -953,7 +953,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Clustering (Kmeans)
 
-mspkx = sspkData{1, 1};
+mspkx = sspkData{35, 10};
 mspkx = squeeze(mean(mspkx, 1));
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
@@ -1014,5 +1014,17 @@ for i = 1:numberOfTabs
 end
 
 % --- End of Script ---
+
+%%
+
+% 1> Rx1/Rx2/Rx3 ...
+% 2> What % of neurons carried significant PEV for Stim& Omission
+%  >> Random should be the same PEV (stimulus)
+%  >> Omission PEV should be lower (Rx/Rx)
+%  >> Smoothing - All to 250/kw
+%  >> D/
+
+% >> Subselect Omission/Stim superneurons compare to LFP-TFR
+% >> Subselect Nullneurons/ Null
 
 %%
