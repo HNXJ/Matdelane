@@ -108,7 +108,7 @@ for ik = 1:Nfiles
 
         end
 
-        trnth = max(mean(trnths), 2.5);
+        trnth = max(mean(trnths), 5.0);
 
         for kk = 1:12
 
@@ -818,7 +818,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron rastrogram (N)
 
-nID = 1271; % Grand neuron ID % 1004/1269
+nID = 1004; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
