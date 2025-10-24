@@ -466,6 +466,8 @@ end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
+% TODO : RX-Shuffle test group
+
 kW = 100;
 gkernel = ones(1, 1, kW)/kW; 
 
@@ -473,6 +475,11 @@ gkernel = ones(1, 1, kW)/kW;
 tOi2 = 1531:2030; %zAzz
 tOi3 = 2561:3060; %zzAz
 tOi4 = 3591:4090; %zzzA
+
+tOirx1 = [151:400, 1151:1400];
+tOirx2 = tOirx1 + 1031;
+tOirx3 = tOirx2 + 1031;
+tOirx4 = tOirx3 + 1031;
 
 tN = length(tOi2);
 nTrials = 100;
@@ -483,6 +490,7 @@ for ik = 1:Nfiles
 
     ncnt = length(areaIDset{ik});
     tempSig1 = zeros(nTrials, ncnt, tN);
+    tempSig1r = zeros(nTrials, ncnt, tN);
 
     for jk = 1:size(tempSig1, 2)
         ltrials = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
@@ -490,10 +498,12 @@ for ik = 1:Nfiles
         if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig1(:, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);
+            tempSig1r(:, jk, :) = sspkData{ik, axab}(iTrials, jk, tOirx2);
         end
     end
 
     tempSig2 = zeros(nTrials, ncnt, tN);
+    tempSig2r = zeros(nTrials, ncnt, tN);
 
     for jk = 1:size(tempSig2, 2)
         ltrials = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
@@ -501,10 +511,12 @@ for ik = 1:Nfiles
         if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig2(:, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
+            tempSig2r(:, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOirx3);
         end
     end
 
     tempSig3 = zeros(nTrials, ncnt, tN);
+    tempSig3r = zeros(nTrials, ncnt, tN);
 
     for jk = 1:size(tempSig3, 2)
         ltrials = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
@@ -512,6 +524,7 @@ for ik = 1:Nfiles
         if tcnt > 10
             iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
             tempSig3(:, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
+            tempSig3r(:, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOirx4);
         end
     end
 
@@ -553,9 +566,9 @@ for ik = 1:Nfiles
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
     data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
 
-    data(3*nTrials+1:4*nTrials, :, :) = tempSig4;
-    data(4*nTrials+1:5*nTrials, :, :) = tempSig5;
-    data(5*nTrials+1:6*nTrials, :, :) = tempSig6;
+    data(3*nTrials+1:4*nTrials, :, :) = tempSig1r;
+    data(4*nTrials+1:5*nTrials, :, :) = tempSig2r;
+    data(5*nTrials+1:6*nTrials, :, :) = tempSig3r;
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
@@ -852,7 +865,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 3461; % Grand neuron ID % 1004/1269
+nID = 1269; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
