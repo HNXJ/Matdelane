@@ -865,7 +865,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 1269; % Grand neuron ID % 1004/1269
+nID = 3434; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -908,7 +908,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3757; % Grand neuron ID 4099(FST) | 3461(FEF)
+nID = 1106; % Grand neuron ID 4099(FST) | 3461(FEF)
 
 kW = 400;
 kX = 1;
@@ -916,7 +916,7 @@ tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [3, 7];
+condOi = [3, 7, 11];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
