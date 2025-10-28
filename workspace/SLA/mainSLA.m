@@ -634,12 +634,12 @@ end
 
 %% Grand matrix concatenation (iFR)
 
-tOi1 = 501:1000; %Azzz
-tOi2 = 1531:2030; %zAzz
-tOi3 = 2561:3060; %zzAz
-tOi4 = 3591:4090; %zzzA
+tOi1 = 501:1100; %Azzz
+tOi2 = 1531:2130; %zAzz
+tOi3 = 2561:3160; %zzAz
+tOi4 = 3591:4190; %zzzA
 
-tOib = [1:400, 1101:1400, 2201:2400];
+tOib = [1:300, 1101:1400, 2131:2430, 3161:3460];
 tN = length(tOi1);
 nTrials = 100;
 
@@ -814,7 +814,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 4057; % Grand neuron ID % 1004/1269
+nID = 3673; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -827,7 +827,7 @@ tN = 1*kW; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = 9:12;
+condOi = 1:4;
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -857,15 +857,15 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-% nID = 1101; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
+nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
 
-kW = 200;
-kX = 1;
+kW = 400;
+kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [3, 7, 11];
+condOi = [2, 6] + 1;
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -884,8 +884,8 @@ for ik = 1:ncondOi
     xpe2 = timevec(end:-1:1);
     ype2 = temp_sig1(end:-1:1) - kX*temp_sig2(end:-1:1);
 
-    plot(timevec, temp_sig1, "DisplayName", condNames(icond) + "+-" + num2str(kX) + "SEM", "LineWidth", 2, "Color", color_t(icond, :));
-    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+    % plot(timevec, temp_sig1, "LineWidth", 2, "Color", color_t(icond, :));
+    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 0.2, "EdgeColor", "none", "DisplayName", condNames(icond) + "+-" + num2str(kX) + "SEM");
     hold("on");
 
 end
@@ -898,13 +898,14 @@ xline(3090, "HandleVisibility", "off");
 xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
-timevec = linspace(-500, 4000, 4500);
+timevec = linspace(-500, 4250, 4750);
+dispnametemp1 = "PEV(AXABvsBXBA)";
 temp_sigx = gmatrixN3(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");
 
 % kW = 1;
-plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBX)", "LineWidth", 2, "color", [1 0 0]);
+plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
 yline(0, "LineStyle", "--");
 
 ax = gca;
@@ -912,6 +913,25 @@ ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
+
+%%
+
+[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1(1:1000), "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+[ps1, fs1, ts1] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+figure;
+% imagsesc(log(ps1), "XData", ts1-0.5, "YData", fs1+0.1);
+plot(fs1+0.1, 10*log10(ps1./ps0));
+xlabel("Freq");
+ylabel("change(dB)");
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + "/Power change from baseline");
+% set(gca, "YDir", "normal");
+set(gca, "XScale", "log");
+set(gca, 'XTick', [1 3 8 12 20 40 100]);
+set(gca, 'XTickLabel', [1 3 8 12 20 40 100]);
+% set(gca, 'YTick', [0.1 1 3 10 30 100]);
+% set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 
 %% Clustering (Kmeans)
 
