@@ -57,13 +57,17 @@ for iA = 1:11
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
     idxs = be1 > 0.1;
+    idxs2 = ye1 > xe1*3;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    pointsizes = 4*ones(size(generalIDs));
+    pointsizes(idxs2) = 40;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .6, 'std');
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .9, 'std');
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
@@ -71,7 +75,7 @@ for iA = 1:11
     yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .6, 'std');
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .8, 'std');
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
     patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
    
@@ -79,9 +83,9 @@ for iA = 1:11
     
 end
 
-set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
-xlim([0.3 30]);
-ylim([0.3 30]);
+% set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
+xlim([0.1 30]);
+ylim([0.1 30]);
 % xlim([0.1 20]);
 % ylim([0.1 20]);
 grid("on");
@@ -180,13 +184,13 @@ for iA = 1:11
     [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
     patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
    
-    line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    line([0.01 100], [0.01 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.1 30]);
-ylim([0.1 30]);
+xlim([0.01 100]);
+ylim([0.01 100]);
 set(gca, 'XTick', [0.1 1 3 10 30 100]);
 set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
 set(gca, 'YTick', [0.1 1 3 10 30 100]);
@@ -682,8 +686,10 @@ function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mo
 
     if rect
 
-        X_ellipse(X_ellipse < 0) = 1e-6;
-        Y_ellipse(Y_ellipse < 0) = 1e-6;
+        indxtemp1 = find(X_ellipse < 1);
+        X_ellipse(indxtemp1) = exp(X_ellipse(indxtemp1) - 1);
+        indxtemp1 = find(Y_ellipse < 1);
+        Y_ellipse(indxtemp1) = exp(Y_ellipse(indxtemp1) - 1);
         
     end
 
