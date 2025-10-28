@@ -27,12 +27,12 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 100)));
-    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 100)));
-    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 100)));
+    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 40)));
+    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 40)));
+    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 40)));
 
-    svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 50)));
-    xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 50)));
+    svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 40)));
+    xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 40)));
     tW = size(gmatrix3, 2) / 1000;
     sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
     xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
@@ -384,7 +384,7 @@ for iA = 1:11
     
 end
 
-set(gca, 'XScale', 'log', 'YScale', 'log');
+% set(gca, 'XScale', 'log', 'YScale', 'log');
 xlim([0.1 100]);
 ylim([0.1 100]);
 

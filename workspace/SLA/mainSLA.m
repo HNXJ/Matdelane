@@ -180,8 +180,8 @@ gkernel(1, 1, :) = gausswin(kW);
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
-tOi1 = 1:4500;
-% tOi2 = 1:4500;
+tOi1 = 1:4750;
+
 tN = length(tOi1);
 icond1 = aaab;
 icond2 = bbba;
@@ -228,12 +228,12 @@ end
 
 %% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
-tOi1 = 1:4500;
-tOi2 = 1:4500;
-% tOi3 = 1:4500;
+tOi1 = 1:4750;
+tOi2 = 1:4750;
+
 tN = length(tOi1);
 icond1 = axab;
-icond2 = rxrr;
+icond2 = bxba;
 % icond3 = rrrx;
 nTrials = 100;
 
@@ -278,12 +278,12 @@ end
 
 %% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
-tOi1 = 1:4500;
-tOi2 = 1:4500;
-% tOi3 = 1:4500;
+tOi1 = 1:4750;
+tOi2 = 1:4750;
+
 tN = length(tOi1);
 icond1 = aaxb;
-icond2 = rrxr;
+icond2 = bbxa;
 % icond3 = rrrx;
 nTrials = 100;
 
@@ -328,12 +328,12 @@ end
 
 %% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
-tOi1 = 1:4500;
-tOi2 = 1:4500;
-% tOi3 = 1:4500;
+tOi1 = 1:4750;
+tOi2 = 1:4750;
+
 tN = length(tOi1);
 icond1 = aaax;
-icond2 = rrrx;
+icond2 = bbbx;
 % icond3 = rrrx;
 nTrials = 100;
 
@@ -518,12 +518,12 @@ for ik = 1:Nfiles
 
     data = zeros(nTrials*6, size(tempSig1, 2), tN);
     data(1:nTrials, :, :) = tempSig1;
-    data(nTrials+1:2*nTrials, :, :) = tempSig1;
-    data(2*nTrials+1:3*nTrials, :, :) = tempSig1;
+    data(nTrials+1:2*nTrials, :, :) = tempSig2;
+    data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
 
     data(3*nTrials+1:4*nTrials, :, :) = tempSig1r;
-    data(4*nTrials+1:5*nTrials, :, :) = tempSig1r;
-    data(5*nTrials+1:6*nTrials, :, :) = tempSig1r;
+    data(4*nTrials+1:5*nTrials, :, :) = tempSig2r;
+    data(5*nTrials+1:6*nTrials, :, :) = tempSig3r;
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
@@ -814,7 +814,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 3434; % Grand neuron ID % 1004/1269
+nID = 4057; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -857,9 +857,9 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 1106; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
+% nID = 1101; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
 
-kW = 400;
+kW = 200;
 kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
@@ -885,7 +885,7 @@ for ik = 1:ncondOi
     ype2 = temp_sig1(end:-1:1) - kX*temp_sig2(end:-1:1);
 
     plot(timevec, temp_sig1, "DisplayName", condNames(icond) + "+-" + num2str(kX) + "SEM", "LineWidth", 2, "Color", color_t(icond, :));
-    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 1.0, "HandleVisibility", "off", "EdgeColor", "none");
+    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
     hold("on");
 
 end
@@ -899,11 +899,11 @@ xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4000, 4500);
-temp_sigx = gmatrixN1(nID, :);
+temp_sigx = gmatrixN3(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");
 
-kW = 1;
+% kW = 1;
 plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", "PEV(AAAXvsBBBX)", "LineWidth", 2, "color", [1 0 0]);
 yline(0, "LineStyle", "--");
 
