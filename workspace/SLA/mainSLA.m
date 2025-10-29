@@ -625,7 +625,7 @@ for ik = 1:Nfiles
         , ones(1, nTrials)*1, ones(1, nTrials)*2, ones(1, nTrials)*3];
 
     data = convn(data, gkernel, 'same');
-    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
+    [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2, 3], 1);
     gmatrix6(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
@@ -641,7 +641,7 @@ tOi4 = 3591:4190; %zzzA
 tOib = [1:400, 1201:1400, 2231:2430, 3261:3460];
 tOis = [501:1100, 1531:2130, 2561:3160, 3591:4190];
 
-tN = length(tOi1);
+tN = length(tOis);
 nTrials = 100;
 
 icond1 = rrrr;
@@ -650,7 +650,7 @@ icond3 = rrxr;
 icond4 = rrrx;
 
 gmatrix3 = zeros(neuronCnt, tN);
-gmatrix4 = zeros(neuronCnt, tN);
+gmatrix4 = zeros(neuronCnt, length(tOi1));
 gmatrix5 = zeros(neuronCnt, length(tOib));
 
 for ik = 1:Nfiles
