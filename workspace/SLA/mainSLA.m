@@ -110,8 +110,8 @@ for ik = 1:Nfiles
 
         end
 
-        trnthl = max(mean(trnthsl), 2.5);
-        trnthu = max(mean(trnthsu), 5.0);
+        trnthl = max(mean(trnthsl), 3.0);
+        trnthu = max(mean(trnthsu), 6.0);
 
         for kk = 1:12
 
@@ -177,6 +177,7 @@ disp(neuronCnt);
 kW = 100;
 gkernel = zeros(1, 1, kW);
 gkernel(1, 1, :) = gausswin(kW);
+pThresh = 0.01;
 
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
@@ -221,7 +222,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrixN1(areaIDset{ik}, :) = squeeze(expv);
+    gmatrixN1(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -271,7 +272,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrixN2(areaIDset{ik}, :) = squeeze(expv);
+    gmatrixN2(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -321,7 +322,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrixN3(areaIDset{ik}, :) = squeeze(expv);
+    gmatrixN3(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -371,7 +372,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
-    gmatrixN4(areaIDset{ik}, :) = squeeze(expv);
+    gmatrixN4(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -419,19 +420,19 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
-    gmatrix1(areaIDset{ik}, :) = squeeze(expv);
+    gmatrix1(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
 
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
-% tOi1 = 501:1500; %Azzz
-tOi2 = 1531:2030; %zAzz
-tOi3 = 2561:3060; %zzAz
-tOi4 = 3591:4090; %zzzA
+% tOi1 = 501:1050; %Azzz
+tOi2 = 1531:2080; %zAzz
+tOi3 = 2561:3110; %zzAz
+tOi4 = 3591:4140; %zzzA
 
-tOirx1 = [151:400, 1151:1400];
+tOirx1 = [201:400, 1201:1400];
 tOirx2 = tOirx1 + 1031;
 tOirx3 = tOirx2 + 1031;
 tOirx4 = tOirx3 + 1031;
@@ -528,7 +529,7 @@ for ik = 1:Nfiles
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
-    gmatrix2(areaIDset{ik}, :) = squeeze(expv);
+    gmatrix2(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -622,12 +623,12 @@ for ik = 1:Nfiles
     data(3*nTrials+1:4*nTrials, :, :) = tempSig4;
     data(4*nTrials+1:5*nTrials, :, :) = tempSig5;
     data(5*nTrials+1:6*nTrials, :, :) = tempSig6;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*1, ones(1, nTrials)*1 ...
-        , ones(1, nTrials)*2, ones(1, nTrials)*2, ones(1, nTrials)*2];
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2, ones(1, nTrials)*3 ...
+        , ones(1, nTrials)*1, ones(1, nTrials)*2, ones(1, nTrials)*3];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2], 1);
-    gmatrix6(areaIDset{ik}, :) = squeeze(expv.*(p < 0.01));
+    gmatrix6(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
 
 end
@@ -639,7 +640,9 @@ tOi2 = 1531:2130; %zAzz
 tOi3 = 2561:3160; %zzAz
 tOi4 = 3591:4190; %zzzA
 
-tOib = [1:300, 1101:1400, 2131:2430, 3161:3460];
+tOib = [1:400, 1201:1400, 2231:2430, 3261:3460];
+tOis = [501:1100, 1531:2130, 2561:3160, 3591:4190];
+
 tN = length(tOi1);
 nTrials = 100;
 
@@ -699,7 +702,7 @@ for ik = 1:Nfiles
         end
     end
 
-    tempSig1 = mean(tempSigG(:, :, tOi1), 1);
+    tempSig1 = mean(tempSigG(:, :, tOis), 1);
     tempSig2 = (mean(tempSigx1(:, :, tOi2), 1) + mean(tempSigx2(:, :, tOi3), 1) + mean(tempSigx3(:, :, tOi4), 1))/3;
     tempSig3 = mean(tempSigG(:, :, tOib), 1);
 
