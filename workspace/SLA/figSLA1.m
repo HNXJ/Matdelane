@@ -27,16 +27,17 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(max(smooth(gmatrix1(iN, :), 40)));
-    xPEV(iN) = 100*(max(smooth(gmatrix2(iN, :), 40)));
-    xOPEV(iN) = 100*(max(smooth(gmatrix6(iN, :), 40)));
+    sPEV(iN) = 100*(max(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
+    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
+    xOPEV(iN) = 100*(max(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
 
-    svPEV(iN) = 100*(std(smooth(gmatrix1(iN, :), 40)));
-    xvPEV(iN) = 100*(std(smooth(gmatrix2(iN, :), 40)));
+    svPEV(iN) = 100*(std(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
+    xvPEV(iN) = 100*(std(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
     tW = size(gmatrix3, 2) / 1000;
     sAFR(iN) = sum(gmatrix3(iN, :)) / tW;
-    xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
     sVFR(iN) = var(gmatrix3(iN, :)) / tW;
+    tW = size(gmatrix4, 2) / 1000;
+    xAFR(iN) = sum(gmatrix4(iN, :)) / tW;
     xVFR(iN) = var(gmatrix4(iN, :)) / tW;
     tW = size(gmatrix5, 2) / 1000;
     bAFR(iN) = sum(gmatrix5(iN, :)) / tW;
@@ -57,10 +58,10 @@ for iA = 1:11
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
     idxs = be1 > 0.1;
-    idxs2 = ye1 > xe1*2;
+    idxs2 = ye1 > xe1*1.5;
 
-    pointsizes = 3*ones(size(generalIDs));
-    pointsizes(idxs2) = 4;
+    pointsizes = 5*ones(size(generalIDs));
+    pointsizes(idxs2) = 10;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -115,7 +116,7 @@ for iA = 1:11
     ye1 = xAFR(areaIDs == iA)./be1;
     idxs = be1 > 0.1;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 1, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 5, color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     idxs = be1 > 1.0 | xe1 > 1.0;
@@ -164,7 +165,7 @@ for iA = 1:11
     xe1 = bAFR(areaIDs == iA);
     ye1 = xAFR(areaIDs == iA);
     ze1 = sAFR(areaIDs == iA);
-    idxs = xe1 > .1;
+    idxs = xe1 > .0;
     idxs2 = ye1 ./ xe1 > 2 & xe1 > 1;
     pointsizes = 3*ones(size(generalIDs));
     pointsizes(idxs2) = 40;

@@ -638,7 +638,7 @@ tOi2 = 1531:2130; %zAzz
 tOi3 = 2561:3160; %zzAz
 tOi4 = 3591:4190; %zzzA
 
-tOib = [1:400, 1201:1400, 2231:2430, 3261:3460];
+tOib = 1:500;
 tOis = [501:1100, 1531:2130, 2561:3160, 3591:4190];
 
 tN = length(tOis);
@@ -673,7 +673,7 @@ for ik = 1:Nfiles
         ltrials = find(sspkDataCleanTrials{ik, icond2}(:, jk) == 1);
         tcnt = length(ltrials);
         if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            iTrials = ltrials(mod(1:nTrials, tcnt) + 1);
             tempSigx1(:, jk, :) = sspkData{ik, icond2}(iTrials, jk, :);
         end
     end
@@ -684,7 +684,7 @@ for ik = 1:Nfiles
         ltrials = find(sspkDataCleanTrials{ik, icond3}(:, jk) == 1);
         tcnt = length(ltrials);
         if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            iTrials = ltrials(mod(1:nTrials, tcnt) + 1);
             tempSigx2(:, jk, :) = sspkData{ik, icond3}(iTrials, jk, :);
         end
     end
@@ -695,7 +695,7 @@ for ik = 1:Nfiles
         ltrials = find(sspkDataCleanTrials{ik, icond4}(:, jk) == 1);
         tcnt = length(ltrials);
         if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
+            iTrials = ltrials(mod(1:nTrials, tcnt) + 1);
             tempSigx3(:, jk, :) = sspkData{ik, icond4}(iTrials, jk, :);
         end
     end
@@ -815,7 +815,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 3673; % Grand neuron ID % 1004/1269
+nID = 3461; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -860,19 +860,21 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
 
-kW = 400;
+kW = 1;
 kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [2, 6] + 1;
+condOi = 9:10;
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
     
     icond = condOi(ik);
-    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(:, infileIDs(nID), :));
+
+    temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
+    temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
     temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
 
     temp_sig1 = squeeze(mean(temp_sigx, 1));
