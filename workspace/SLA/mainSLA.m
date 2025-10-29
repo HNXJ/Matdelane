@@ -334,7 +334,6 @@ tOi2 = 1:4750;
 tN = length(tOi1);
 icond1 = aaax;
 icond2 = bbbx;
-% icond3 = rrrx;
 nTrials = 100;
 
 gmatrixN4 = zeros(neuronCnt, tN);
