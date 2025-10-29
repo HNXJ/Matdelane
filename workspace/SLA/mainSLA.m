@@ -430,7 +430,7 @@ tOi2 = 1531:2080; %zAzz
 tOi3 = 2561:3110; %zzAz
 tOi4 = 3591:4140; %zzzA
 
-tOirx1 = [201:400, 1201:1400];
+tOirx1 = [101:400, 1201:1450];
 tOirx2 = tOirx1 + 1031;
 tOirx3 = tOirx2 + 1031;
 tOirx4 = tOirx3 + 1031;
