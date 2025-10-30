@@ -58,10 +58,10 @@ for iA = 1:11
     ye1 = xAFR(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
     idxs = be1 > 0.1;
-    idxs2 = ye1 > xe1*1.5;
+    idxs2 = ye1 > xe1*2.0;
 
-    pointsizes = 5*ones(size(generalIDs));
-    pointsizes(idxs2) = 10;
+    pointsizes = 8*ones(size(generalIDs));
+    pointsizes(idxs2) = 12;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -85,26 +85,26 @@ for iA = 1:11
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
-xlim([0.4 100]);
-ylim([0.4 100]);
+xlim([0.45 100]);
+ylim([0.45 100]);
 % xlim([0.1 20]);
 % ylim([0.1 20]);
 grid("on");
 % zlim([0.2 5000]);
-set(gca, 'XTick', [0.1 1 3 10 30 100]);
-set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
-set(gca, 'YTick', [0.1 1 3 10 30 100]);
-set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'XTick', [0.5 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
 
 title("1.a: Omission|Stimulus avg. FR");
 xlabel("Stim-AFR");ylabel("Oxm-AFR");
 legend;
 
-% fname = "1A-Scatter-Ox-St";
-% print(gcf,'-vector','-dsvg', fname +".svg");
+fname = "1A-Scatter-Ox-St";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Fig.1 B:
-%  Relative to baseline scatter aFR(Oxm/b) | aFR(Stim/b)
+%  Relative to baseline scatter aFR(Stim) | aFR(baseline)
 
 figure("Position", [0 0 1500 1500]);
 
@@ -112,101 +112,111 @@ for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     be1 = bAFR(areaIDs == iA);
-    xe1 = sAFR(areaIDs == iA)./be1;
-    ye1 = xAFR(areaIDs == iA)./be1;
+    xe1 = bAFR(areaIDs == iA);
+    ye1 = sAFR(areaIDs == iA);
     idxs = be1 > 0.1;
+    idxs2 = ye1 > xe1*2.0;
 
-    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), 5, color_t(iA, :), "filled", DisplayName=areaList(iA));
+    pointsizes = 8*ones(size(generalIDs));
+    pointsizes(idxs2) = 12;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
-    idxs = be1 > 1.0 | xe1 > 1.0;
     
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 1, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.05, "HandleVisibility", "off", "EdgeColor", "none");
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 1);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .9, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
-    xetext = mean(xe);
-    yetext = mean(ye);
+    xetext = max(xe);
+    yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .7, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
    
     line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-
+    
     
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.1 100]);
-ylim([0.1 100]);
+xlim([0.45 100]);
+ylim([0.45 100]);
 
-set(gca, 'XTick', [0.1 1 2 3 10 30 100]);
-set(gca, 'XTickLabel', [0.1 1 2 3 10 30 100]);
-set(gca, 'YTick', [0.1 1 2 3 10 30 100]);
-set(gca, 'YTickLabel', [0.1 1 2 3 10 30 100]);
+set(gca, 'XTick', [0.5 1 2 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 2 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 2 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 2 3 10 30 100]);
 
-title("1.b: Omission/baseline|Stimulus/baseline avg. FR ratio");
-xlabel("Stim-AFR/baseline");ylabel("Oxm-AFR/baseline");
+title("1.b: Stimulus|baseline avg. FR ratio");
+xlabel("baseline-AFR");ylabel("Stim-AFR");
 legend;
 
-% fname = "1B-Scatter-Ox-St-BaselineRatio";
-% print(gcf,'-vector','-dsvg', fname +".svg");
+fname = "1B-Scatter-St-Bl";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Fig.1 C:
 %  Baseline scatter aFR(Oxm) | aFR(baseline)
 
-figure;
+figure("Position", [0 0 1500 1500]);
 
 for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = bAFR(areaIDs == iA);
     ye1 = xAFR(areaIDs == iA);
-    ze1 = sAFR(areaIDs == iA);
-    idxs = xe1 > .0;
-    idxs2 = ye1 ./ xe1 > 2 & xe1 > 1;
-    pointsizes = 3*ones(size(generalIDs));
-    pointsizes(idxs2) = 40;
+    be1 = bAFR(areaIDs == iA);
+    idxs = be1 > 0.1;
+    idxs2 = ye1 > xe1*2.0;
+
+    pointsizes = 8*ones(size(generalIDs));
+    pointsizes(idxs2) = 16;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
-        ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, 1, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.05, "HandleVisibility", "off", "EdgeColor", "none");
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .9, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
-    xetext = mean(xe);
-    yetext = mean(ye);
+    xetext = max(xe);
+    yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .5, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .7, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
    
-    line([0.01 100], [0.01 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.01 100]);
-ylim([0.01 100]);
-set(gca, 'XTick', [0.1 1 3 10 30 100]);
-set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
-set(gca, 'YTick', [0.1 1 3 10 30 100]);
-set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+xlim([0.45 100]);
+ylim([0.45 100]);
+set(gca, 'XTick', [0.5 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
 
 title("1.c: Omission|Baseline avg. FR");
 xlabel("Base-AFR");ylabel("Oxm-AFR");
 legend;
 
+fname = "1C-Scatter-Ox-Bl";
+print(gcf,'-vector','-dsvg', fname +".svg");
+
 %% Fig.1 D:
 %  Kmeans clustered aFR(Oxm) | aFR(Stim)
 
-figure;
+figure("Position", [0 0 1500 1500]);
 
-kmeans_gn = 7;
+kmeans_gn = 3;
 
 for iA = 1:11
 
@@ -232,15 +242,15 @@ for iA = 1:11
         if length(idxs2) > 3
 
                 ze = mean(generalIDs);
-                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
-                patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
+                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.5, 'std');
+                % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
             
                 xetext = mean(xe);
                 yetext = mean(ye);
                 text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .5, 'std');
-                patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.4, "HandleVisibility", "off", "EdgeColor", "none");
+                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
+                patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
                
                 line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
                 xlim([0.2 100]);
@@ -250,22 +260,23 @@ for iA = 1:11
     end
 
     line(0:100, 0:100, "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
-    xlim([0.3 30]);
-    ylim([0.3 30]);
     
 end
 
-xlim([0.3 100]);
-ylim([0.3 100]);
+xlim([0.45 100]);
+ylim([0.45 100]);
 set(gca, 'XScale', 'log', 'YScale', 'log');
-set(gca, 'XTick', [0.1 1 3 10 30 100]);
-set(gca, 'XTickLabel', [0.1 1 3 10 30 100]);
-set(gca, 'YTick', [0.1 1 3 10 30 100]);
-set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+set(gca, 'XTick', [0.5 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
 
 title("1.d: Omission|Stimulus avg. FR (Kmeans groups = " + num2str(kmeans_gn) + ")");
 xlabel("Stim-AFR");ylabel("Oxm-AFR");
 legend;
+
+fname = "1D-Scatter-Ox-St-Cluster";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Fig.1 E:
 %  Kmeans clustered aFR(Oxm) | aFR(Baseline)
