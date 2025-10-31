@@ -49,16 +49,18 @@ colmap = ones(neuronCnt, 1);
 %% Stim prime neurons
 
 g1_sprime = find(sAFR > bAFR*3);
-g2_inv_sprime = find(sAFR < bAFR*3);
+g2_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
 g1_oxprime = find(xAFR > bAFR*2);
 
+
+
 %% Group PEVs in time (N) with iFRs
 
-% nIDgroup = g1_sprime;
-nIDgroup = g2_inv_sprime;
+nIDgroup = g1_sprime;
+% nIDgroup = g2_inv_sprime;
 
 kW = 200;
 kX = 1;
@@ -80,11 +82,16 @@ for ik = 1:ncondOi
         temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nIDx), icond}(:, infileIDs(nIDx))) == 1);
         temp_sigx = squeeze(sspkData{fileIDs(nIDx), icond}(temp_sigxc, infileIDs(nIDx), :));
         temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
-    
-        temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
-        temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
-
+        temp_sigx(isnan(temp_sigx)) = 0;
+        
+        if size(temp_sigx, 1) > 1
+            temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
+            temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
+        end
+        
     end
+
+    temp_sig1 = detrend(temp_sig1);
 
     xpe1 = timevec;
     ype1 = temp_sig1 + kX*temp_sig2;
