@@ -696,11 +696,11 @@ for ik = 1:Nfiles
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
         if  tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
-            iTrials = ltrials(mod(1:nTrials, tcnt1) + 1);
+            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx1(1:nTrials, jk, :) = sspkData{ik, axab}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt2) + 1);
+            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
             tempSigx1(nTrials*1+1:2*nTrials, jk, :) = sspkData{ik, bxba}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt3) + 1);
+            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
             tempSigx1(nTrials*2+1:3*nTrials, jk, :) = sspkData{ik, rxrr}(iTrials, jk, :);
         end
     end
@@ -715,11 +715,11 @@ for ik = 1:Nfiles
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
         if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
-            iTrials = ltrials(mod(1:nTrials, tcnt1) + 1);
+            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx2(1:nTrials, jk, :) = sspkData{ik, aaxb}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt2) + 1);
+            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
             tempSigx2(nTrials*1+1:2*nTrials, jk, :) = sspkData{ik, bbxa}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt3) + 1);
+            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
             tempSigx2(nTrials*2+1:3*nTrials, jk, :) = sspkData{ik, rrxr}(iTrials, jk, :);
         end
     end
@@ -734,11 +734,11 @@ for ik = 1:Nfiles
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
         if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
-            iTrials = ltrials(mod(1:nTrials, tcnt1) + 1);
+            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx3(1:nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt2) + 1);
+            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
             tempSigx3(nTrials*1+1:2*nTrials, jk, :) = sspkData{ik, bbbx}(iTrials, jk, :);
-            iTrials = ltrials(mod(1:nTrials, tcnt3) + 1);
+            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
             tempSigx3(nTrials*2+1:3*nTrials, jk, :) = sspkData{ik, rrrx}(iTrials, jk, :);
         end
     end

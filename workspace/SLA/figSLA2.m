@@ -27,9 +27,9 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(mean(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
-    xPEV(iN) = 100*(mean(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
-    xOPEV(iN) = 100*(mean(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
+    sPEV(iN) = 100*(max(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
+    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
+    xOPEV(iN) = 100*(max(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
 
     svPEV(iN) = 100*(std(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
     xvPEV(iN) = 100*(std(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
@@ -48,21 +48,22 @@ colmap = ones(neuronCnt, 1);
 
 %% Stim prime neurons
 
-g1_sprime = find(sAFR > bAFR*3);
+g1_sprime = find(sPEV > 10.0);
 g2_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xAFR > bAFR*2);
-
+g1_oxprime = find(xPEV./sPEV > 5.0 & xPEV > 2.0);
 
 
 %% Group PEVs in time (N) with iFRs
 
-nIDgroup = g1_sprime;
+% nIDgroup = g1_sprime;
+nIDgroup = g1_oxprime;
+
 % nIDgroup = g2_inv_sprime;
 
-kW = 200;
+kW = 500;
 kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
@@ -88,10 +89,10 @@ for ik = 1:ncondOi
             temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
             temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
         end
-        
+
     end
 
-    temp_sig1 = detrend(temp_sig1);
+    % temp_sig1 = detrend(temp_sig1);
 
     xpe1 = timevec;
     ype1 = temp_sig1 + kX*temp_sig2;
@@ -118,8 +119,11 @@ temp_sig1 = squeeze(mean(temp_sigx, 1));
 temp_sig1 = temp_sig1 - min(temp_sig1);
 yyaxis("right");
 
+pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
+pevvec = pevvec - min(pevvec);
+
 % kW = 1;
-plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+plot(timevec, pevvec, "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
 yline(0, "LineStyle", "--");
 
 ax = gca;

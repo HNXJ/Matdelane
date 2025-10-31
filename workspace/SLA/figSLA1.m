@@ -287,7 +287,7 @@ print(gcf,'-vector','-dsvg', fname +".svg");
 
 figure("Position", [0 0 1500 1500]);
 
-kmeans_gn = 4;
+kmeans_gn = 3;
 
 for iA = 1:11
 
@@ -403,8 +403,8 @@ for iA = 1:11
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.45 100]);
-ylim([0.45 100]);
+xlim([0.45 30]);
+ylim([0.45 30]);
 set(gca, 'XScale', 'log', 'YScale', 'log');
 set(gca, 'XTick', [0.5 1 3 10 30 100]);
 set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
@@ -489,7 +489,7 @@ figure("Position", [0 0 1500 1500]);
 kmeans_gn = 4;
 xrks = cell(2, 11);
 
-for iA = 10:10
+for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = sPEV(areaIDs == iA);
@@ -524,7 +524,7 @@ for iA = 10:10
                 yetext = mean(ye);
                 text(xetext, yetext, [areaList{iA}, '-', num2str(length(idxs2))], "Color", color_t(iA, :), "FontWeight", "bold");
 
-                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.8, 'std');
+                [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1, 'std');
                 patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
                
                 line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
