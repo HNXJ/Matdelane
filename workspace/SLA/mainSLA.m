@@ -815,7 +815,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 3461; % Grand neuron ID % 1004/1269
+nID = 1112; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -828,7 +828,7 @@ tN = 1*kW; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = 1:4;
+condOi =[1, 4, 8, 12];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -858,15 +858,15 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
+nID = 485; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
 
-kW = 1;
+kW = 200;
 kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = 9:10;
+condOi = [1, 5, 6, 10];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -902,8 +902,26 @@ xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
-dispnametemp1 = "PEV(AXABvsBXBA)";
+dispnametemp1 = "PEV(AAABvsBBBA)";
+temp_sigx = gmatrixN1(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+yyaxis("right");
+
+% kW = 1;
+plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+yline(0, "LineStyle", "--");
+
+dispnametemp1 = "PEV(AAXBvsBBXA)";
 temp_sigx = gmatrixN3(nID, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+yyaxis("right");
+
+% kW = 1;
+plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+yline(0, "LineStyle", "--");
+
+dispnametemp1 = "PEV(AAAXvsBBBX)";
+temp_sigx = gmatrixN4(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");
 
@@ -1000,16 +1018,70 @@ end
 
 % --- End of Script ---
 
-%%
+%% Group PEVs in time (N) with iFRs
 
-% 1> Rx1/Rx2/Rx3 ...
-% 2> What % of neurons carried significant PEV for Stim& Omission
-%  >> Random should be the same PEV (stimulus)
-%  >> Omission PEV should be lower (Rx/Rx)
-%  >> Smoothing - All to 250/kw
-%  >> D/
+% nIDgroup = pfcidxng1;
+nIDgroup = fefidxng1;
 
-% >> Subselect Omission/Stim superneurons compare to LFP-TFR
-% >> Subselect Nullneurons/ Null
+kW = 200;
+kX = 1;
+tN = 1000; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
+
+figure;
+condOi = [2, 6, 10];
+ncondOi = length(condOi);
+
+for ik = 1:ncondOi
+    
+    icond = condOi(ik);
+    temp_sig1 = zeros(size(timevec));
+    temp_sig2 = zeros(size(timevec));
+
+    for nIDx = nIDgroup
+
+        temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nIDx), icond}(:, infileIDs(nIDx))) == 1);
+        temp_sigx = squeeze(sspkData{fileIDs(nIDx), icond}(temp_sigxc, infileIDs(nIDx), :));
+        temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+    
+        temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
+        temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
+
+    end
+
+    xpe1 = timevec;
+    ype1 = temp_sig1 + kX*temp_sig2;
+    xpe2 = timevec(end:-1:1);
+    ype2 = temp_sig1(end:-1:1) - kX*temp_sig2(end:-1:1);
+    % plot(timevec, temp_sig1, "LineWidth", 2, "Color", color_t(icond, :));
+    patch([xpe1, xpe2], [ype1, ype2], color_t(icond, :), "FaceAlpha", 0.5, "EdgeColor", "none", "DisplayName", condNames(icond) + "+-" + num2str(kX) + "SEM");
+    hold("on");
+
+end
+
+xline(0, "HandleVisibility", "off");
+xline(1030, "HandleVisibility", "off");
+xline(2060, "HandleVisibility", "off");
+xline(3090, "HandleVisibility", "off");
+
+xlim([-750, 4500]);
+legend();
+xlabel("Time(ms)");ylabel("FR(Spk/s)");
+timevec = linspace(-500, 4250, 4750);
+dispnametemp1 = "PEV(AAXBvsBBXA)";
+temp_sigx = gmatrixN2(nIDgroup, :);
+temp_sig1 = squeeze(mean(temp_sigx, 1));
+temp_sig1 = temp_sig1 - min(temp_sig1);
+yyaxis("right");
+
+% kW = 1;
+plot(timevec, 100*smoothdata(temp_sig1, "gaussian", kW), "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+yline(0, "LineStyle", "--");
+
+ax = gca;
+ax.YAxis(1).Color = 'k';
+ax.YAxis(2).Color = 'k';
+ylabel("PEV(%)", "Color", [1 0 0]);
+sgtitle("N = " + num2str(length(nIDgroup)) + " > " + areaList(areaIDs(nIDgroup(1))));
 
 %%

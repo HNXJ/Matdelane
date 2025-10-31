@@ -27,9 +27,9 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(max(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
-    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
-    xOPEV(iN) = 100*(max(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
+    sPEV(iN) = 100*(mean(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
+    xPEV(iN) = 100*(mean(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
+    xOPEV(iN) = 100*(mean(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
 
     svPEV(iN) = 100*(std(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
     xvPEV(iN) = 100*(std(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
@@ -365,8 +365,8 @@ for iA = 1:11
     ze1 = bAFR(areaIDs == iA);
     idxs = ze1 > .1;
     idxs2 = ye1 ./ xe1 > 3.0 & ye1 > 5.0;
-    pointsizes = 2*ones(size(generalIDs));
-    pointsizes(idxs2) = 4;
+    pointsizes = 4*ones(size(generalIDs));
+    pointsizes(idxs2) = 8;
 
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
@@ -486,16 +486,16 @@ legend;
 
 figure("Position", [0 0 1500 1500]);
 
-kmeans_gn = 2;
+kmeans_gn = 4;
 xrks = cell(2, 11);
 
-for iA = 1:11
+for iA = 10:10
 
     generalIDs = find(areaIDs == iA);
     xe1 = sPEV(areaIDs == iA);
     ye1 = xPEV(areaIDs == iA);
     ze1 = bAFR(areaIDs == iA);
-    we1 = 10*(ye1 > 4*xe1) - 5.0;
+    we1 = 10*(ye1 > 3*xe1) - 5.0;
     idxs = ze1 > .1;
     idxs2 = ye1 ./ xe1 > 3.0 & ye1 > 5.0;
     pointsizes = 2*ones(size(generalIDs));
@@ -504,7 +504,7 @@ for iA = 1:11
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
     
-    kGx = [xe1; ye1; we1]';
+    kGx = [ye1; we1]';
     [idxs, c1, sm1, d1] = kmeans(kGx, kmeans_gn, "Distance", "sqeuclidean");
     
     for iB = 1:kmeans_gn
@@ -522,7 +522,7 @@ for iA = 1:11
             
                 xetext = mean(xe);
                 yetext = mean(ye);
-                text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
+                text(xetext, yetext, [areaList{iA}, '-', num2str(length(idxs2))], "Color", color_t(iA, :), "FontWeight", "bold");
 
                 [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 0.8, 'std');
                 patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
