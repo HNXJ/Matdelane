@@ -48,29 +48,45 @@ colmap = ones(neuronCnt, 1);
 
 %% Stim prime neurons
 
-g1_sprime = find(sPEV > 10.0);
-g2_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
+g1_sprime = find(sAFR./bAFR > 2.5);
+g2_invsprime = find(xAFR./sAFR > 1.5);
+g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xPEV./sPEV > 5.0 & xPEV > 2.0);
-
+g1_oxprime = find(xAFR./bAFR > 2.0);
 
 %% Group PEVs in time (N) with iFRs
 
-% nIDgroup = g1_sprime;
-nIDgroup = g1_oxprime;
+nIDgroup = g1_sprime;
+% nIDgroup = g1_oxprime;
 
 % nIDgroup = g2_inv_sprime;
 
-kW = 500;
+kW = 10;
 kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
-figure;
-condOi = [2, 6, 10];
+figure("Position", [0 0 1500 1500]);
+
+areaNcountx = zeros(1, 11);
+
+for iA = 1:11
+
+    cntxtemp = sum(areaIDs(nIDgroup) == iA);
+    areaNcountx(iA) = cntxtemp;
+
+end
+subplot(2, 1, 1);
+bar(areaNcountx);
+xticks(1:11);
+xticklabels(areaList(1:11));
+
+condOi = [1, 2, 9];
 ncondOi = length(condOi);
+
+subplot(2, 1, 2);
 
 for ik = 1:ncondOi
     

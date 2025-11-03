@@ -174,7 +174,7 @@ disp(neuronCnt);
 
 %% Smoothing parameters
 
-kW = 100;
+kW = 250;
 gkernel = zeros(1, 1, kW);
 gkernel(1, 1, :) = gausswin(kW);
 pThresh = 0.01;
@@ -221,11 +221,11 @@ for ik = 1:Nfiles
 
     end
 
-    data = zeros(nTrials*3, ncnt, tN);
+    data = zeros(nTrials*2, ncnt, tN);
     data(1:nTrials, :, :) = tempSig1;
     data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
-    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2, ones(1, nTrials)*3];
+    % data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
+    groupIDs = [ones(1, nTrials), ones(1, nTrials)*2];%, ones(1, nTrials)*3];
 
     data = convn(data, gkernel, 'same');
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1);
@@ -449,14 +449,9 @@ end
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
 % tOi1 = 501:1050; %Azzz
-tOi2 = 1531:2080; %zAzz
-tOi3 = 2561:3110; %zzAz
-tOi4 = 3591:4140; %zzzA
-
-tOirx1 = [101:400, 1201:1450];
-tOirx2 = tOirx1 + 1031;
-tOirx3 = tOirx2 + 1031;
-tOirx4 = tOirx3 + 1031;
+tOi2 = 501:2500; %ZAzz
+tOi3 = 1531:3530; %zZAz
+tOi4 = 2561:4560; %zzZA
 
 tN = length(tOi2);
 nTrials = 100;
@@ -466,86 +461,47 @@ gmatrix2 = zeros(neuronCnt, tN);
 for ik = 1:Nfiles
 
     ncnt = length(areaIDset{ik});
-    tempSig1 = zeros(nTrials, ncnt, tN);
-    tempSig1r = zeros(nTrials, ncnt, tN);
+    tempSig1 = zeros(nTrials*3, ncnt, tN);
+    tempSig2 = zeros(nTrials*3, ncnt, tN);
 
     for jk = 1:size(tempSig1, 2)
-        ltrials = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig1(:, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);
-            tempSig1r(:, jk, :) = sspkData{ik, axab}(iTrials, jk, tOirx2);
+        ltrials1 = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
+        ltrials2 = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
+        ltrials3 = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
+        tcnt1 = length(ltrials1);
+        tcnt2 = length(ltrials2);
+        tcnt3 = length(ltrials3);
+        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
+            tempSig1(1:nTrials, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);
+            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
+            tempSig1(nTrials+1:2*nTrials, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
+            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
+            tempSig1(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4);
         end
     end
-
-    tempSig2 = zeros(nTrials, ncnt, tN);
-    tempSig2r = zeros(nTrials, ncnt, tN);
 
     for jk = 1:size(tempSig2, 2)
-        ltrials = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig2(:, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
-            tempSig2r(:, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOirx3);
-        end
-    end
-
-    tempSig3 = zeros(nTrials, ncnt, tN);
-    tempSig3r = zeros(nTrials, ncnt, tN);
-
-    for jk = 1:size(tempSig3, 2)
-        ltrials = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig3(:, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
-            tempSig3r(:, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOirx4);
-        end
-    end
-
-    tempSig4 = zeros(nTrials, ncnt, tN);
-
-    for jk = 1:size(tempSig4, 2)
-        ltrials = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig4(:, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2);
-        end
-    end
-
-    tempSig5 = zeros(nTrials, ncnt, tN);
-
-    for jk = 1:size(tempSig5, 2)
-        ltrials = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig5(:, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3);
-        end
-    end
-
-    tempSig6 = zeros(nTrials, ncnt, tN);
-
-    for jk = 1:size(tempSig6, 2)
-        ltrials = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
-        tcnt = length(ltrials);
-        if tcnt > 10
-            iTrials = ltrials(mod(randperm(nTrials), tcnt) + 1);
-            tempSig6(:, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4);
+        ltrials1 = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
+        ltrials2 = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
+        ltrials3 = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
+        tcnt1 = length(ltrials1);
+        tcnt2 = length(ltrials2);
+        tcnt3 = length(ltrials3);
+        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
+            tempSig2(1:nTrials, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2);
+            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
+            tempSig2(nTrials+1:2*nTrials, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3);
+            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
+            tempSig2(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
         end
     end
 
     data = zeros(nTrials*6, size(tempSig1, 2), tN);
-    data(1:nTrials, :, :) = tempSig1;
-    data(nTrials+1:2*nTrials, :, :) = tempSig2;
-    data(2*nTrials+1:3*nTrials, :, :) = tempSig3;
+    data(1:3*nTrials, :, :) = tempSig1;
+    data(3*nTrials+1:6*nTrials, :, :) = tempSig2;
 
-    data(3*nTrials+1:4*nTrials, :, :) = tempSig1r;
-    data(4*nTrials+1:5*nTrials, :, :) = tempSig2r;
-    data(5*nTrials+1:6*nTrials, :, :) = tempSig3r;
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
@@ -824,7 +780,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N)
 
-nID = 3557; % Grand neuron ID
+nID = 3007; % Grand neuron ID
 
 kW = 100;
 
@@ -858,7 +814,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 1112; % Grand neuron ID % 1004/1269
+nID = 3007; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -901,7 +857,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 485; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602
+nID = 3007; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
 kW = 200;
 kX = 2;
@@ -909,7 +865,7 @@ tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [1, 5, 6, 10];
+condOi = [2, 6, 10];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -946,7 +902,7 @@ legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
 dispnametemp1 = "PEV(AAABvsBBBA)";
-temp_sigx = gmatrixN1(nID, :);
+temp_sigx = gmatrixN2(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");
 
