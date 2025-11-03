@@ -27,9 +27,10 @@ xVFR = zeros(1, size(gmatrix4, 1));
 bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
-    sPEV(iN) = 100*(max(smoothdata(gmatrix1(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
-    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
-    xOPEV(iN) = 100*(max(smoothdata(gmatrix6(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
+    sPEV(iN) = 100*(mean(smoothdata(gmatrix1(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
+    % xPEV(iN) = 100*(mean(smoothdata(gmatrix2(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
+    xPEV(iN) = 100*gmatrix2(iN);
+    xOPEV(iN) = 100*(mean(smoothdata(gmatrix6(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
 
     svPEV(iN) = 100*(std(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
     xvPEV(iN) = 100*(std(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
@@ -403,8 +404,8 @@ for iA = 1:11
 end
 
 % set(gca, 'XScale', 'log', 'YScale', 'log');
-xlim([0.45 30]);
-ylim([0.45 30]);
+xlim([0.45 100]);
+ylim([0.45 100]);
 set(gca, 'XTick', [0.5 1 3 10 30 100]);
 set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
 set(gca, 'YTick', [0.5 1 3 10 30 100]);

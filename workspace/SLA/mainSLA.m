@@ -110,8 +110,8 @@ for ik = 1:Nfiles
 
         end
 
-        trnthl = max(mean(trnthsl), 3.0);
-        trnthu = max(mean(trnthsu), 6.0);
+        trnthl = max(mean(trnthsl), 5.0);
+        trnthu = max(mean(trnthsu), 10.0);
 
         for kk = 1:12
 
@@ -174,7 +174,7 @@ disp(neuronCnt);
 
 %% Smoothing parameters
 
-kW = 250;
+kW = 500;
 gkernel = zeros(1, 1, kW);
 gkernel(1, 1, :) = gausswin(kW);
 pThresh = 0.01;
@@ -505,6 +505,7 @@ for ik = 1:Nfiles
     groupIDs = [ones(1, 3*nTrials), ones(1, 3*nTrials)*2];
 
     data = convn(data, gkernel, 'same');
+    % data = squeeze(mean(data, 3));
     [expv, n, mu, p, F] = jPEV(data, groupIDs, 1, [1, 2]);
     gmatrix2(areaIDset{ik}, :) = squeeze(expv.*(p < pThresh));
     disp(ik);
