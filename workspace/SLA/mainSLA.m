@@ -174,7 +174,7 @@ disp(neuronCnt);
 
 %% Smoothing parameters
 
-kW = 500;
+kW = 100;
 gkernel = zeros(1, 1, kW);
 gkernel(1, 1, :) = gausswin(kW);
 pThresh = 0.01;
@@ -234,7 +234,7 @@ for ik = 1:Nfiles
 
 end
 
-%% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
+% Grand matrix concatenation (PEV) 2nd Omission Identity (A?B)
 
 tOi1 = 1:4750;
 
@@ -289,7 +289,7 @@ for ik = 1:Nfiles
 
 end
 
-%% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
+% Grand matrix concatenation (PEV) 3rd Omission Identity (A?B)
 
 tOi1 = 1:4750;
 
@@ -344,7 +344,7 @@ for ik = 1:Nfiles
 
 end
 
-%% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
+% Grand matrix concatenation (PEV) 4th Omission Identity (A?B)
 
 tOi1 = 1:4750;
 
@@ -406,12 +406,13 @@ tOi1 = 1:3500;
 tN = length(tOi1);
 icond1 = aaab;
 icond2 = bbba;
-nTrials = 200;
+nTrials = 100;
 
 gmatrix1 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
+    nTrials = size(sspkData{ik, icond1}, 1);
     ncnt = length(areaIDset{ik});
     tempSig1 = zeros(nTrials, ncnt, tN);
     tempSig2 = zeros(nTrials, ncnt, tN);
@@ -449,9 +450,9 @@ end
 %% Grand matrix concatenation (PEV) Omission Identity (X|A?X|B)
 
 % tOi1 = 501:1050; %Azzz
-tOi2 = 501:2500; %ZAzz
-tOi3 = 1531:3530; %zZAz
-tOi4 = 2561:4560; %zzZA
+tOi2 = 1501:2300; %ZAzz
+tOi3 = 2531:3330; %zZAz
+tOi4 = 3561:4360; %zzZA
 
 tN = length(tOi2);
 nTrials = 100;
@@ -460,6 +461,7 @@ gmatrix2 = zeros(neuronCnt, tN);
 
 for ik = 1:Nfiles
 
+    nTrials = size(sspkData{ik, axab}, 1);
     ncnt = length(areaIDset{ik});
     tempSig1 = zeros(nTrials*3, ncnt, tN);
     tempSig2 = zeros(nTrials*3, ncnt, tN);
@@ -467,7 +469,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSig1, 2)
         ltrials1 = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
         ltrials2 = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
-        ltrials3 = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
+        ltrials3 = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
@@ -477,24 +479,28 @@ for ik = 1:Nfiles
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
             tempSig1(nTrials+1:2*nTrials, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
             iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
-            tempSig1(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4);
+            tempSig1(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
         end
     end
+
+    tOi2shuffle = tOi2(randperm(length(tOi2)));
+    tOi3shuffle = tOi3(randperm(length(tOi3)));
+    tOi4shuffle = tOi4(randperm(length(tOi4)));
 
     for jk = 1:size(tempSig2, 2)
         ltrials1 = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
         ltrials2 = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
-        ltrials3 = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
+        ltrials3 = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
         if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
-            tempSig2(1:nTrials, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2);
+            tempSig2(1:nTrials, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2shuffle);
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
-            tempSig2(nTrials+1:2*nTrials, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3);
+            tempSig2(nTrials+1:2*nTrials, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3shuffle);
             iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
-            tempSig2(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
+            tempSig2(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4shuffle);
         end
     end
 
@@ -858,7 +864,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3007; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
 kW = 200;
 kX = 2;
