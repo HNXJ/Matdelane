@@ -149,3 +149,22 @@ ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("N = " + num2str(length(nIDgroup)));
 
 %%
+%% Spectral
+
+[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1(1:1000), "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+[ps1, fs1, ts1] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+figure;
+% imagsesc(log(ps1), "XData", ts1-0.5, "YData", fs1+0.1);
+plot(fs1+0.1, 10*log10(ps1./ps0));
+xlabel("Freq");
+ylabel("change(dB)");
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + "/Power change from baseline");
+% set(gca, "YDir", "normal");
+set(gca, "XScale", "log");
+set(gca, 'XTick', [1 3 8 12 20 40 100]);
+set(gca, 'XTickLabel', [1 3 8 12 20 40 100]);
+% set(gca, 'YTick', [0.1 1 3 10 30 100]);
+% set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+%%

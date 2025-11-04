@@ -403,7 +403,7 @@ for iA = 1:11
     
 end
 
-% set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XScale', 'log', 'YScale', 'log');
 xlim([0.45 100]);
 ylim([0.45 100]);
 set(gca, 'XTick', [0.5 1 3 10 30 100]);

@@ -111,7 +111,7 @@ for ik = 1:Nfiles
         end
 
         trnthl = max(mean(trnthsl), 5.0);
-        trnthu = max(mean(trnthsu), 10.0);
+        trnthu = max(mean(trnthsu), 5.0);
 
         for kk = 1:12
 
@@ -455,7 +455,6 @@ tOi3 = 2531:3330; %zZAz
 tOi4 = 3561:4360; %zzZA
 
 tN = length(tOi2);
-nTrials = 100;
 
 gmatrix2 = zeros(neuronCnt, tN);
 
@@ -465,43 +464,44 @@ for ik = 1:Nfiles
     ncnt = length(areaIDset{ik});
     tempSig1 = zeros(nTrials*3, ncnt, tN);
     tempSig2 = zeros(nTrials*3, ncnt, tN);
+        
+    tOi2shuffle = tOi2(randperm(length(tOi2)));
+    tOi3shuffle = tOi3(randperm(length(tOi3)));
+    tOi4shuffle = tOi4(randperm(length(tOi4)));
 
     for jk = 1:size(tempSig1, 2)
+
         ltrials1 = find(sspkDataCleanTrials{ik, axab}(:, jk) == 1);
         ltrials2 = find(sspkDataCleanTrials{ik, aaxb}(:, jk) == 1);
         ltrials3 = find(sspkDataCleanTrials{ik, bbbx}(:, jk) == 1);
+        ltrials4 = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
+        ltrials5 = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
+        ltrials6 = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
+
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
-        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+        tcnt4 = length(ltrials4);
+        tcnt5 = length(ltrials5);
+        tcnt6 = length(ltrials6);
+
+        if tcnt1 > 10 & tcnt2 > 10 & tcnt3 > 10 & tcnt4 > 10 & tcnt5 > 10 & tcnt6 > 10
+
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSig1(1:nTrials, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
             tempSig1(nTrials+1:2*nTrials, jk, :) = sspkData{ik, aaxb}(iTrials, jk, tOi3);
             iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
             tempSig1(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, bbbx}(iTrials, jk, tOi4);
-        end
-    end
 
-    tOi2shuffle = tOi2(randperm(length(tOi2)));
-    tOi3shuffle = tOi3(randperm(length(tOi3)));
-    tOi4shuffle = tOi4(randperm(length(tOi4)));
-
-    for jk = 1:size(tempSig2, 2)
-        ltrials1 = find(sspkDataCleanTrials{ik, bxba}(:, jk) == 1);
-        ltrials2 = find(sspkDataCleanTrials{ik, bbxa}(:, jk) == 1);
-        ltrials3 = find(sspkDataCleanTrials{ik, aaax}(:, jk) == 1);
-        tcnt1 = length(ltrials1);
-        tcnt2 = length(ltrials2);
-        tcnt3 = length(ltrials3);
-        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
-            iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
+            iTrials = ltrials4(mod(1:nTrials, tcnt4) + 1);
             tempSig2(1:nTrials, jk, :) = sspkData{ik, bxba}(iTrials, jk, tOi2shuffle);
-            iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
+            iTrials = ltrials5(mod(1:nTrials, tcnt5) + 1);
             tempSig2(nTrials+1:2*nTrials, jk, :) = sspkData{ik, bbxa}(iTrials, jk, tOi3shuffle);
-            iTrials = ltrials3(mod(1:nTrials, tcnt3) + 1);
+            iTrials = ltrials6(mod(1:nTrials, tcnt6) + 1);
             tempSig2(2*nTrials+1:3*nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, tOi4shuffle);
         end
+
     end
 
     data = zeros(nTrials*6, size(tempSig1, 2), tN);
@@ -940,25 +940,6 @@ ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
-
-%%
-
-[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1(1:1000), "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
-
-[ps1, fs1, ts1] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
-
-figure;
-% imagsesc(log(ps1), "XData", ts1-0.5, "YData", fs1+0.1);
-plot(fs1+0.1, 10*log10(ps1./ps0));
-xlabel("Freq");
-ylabel("change(dB)");
-sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + "/Power change from baseline");
-% set(gca, "YDir", "normal");
-set(gca, "XScale", "log");
-set(gca, 'XTick', [1 3 8 12 20 40 100]);
-set(gca, 'XTickLabel', [1 3 8 12 20 40 100]);
-% set(gca, 'YTick', [0.1 1 3 10 30 100]);
-% set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
 
 %% Clustering (Kmeans)
 
