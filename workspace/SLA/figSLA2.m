@@ -54,17 +54,17 @@ g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xAFR./bAFR > 2.0);
+g1_oxprime = find(xPEV > 0);
 
 %% Group PEVs in time (N) with iFRs
 
-nIDgroup = g1_sprime;
-% nIDgroup = g1_oxprime;
+% nIDgroup = g1_sprime;
+nIDgroup = g1_oxprime;
 
 % nIDgroup = g2_inv_sprime;
 
-kW = 10;
-kX = 1;
+kW = 500;
+kX = .1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
