@@ -110,8 +110,8 @@ for ik = 1:Nfiles
 
         end
 
-        trnthl = max(mean(trnthsl), 5.0);
-        trnthu = max(mean(trnthsu), 5.0);
+        trnthl = max(mean(trnthsl), 4.0);
+        trnthu = max(mean(trnthsu), 6.0);
 
         for kk = 1:12
 
