@@ -48,29 +48,46 @@ colmap = ones(neuronCnt, 1);
 
 %% Stim prime neurons
 
-g1_sprime = find(sAFR./xAFR > 2.0);
-g2_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
+g1_sprime = find(sAFR./bAFR > 2.5);
+g2_invsprime = find(xAFR./sAFR > 1.5);
+g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xAFR./sAFR > 2.0 & xPEV > 2.0);
+g1_oxprime = find(xPEV > .1);
 
 %% Group PEVs in time (N) with iFRs
 
-% nIDgroup = g1_sprime;
-nIDgroup = g1_oxprime;
+nIDgroup = g1_sprime;
+% nIDgroup = g2_invsprime;
+% nIDgroup = g1_oxprime;
 
 % nIDgroup = g2_inv_sprime;
 
-kW = 100;
-kX = 1;
+kW = 500;
+kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure("Position", [0 0 1500 1500]);
 
-condOi = [1, 5, 9];
+areaNcountx = zeros(1, 11);
+
+for iA = 1:11
+
+    cntxtemp = sum(areaIDs(nIDgroup) == iA);
+    areaNcountx(iA) = cntxtemp;
+
+end
+subplot(2, 1, 1);
+bar(areaNcountx);
+xticks(1:11);
+xticklabels(areaList(1:11));
+
+condOi = [1, 2, 9];
 ncondOi = length(condOi);
+
+subplot(2, 1, 2);
 
 for ik = 1:ncondOi
     
@@ -87,7 +104,7 @@ for ik = 1:ncondOi
         
         if size(temp_sigx, 1) > 1
             temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
-            temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
+            temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(2*size(temp_sigx, 1)))/(2*length(nIDgroup));
         end
 
     end
@@ -114,9 +131,12 @@ legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
 dispnametemp1 = "PEV(AAXBvsBBXA)";
-temp_sigx = gmatrixN1(nIDgroup, :);
-temp_sig1 = squeeze(mean(temp_sigx, 1));
-temp_sig1 = temp_sig1 - min(temp_sig1);
+temp_sigx = gmatrixN2(nIDgroup, :);
+for ik = 1:size(temp_sigx, 1)
+    temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
+end
+temp_sig1 = squeeze(max(temp_sigx));
+% temp_sig1 = temp_sig1 - min(temp_sig1);
 yyaxis("right");
 
 pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
@@ -131,5 +151,142 @@ ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("N = " + num2str(length(nIDgroup)));
+
+%% Single neuron TFR in time (N) with iFR
+
+
+tOi1 = 501:1500; %Azzz
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
+% nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nIDs = g1_sprime;
+
+kW = 100;
+kX = 2;
+tN = 1000; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
+
+condOi = 1:12;
+ncondOi = length(condOi);
+grand_tfr = cell(1, 5);
+gcnt = 0;
+
+for jk = nIDs
+
+    for ik = 1:ncondOi
+        
+        icond = condOi(ik);
+    
+        temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
+        temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
+        temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+    
+        [temp_sig_tfr1, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [.1 100]);
+        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
+        [temp_sig_tfr3, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi3), [.1 100]);
+        [temp_sig_tfr4, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi4), [.1 100]);
+        [temp_sig_tfr4, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOib), [.1 100]);
+
+        if gcnt == 0
+
+            grand_tfr{ik, 1} = temp_sig_tfr1;
+            grand_tfr{ik, 2} = temp_sig_tfr2;
+            grand_tfr{ik, 3} = temp_sig_tfr3;
+            grand_tfr{ik, 4} = temp_sig_tfr4;
+
+        else
+
+            grand_tfr{ik, 1} = grand_tfr{ik, 1} + temp_sig_tfr1;
+            grand_tfr{ik, 2} = grand_tfr{ik, 2} + temp_sig_tfr2;
+            grand_tfr{ik, 2} = grand_tfr{ik, 3} + temp_sig_tfr3;
+            grand_tfr{ik, 2} = grand_tfr{ik, 4} + temp_sig_tfr4;
+
+        end
+
+    end
+
+    gcnt = gcnt + 1;
+
+end
+
+%%
+
+figure("Position", [0 0 1500 1500]);
+
+for ik = 1:4
+
+    temp_sig_tfr1 = grand_tfr{9, ik};
+    temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
+    plot(fs, temp_sig_tfr1, "DisplayName", num2str(ik), "LineWidth", 2);hold("on");
+
+end
+
+temp_sig_tfr1 = grand_tfr{9, 1};
+temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
+temp_sig_tfr2 = grand_tfr{9, 2};
+temp_sig_tfr2 = temp_sig_tfr2 / max(temp_sig_tfr2);
+
+yyaxis("right");
+plot(fs, temp_sig_tfr2./temp_sig_tfr1, "LineStyle", "--", "DisplayName", "Ratio", "LineWidth", 3);
+set(gca, "YScale", "log", "XScale", "log");
+set(gca, 'XTick', [1 3 8 12 20 32 60 100]);
+set(gca, 'XTickLabel', [1 3 8 12 20 32 60 100]);
+
+xline(2.5);
+text(4, 1, "Theta");
+xline(7.5);
+text(10, 1, "Alpha");
+xline(12);
+text(20, 1, "Beta");
+xline(32);
+text(50, 1, "Gamma");
+
+legend;
+
+%% Spectral
+
+temp_sig1 = rand(1, 1000);
+[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+temp_sig1 = rand(1, 1000);
+[ps1, fs1, ts1] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+
+figure;
+% imagsesc(log(ps1), "XData", ts1-0.5, "YData", fs1+0.1);
+plot(fs1+0.1, 10*log10(ps1./ps0));
+xlabel("Freq");
+ylabel("change(dB)");
+sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + "/Power change from baseline");
+% set(gca, "YDir", "normal");
+set(gca, "XScale", "log");
+set(gca, 'XTick', [1 3 8 12 20 40 100]);
+set(gca, 'XTickLabel', [1 3 8 12 20 40 100]);
+% set(gca, 'YTick', [0.1 1 3 10 30 100]);
+% set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
+%%
+
+function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
+
+    if ~exist("flims", "var")
+
+        flims = [0.1 100];
+
+    end
+
+    temp_sig1 = x(1, :);
+    [ps, fs, ts] = pspectrum(temp_sig1, 1000, "power", "FrequencyLimits", flims);
+        
+    for ik = 2:size(x, 1)
+
+        [ps0, ~, ~] = pspectrum(x(ik, :), 1000, "power", "FrequencyLimits", flims);
+        ps = ps + ps0;
+
+    end
+
+    ps = ps / (size(x, 1));
+
+end
 
 %%

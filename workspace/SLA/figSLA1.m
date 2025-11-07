@@ -28,9 +28,8 @@ bVFR = zeros(1, size(gmatrix5, 1));
 
 for iN = 1:size(gmatrix1, 1)
     sPEV(iN) = 100*(max(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
-    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
-    % xPEV(iN) = 100*gmatrix2(iN);
-    xOPEV(iN) = 100*(mean(smoothdata(gmatrix6(iN, :), "gaussian", 100)) - min(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
+    xPEV(iN) = 100*(max(smoothdata(gmatrix2(iN, :), "gaussian", 100)));
+    xOPEV(iN) = 100*(max(smoothdata(gmatrix6(iN, :), "gaussian", 100)));
 
     svPEV(iN) = 100*(std(smoothdata(gmatrix1(iN, :), "gaussian", 100)));
     xvPEV(iN) = 100*(std(smoothdata(gmatrix2(iN, :), "gaussian", 100)));

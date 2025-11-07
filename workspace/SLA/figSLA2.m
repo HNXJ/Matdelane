@@ -54,7 +54,7 @@ g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xPEV > 0);
+g1_oxprime = find(xPEV > .1);
 
 %% Group PEVs in time (N) with iFRs
 
@@ -152,11 +152,126 @@ ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("N = " + num2str(length(nIDgroup)));
 
+%% Single neuron TFR in time (N) with iFR
+
+
+tOi1 = 501:1500; %Azzz
+tOi2 = 1531:2030; %zAzz
+tOi3 = 2561:3060; %zzAz
+tOi4 = 3591:4090; %zzzA
+tOib = [1:500, 4201:4700];
+
+% nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nIDs = g1_sprime;
+
+kW = 50;
+kX = 2;
+tN = 1000; % length(temp_sig1);
+timevec = linspace(-500, 4250, 4750);
+
+condOi = 1:12;
+ncondOi = length(condOi);
+grand_tfr = cell(1, 5);
+gcnt = 0;
+
+for jk = nIDs
+
+    for ik = 1:ncondOi
+        
+        icond = condOi(ik);
+    
+        temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(nID), icond}(:, infileIDs(nID))) == 1);
+        temp_sigx = squeeze(sspkData{fileIDs(nID), icond}(temp_sigxc, infileIDs(nID), :));
+        temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+    
+        [temp_sig_tfr1, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [.1 100]);
+        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
+        [temp_sig_tfr3, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi3), [.1 100]);
+        [temp_sig_tfr4, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi4), [.1 100]);
+        [temp_sig_tfr5, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOib), [.1 100]);
+
+        if gcnt == 0
+
+            grand_tfr{ik, 1} = temp_sig_tfr1;
+            grand_tfr{ik, 2} = temp_sig_tfr2;
+            grand_tfr{ik, 3} = temp_sig_tfr3;
+            grand_tfr{ik, 4} = temp_sig_tfr4;
+            grand_tfr{ik, 5} = temp_sig_tfr5;
+
+        else
+
+            grand_tfr{ik, 1} = grand_tfr{ik, 1} + temp_sig_tfr1;
+            grand_tfr{ik, 2} = grand_tfr{ik, 2} + temp_sig_tfr2;
+            grand_tfr{ik, 3} = grand_tfr{ik, 3} + temp_sig_tfr3;
+            grand_tfr{ik, 4} = grand_tfr{ik, 4} + temp_sig_tfr4;
+            grand_tfr{ik, 5} = grand_tfr{ik, 5} + temp_sig_tfr5;
+
+        end
+
+    end
+
+    gcnt = gcnt + 1;
+
+end
+
 %%
+
+figure("Position", [0 0 1500 1500]);
+
+temp_sig_tfrb = grand_tfr{9, 5};
+
+for ik = 1:3
+
+    temp_sig_tfr1 = grand_tfr{9+ik, ik+1};
+    temp_sig_tfr1 = temp_sig_tfr1 ./ temp_sig_tfrb;
+    temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
+    temp_sig_tfr1 = temp_sig_tfr1 - min(temp_sig_tfr1);
+    temp_sig_tfr1 = temp_sig_tfr1 / temp_sig_tfr1(1);
+    plot(fs, 10*log(temp_sig_tfr1), "DisplayName", num2str(ik), "LineWidth", 2);hold("on");
+
+end
+
+
+xlim([0 90]);
+ylabel("Change from baseline (dB)");
+
+temp_sig_tfr1 = grand_tfr{9, 3};
+temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
+temp_sig_tfr2 = grand_tfr{9, 4};
+temp_sig_tfr2 = temp_sig_tfr2 / max(temp_sig_tfr2);
+
+temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
+temp_sig_tfr2(fs > 25) = smooth(temp_sig_tfr2(fs > 25), 3000);
+
+yyaxis("right");
+plot(fs, temp_sig_tfr2./temp_sig_tfr1, "LineStyle", "--", "DisplayName", "Ratio", "LineWidth", 3);
+yline(1.0, "LineWidth", 2, "LineStyle","-.");
+set(gca, "YScale", "log", "XScale", "log");
+set(gca, 'XTick', [1 3 8 12 20 32 60 100]);
+set(gca, 'XTickLabel', [1 3 8 12 20 32 60 100]);
+
+xline(2.5);
+text(4, 0, "Theta");
+xline(7.5);
+text(10, 0, "Alpha");
+xline(12);
+text(20, 0, "Beta");
+xline(32);
+text(50, 0, "Gamma");
+
+title("Spectral change (Spiking activity)");
+xlabel("Frequency");
+ylabel("Ratio (a.u)");
+
+xlim([0 90]);
+legend;
+
 %% Spectral
 
-[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1(1:1000), "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
+temp_sig1 = rand(1, 1000);
+[ps0, fs0, ts0] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
 
+temp_sig1 = rand(1, 1000);
 [ps1, fs1, ts1] = pspectrum(smoothdata(temp_sig1, "gaussian", 100), 1000, "power", "FrequencyLimits", [1 100]);
 
 figure;
@@ -171,4 +286,29 @@ set(gca, 'XTick', [1 3 8 12 20 40 100]);
 set(gca, 'XTickLabel', [1 3 8 12 20 40 100]);
 % set(gca, 'YTick', [0.1 1 3 10 30 100]);
 % set(gca, 'YTickLabel', [0.1 1 3 10 30 100]);
+
+%%
+
+function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
+
+    if ~exist("flims", "var")
+
+        flims = [0.1 100];
+
+    end
+
+    temp_sig1 = x(1, :);
+    [ps, fs, ts] = pspectrum(temp_sig1, 1000, "power", "FrequencyLimits", flims);
+        
+    for ik = 2:size(x, 1)
+
+        [ps0, ~, ~] = pspectrum(x(ik, :), 1000, "power", "FrequencyLimits", flims);
+        ps = ps + ps0;
+
+    end
+
+    ps = ps / (size(x, 1));
+
+end
+
 %%

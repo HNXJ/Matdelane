@@ -240,8 +240,8 @@ tOi1 = 1:4750;
 
 tN = length(tOi1);
 icond1 = axab;
-icond2 = bxba;
-icond3 = rxrr;
+icond2 = axab;
+icond3 = aaab;
 
 nTrials = 100;
 gmatrixN2 = zeros(neuronCnt, tN);
@@ -295,8 +295,8 @@ tOi1 = 1:4750;
 
 tN = length(tOi1);
 icond1 = aaxb;
-icond2 = bbxa;
-icond3 = rrxr;
+icond2 = aaxb;
+icond3 = aaab;
 
 nTrials = 100;
 gmatrixN3 = zeros(neuronCnt, tN);
@@ -350,8 +350,8 @@ tOi1 = 1:4750;
 
 tN = length(tOi1);
 icond1 = aaax;
-icond2 = bbbx;
-icond3 = rrrx;
+icond2 = aaax;
+icond3 = aaab;
 
 nTrials = 100;
 gmatrixN4 = zeros(neuronCnt, tN);
@@ -864,7 +864,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-% nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
 kW = 200;
 kX = 2;
