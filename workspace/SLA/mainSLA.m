@@ -625,7 +625,7 @@ tOi3 = 2561:3360; %zzAz
 tOi4 = 3591:4390; %zzzA
 
 tOib = 1:400;
-tOis = [501:900, 1531:1930, 2561:2960, 3591:3990];
+tOis = [501:1000, 1531:2030, 2561:3060, 3591:4090];
 
 tN = length(tOis);
 nTrials = 100;
@@ -821,7 +821,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 3007; % Grand neuron ID % 1004/1269
+nID = 159; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -864,7 +864,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+% nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
 kW = 200;
 kX = 2;

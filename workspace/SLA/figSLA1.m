@@ -361,11 +361,11 @@ xrks = cell(2, 11);
 for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
-    xe1 = sPEV(areaIDs == iA);
-    ye1 = xPEV(areaIDs == iA);
-    ze1 = bAFR(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA) + 1e-1;
+    ye1 = xPEV(areaIDs == iA) + 1e-1;
+    ze1 = bAFR(areaIDs == iA) + 1e-1;
     idxs = ze1 > .1;
-    idxs2 = ye1 ./ xe1 > 3.0 & ye1 > 5.0;
+    idxs2 = ye1 > 1.0;
     pointsizes = 4*ones(size(generalIDs));
     pointsizes(idxs2) = 8;
 
@@ -376,7 +376,7 @@ for iA = 1:11
     view(0, 90)
     hold("on");
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .6, 'std');
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .6, 'std');
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
@@ -384,7 +384,7 @@ for iA = 1:11
     yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .8, 'std');
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .8, 'std');
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.2, "HandleVisibility", "off", "EdgeColor", "none");
     patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
    
@@ -403,7 +403,7 @@ for iA = 1:11
     
 end
 
-% set(gca, 'XScale', 'log', 'YScale', 'log');
+set(gca, 'XScale', 'log', 'YScale', 'log');
 xlim([0.0 100]);
 ylim([0.0 100]);
 set(gca, 'XTick', [0.5 1 3 10 30 100]);

@@ -58,13 +58,14 @@ g1_oxprime = find(xPEV > 0);
 
 %% Group PEVs in time (N) with iFRs
 
-% nIDgroup = g1_sprime;
-nIDgroup = g1_oxprime;
+nIDgroup = g1_sprime;
+% nIDgroup = g2_invsprime;
+% nIDgroup = g1_oxprime;
 
 % nIDgroup = g2_inv_sprime;
 
 kW = 500;
-kX = .1;
+kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
@@ -103,7 +104,7 @@ for ik = 1:ncondOi
         
         if size(temp_sigx, 1) > 1
             temp_sig1 = temp_sig1 + squeeze(mean(temp_sigx, 1))/length(nIDgroup);
-            temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(size(temp_sigx, 1)))/length(nIDgroup);
+            temp_sig2 = temp_sig2 + squeeze(std(temp_sigx, 1) / sqrt(2*size(temp_sigx, 1)))/(2*length(nIDgroup));
         end
 
     end
@@ -131,8 +132,11 @@ xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
 dispnametemp1 = "PEV(AAXBvsBBXA)";
 temp_sigx = gmatrixN2(nIDgroup, :);
-temp_sig1 = squeeze(mean(temp_sigx, 1));
-temp_sig1 = temp_sig1 - min(temp_sig1);
+for ik = 1:size(temp_sigx, 1)
+    temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
+end
+temp_sig1 = squeeze(max(temp_sigx));
+% temp_sig1 = temp_sig1 - min(temp_sig1);
 yyaxis("right");
 
 pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
