@@ -864,15 +864,15 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nID = 3446; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
-kW = 200;
+kW = 400;
 kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
 figure;
-condOi = [2, 6, 10];
+condOi = [2, 3, 6, 7, 10, 11];
 ncondOi = length(condOi);
 
 for ik = 1:ncondOi
@@ -908,7 +908,7 @@ xlim([-750, 4500]);
 legend();
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
-dispnametemp1 = "PEV(AAABvsBBBA)";
+dispnametemp1 = "PEV(AXABvsBXBA)";
 temp_sigx = gmatrixN2(nID, :);
 temp_sig1 = squeeze(mean(temp_sigx, 1));
 yyaxis("right");

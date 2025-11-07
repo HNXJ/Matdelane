@@ -55,11 +55,12 @@ g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 %% Oxm prime neurons
 
 g1_oxprime = find(xPEV > .1);
+g2_
 
 %% Group PEVs in time (N) with iFRs
 
-nIDgroup = g1_sprime;
-% nIDgroup = g2_invsprime;
+% nIDgroup = g1_sprime;
+nIDgroup = g2_invsprime;
 % nIDgroup = g1_oxprime;
 
 % nIDgroup = g2_inv_sprime;
@@ -84,7 +85,7 @@ bar(areaNcountx);
 xticks(1:11);
 xticklabels(areaList(1:11));
 
-condOi = [1, 2, 9];
+condOi = [1, 2, 10];
 ncondOi = length(condOi);
 
 subplot(2, 1, 2);
@@ -159,10 +160,12 @@ tOi1 = 501:1500; %Azzz
 tOi2 = 1531:2030; %zAzz
 tOi3 = 2561:3060; %zzAz
 tOi4 = 3591:4090; %zzzA
+tOib = [1:500, 4201:4700];
+
 % nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 nIDs = g1_sprime;
 
-kW = 100;
+kW = 50;
 kX = 2;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
@@ -186,7 +189,7 @@ for jk = nIDs
         [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
         [temp_sig_tfr3, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi3), [.1 100]);
         [temp_sig_tfr4, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi4), [.1 100]);
-        [temp_sig_tfr4, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOib), [.1 100]);
+        [temp_sig_tfr5, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOib), [.1 100]);
 
         if gcnt == 0
 
@@ -194,13 +197,15 @@ for jk = nIDs
             grand_tfr{ik, 2} = temp_sig_tfr2;
             grand_tfr{ik, 3} = temp_sig_tfr3;
             grand_tfr{ik, 4} = temp_sig_tfr4;
+            grand_tfr{ik, 5} = temp_sig_tfr5;
 
         else
 
             grand_tfr{ik, 1} = grand_tfr{ik, 1} + temp_sig_tfr1;
             grand_tfr{ik, 2} = grand_tfr{ik, 2} + temp_sig_tfr2;
-            grand_tfr{ik, 2} = grand_tfr{ik, 3} + temp_sig_tfr3;
-            grand_tfr{ik, 2} = grand_tfr{ik, 4} + temp_sig_tfr4;
+            grand_tfr{ik, 3} = grand_tfr{ik, 3} + temp_sig_tfr3;
+            grand_tfr{ik, 4} = grand_tfr{ik, 4} + temp_sig_tfr4;
+            grand_tfr{ik, 5} = grand_tfr{ik, 5} + temp_sig_tfr5;
 
         end
 
@@ -214,34 +219,52 @@ end
 
 figure("Position", [0 0 1500 1500]);
 
-for ik = 1:4
+temp_sig_tfrb = grand_tfr{9, 5};
 
-    temp_sig_tfr1 = grand_tfr{9, ik};
-    temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
-    plot(fs, temp_sig_tfr1, "DisplayName", num2str(ik), "LineWidth", 2);hold("on");
+for ik = 1:3
+
+    temp_sig_tfr1 = grand_tfr{9+ik, ik+1};
+    temp_sig_tfr1 = temp_sig_tfr1 ./ temp_sig_tfrb;
+    temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
+    temp_sig_tfr1 = temp_sig_tfr1 - min(temp_sig_tfr1);
+    temp_sig_tfr1 = temp_sig_tfr1 / temp_sig_tfr1(1);
+    plot(fs, 10*log(temp_sig_tfr1), "DisplayName", num2str(ik), "LineWidth", 2);hold("on");
 
 end
 
-temp_sig_tfr1 = grand_tfr{9, 1};
+
+xlim([0 90]);
+ylabel("Change from baseline (dB)");
+
+temp_sig_tfr1 = grand_tfr{9, 3};
 temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
-temp_sig_tfr2 = grand_tfr{9, 2};
+temp_sig_tfr2 = grand_tfr{9, 4};
 temp_sig_tfr2 = temp_sig_tfr2 / max(temp_sig_tfr2);
+
+temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
+temp_sig_tfr2(fs > 25) = smooth(temp_sig_tfr2(fs > 25), 3000);
 
 yyaxis("right");
 plot(fs, temp_sig_tfr2./temp_sig_tfr1, "LineStyle", "--", "DisplayName", "Ratio", "LineWidth", 3);
+yline(1.0, "LineWidth", 2, "LineStyle","-.");
 set(gca, "YScale", "log", "XScale", "log");
 set(gca, 'XTick', [1 3 8 12 20 32 60 100]);
 set(gca, 'XTickLabel', [1 3 8 12 20 32 60 100]);
 
 xline(2.5);
-text(4, 1, "Theta");
+text(4, 0, "Theta");
 xline(7.5);
-text(10, 1, "Alpha");
+text(10, 0, "Alpha");
 xline(12);
-text(20, 1, "Beta");
+text(20, 0, "Beta");
 xline(32);
-text(50, 1, "Gamma");
+text(50, 0, "Gamma");
 
+title("Spectral change (Spiking activity)");
+xlabel("Frequency");
+ylabel("Ratio (a.u)");
+
+xlim([0 90]);
 legend;
 
 %% Spectral
@@ -288,5 +311,20 @@ function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
     ps = ps / (size(x, 1));
 
 end
+
+%%
+
+
+xr = gmatrixN1;
+rr1 = corr(xr');
+
+xr = gmatrixN2;
+rr2 = corr(xr');
+
+idxs3 = mean(rr, "omitnan") > .0;
+figure;
+imagesc(rr2(idxs3, idxs3) - rr(idxs3, idxs3));
+
+
 
 %%

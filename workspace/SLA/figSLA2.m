@@ -55,12 +55,15 @@ g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
 %% Oxm prime neurons
 
 g1_oxprime = find(xPEV > .1);
+g2_oxprime2 = find(xPEV > sPEV*2);
 
 %% Group PEVs in time (N) with iFRs
 
-nIDgroup = g1_sprime;
+% nIDgroup = g1_sprime;
 % nIDgroup = g2_invsprime;
+% nIDgroup = g3_inv_sprime;
 % nIDgroup = g1_oxprime;
+nIDgroup = g2_oxprime2;
 
 % nIDgroup = g2_inv_sprime;
 
@@ -84,7 +87,7 @@ bar(areaNcountx);
 xticks(1:11);
 xticklabels(areaList(1:11));
 
-condOi = [1, 2, 9];
+condOi = [1, 2, 10];
 ncondOi = length(condOi);
 
 subplot(2, 1, 2);
@@ -162,7 +165,7 @@ tOi4 = 3591:4090; %zzzA
 tOib = [1:500, 4201:4700];
 
 % nID = 3461; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
-nIDs = g1_sprime;
+nIDs = g1_oxprime;
 
 kW = 50;
 kX = 2;
@@ -310,5 +313,20 @@ function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
     ps = ps / (size(x, 1));
 
 end
+
+%%
+
+
+xr = gmatrixN1;
+rr1 = corr(xr');
+
+xr = gmatrixN2;
+rr2 = corr(xr');
+
+idxs3 = mean(rr, "omitnan") > .0;
+figure;
+imagesc(rr2(idxs3, idxs3) - rr(idxs3, idxs3));
+
+
 
 %%
