@@ -46,29 +46,51 @@ end
 
 colmap = ones(neuronCnt, 1);
 
+%%
+
+xt = ones(1, 4750)*-1;
+xt(1, 1531:2500) = 1;
+xr2 = corr(xt', gmatrixN2');
+
+xt = ones(1, 4750)*-1;
+xt(1, 2561:3500) = 1;
+xr3 = corr(xt', gmatrixN3');
+
+xt = ones(1, 4750)*-1;
+xt(1, 3591:4500) = 1;
+xr4 = corr(xt', gmatrixN4');
+
 %% Stim prime neurons
 
-g1_sprime = find(sAFR./bAFR > 2.5);
+g1_sprime = find(sAFR > xAFR*2.0);
 g2_invsprime = find(xAFR./sAFR > 1.5);
-g3_inv_sprime = find(sAFR < bAFR*3 & bAFR > 5.0);
+g3_inv_sprime = find(sAFR < bAFR*1.5 & bAFR > 5.0);
+g4_ssprime = find(sPEV > 25);
 
 %% Oxm prime neurons
 
 g1_oxprime = find(xPEV > .1);
 g2_oxprime2 = find(xPEV > sPEV*2);
+g3_oxprime = find(xAFR > 2*bAFR);
+g4_gxprime = find(xAFR > sAFR*2);
+
+g5_oxcorr = find(xr3 > 0.5 & xAFR > sAFR);
 
 %% Group PEVs in time (N) with iFRs
 
 % nIDgroup = g1_sprime;
 % nIDgroup = g2_invsprime;
 % nIDgroup = g3_inv_sprime;
+% nIDgroup = g4_ssprime;
+
 % nIDgroup = g1_oxprime;
-nIDgroup = g2_oxprime2;
+% nIDgroup = g2_oxprime2;
+% nIDgroup = g3_oxprime;
+% nIDgroup = g4_gxprime;
+nIDgroup = g5_oxcorr;
 
-% nIDgroup = g2_inv_sprime;
-
-kW = 500;
-kX = 2;
+kW = 400;
+kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
 
@@ -87,7 +109,7 @@ bar(areaNcountx);
 xticks(1:11);
 xticklabels(areaList(1:11));
 
-condOi = [1, 2, 10];
+condOi =  1:12;
 ncondOi = length(condOi);
 
 subplot(2, 1, 2);
@@ -131,9 +153,29 @@ xline(3090, "HandleVisibility", "off");
 
 xlim([-750, 4500]);
 legend();
+
+%
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
 timevec = linspace(-500, 4250, 4750);
-dispnametemp1 = "PEV(AAXBvsBBXA)";
+dispnametemp1 = "PEV(AAABvsBBBA)";
+temp_sigx = gmatrixN1(nIDgroup, :);
+
+for ik = 1:size(temp_sigx, 1)
+    temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
+end
+
+
+temp_sig1 = squeeze(max(temp_sigx));
+% temp_sig1 = temp_sig1 - min(temp_sig1);
+yyaxis("right");
+
+pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
+pevvec = pevvec - min(pevvec);
+
+% kW = 1;
+plot(timevec, pevvec, "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+
+dispnametemp1 = "PEV(AXABvsBXBA)";
 temp_sigx = gmatrixN2(nIDgroup, :);
 for ik = 1:size(temp_sigx, 1)
     temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
@@ -147,6 +189,39 @@ pevvec = pevvec - min(pevvec);
 
 % kW = 1;
 plot(timevec, pevvec, "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+
+
+dispnametemp1 = "PEV(AAXBvsBBXA)";
+temp_sigx = gmatrixN3(nIDgroup, :);
+for ik = 1:size(temp_sigx, 1)
+    temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
+end
+temp_sig1 = squeeze(max(temp_sigx));
+% temp_sig1 = temp_sig1 - min(temp_sig1);
+yyaxis("right");
+
+pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
+pevvec = pevvec - min(pevvec);
+
+% kW = 1;
+plot(timevec, pevvec, "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+
+dispnametemp1 = "PEV(AAAXvsBBBX)";
+temp_sigx = gmatrixN4(nIDgroup, :);
+for ik = 1:size(temp_sigx, 1)
+    temp_sigx(ik, :) = temp_sigx(ik, :) - min(temp_sigx(ik, :));
+end
+temp_sig1 = squeeze(max(temp_sigx));
+% temp_sig1 = temp_sig1 - min(temp_sig1);
+yyaxis("right");
+
+pevvec = 100*smoothdata(temp_sig1, "gaussian", kW);
+pevvec = pevvec - min(pevvec);
+
+% kW = 1;
+plot(timevec, pevvec, "DisplayName", dispnametemp1, "LineWidth", 2, "color", [.5 0 .5]);
+
+
 yline(0, "LineStyle", "--");
 
 ax = gca;
@@ -154,6 +229,9 @@ ax.YAxis(1).Color = 'k';
 ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("N = " + num2str(length(nIDgroup)));
+
+fname = "3B-BarGroup-OX";
+print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Single neuron TFR in time (N) with iFR
 
@@ -225,12 +303,12 @@ temp_sig_tfrb = grand_tfr{9, 5};
 
 for ik = 1:3
 
-    temp_sig_tfr1 = grand_tfr{9+ik, ik+1};
+    temp_sig_tfr1 = grand_tfr{5+ik, ik+1};
     temp_sig_tfr1 = temp_sig_tfr1 ./ temp_sig_tfrb;
     temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
     temp_sig_tfr1 = temp_sig_tfr1 - min(temp_sig_tfr1);
     temp_sig_tfr1 = temp_sig_tfr1 / temp_sig_tfr1(1);
-    plot(fs, 10*log(temp_sig_tfr1), "DisplayName", num2str(ik), "LineWidth", 2);hold("on");
+    plot(fs, 10*log(temp_sig_tfr1), "DisplayName", "O-" + num2str(ik+1), "LineWidth", 2);hold("on");
 
 end
 
@@ -238,9 +316,9 @@ end
 xlim([0 90]);
 ylabel("Change from baseline (dB)");
 
-temp_sig_tfr1 = grand_tfr{9, 3};
+temp_sig_tfr1 = grand_tfr{10, 2};
 temp_sig_tfr1 = temp_sig_tfr1 / max(temp_sig_tfr1);
-temp_sig_tfr2 = grand_tfr{9, 4};
+temp_sig_tfr2 = grand_tfr{12, 4};
 temp_sig_tfr2 = temp_sig_tfr2 / max(temp_sig_tfr2);
 
 temp_sig_tfr1(fs > 25) = smooth(temp_sig_tfr1(fs > 25), 3000);
@@ -313,20 +391,5 @@ function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
     ps = ps / (size(x, 1));
 
 end
-
-%%
-
-
-xr = gmatrixN1;
-rr1 = corr(xr');
-
-xr = gmatrixN2;
-rr2 = corr(xr');
-
-idxs3 = mean(rr, "omitnan") > .0;
-figure;
-imagesc(rr2(idxs3, idxs3) - rr(idxs3, idxs3));
-
-
 
 %%

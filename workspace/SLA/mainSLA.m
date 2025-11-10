@@ -241,7 +241,7 @@ tOi1 = 1:4750;
 tN = length(tOi1);
 icond1 = axab;
 icond2 = axab;
-icond3 = aaab;
+icond3 = rxrr;
 
 nTrials = 100;
 gmatrixN2 = zeros(neuronCnt, tN);
@@ -296,7 +296,7 @@ tOi1 = 1:4750;
 tN = length(tOi1);
 icond1 = aaxb;
 icond2 = aaxb;
-icond3 = aaab;
+icond3 = rrxr;
 
 nTrials = 100;
 gmatrixN3 = zeros(neuronCnt, tN);
@@ -351,7 +351,7 @@ tOi1 = 1:4750;
 tN = length(tOi1);
 icond1 = aaax;
 icond2 = aaax;
-icond3 = aaab;
+icond3 = rrrx;
 
 nTrials = 100;
 gmatrixN4 = zeros(neuronCnt, tN);
