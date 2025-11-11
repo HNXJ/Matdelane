@@ -682,7 +682,7 @@ for ik = 1:Nfiles
     for jk = 1:size(tempSigG, 2)
         ltrials = find(sspkDataCleanTrials{ik, icond1}(:, jk) == 1);
         tcnt = length(ltrials);
-        if tcnt > 10
+        if tcnt > 3
             iTrials = ltrials(mod(1:nTrials, tcnt) + 1);
             tempSigG(:, jk, :) = sspkData{ik, icond1}(iTrials, jk, :);
         end
@@ -697,7 +697,7 @@ for ik = 1:Nfiles
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
-        if  tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+        if  tcnt1 > 2 & tcnt2 > 2 & tcnt3 > 2
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx1(1:nTrials, jk, :) = sspkData{ik, axab}(iTrials, jk, :);
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
@@ -716,7 +716,7 @@ for ik = 1:Nfiles
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
-        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+        if tcnt1 > 2 & tcnt2 > 2 & tcnt3 > 2
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx2(1:nTrials, jk, :) = sspkData{ik, aaxb}(iTrials, jk, :);
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
@@ -735,7 +735,7 @@ for ik = 1:Nfiles
         tcnt1 = length(ltrials1);
         tcnt2 = length(ltrials2);
         tcnt3 = length(ltrials3);
-        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5
+        if tcnt1 > 2 & tcnt2 > 2 & tcnt3 > 2
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSigx3(1:nTrials, jk, :) = sspkData{ik, aaax}(iTrials, jk, :);
             iTrials = ltrials2(mod(1:nTrials, tcnt2) + 1);
@@ -903,7 +903,8 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 34; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nID = 1236; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+% 621 !!!! + 1236 !!!
 
 kW = 400;
 kX = 2;
