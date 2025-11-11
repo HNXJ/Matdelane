@@ -100,7 +100,7 @@ for iN = 1:size(gmatrix1, 1)
 
 end
 
-%%
+%% Corr
 
 xt = ones(1, 4750)*-1;
 xt(1, 1531:2200) = 1;
