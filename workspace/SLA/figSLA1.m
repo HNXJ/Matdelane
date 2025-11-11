@@ -365,8 +365,63 @@ for iA = 1:11
     ze1 = bAFR(areaIDs == iA) + 1e-1;
     idxs = ze1 > .1;
     idxs2 = ye1 > 1.0;
+    idxs3 = xr2(areaIDs == iA) > 0.1;
     pointsizes = 4*ones(size(generalIDs));
-    pointsizes(idxs2) = 8;
+    pointsizes(idxs3) = 12;
+
+    xrks{1, iA} = xe1(idxs);
+    xrks{2, iA} = ye1(idxs);
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .6, 'std');
+
+    xetext = max(xe);
+    yetext = max(ye);
+    text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .8, 'std');
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+
+    line([0.01 100], [0.01 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    
+end
+
+set(gca, 'XScale', 'log', 'YScale', 'log');
+xlim([0.05 100]);
+ylim([0.05 100]);
+set(gca, 'XTick', [0.5 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
+
+title("2.a: Omission|Stim PEV");
+xlabel("Stim-PEV");ylabel("Oxm-PEV");
+legend;
+
+fname = "2A-Scatter-Ox-St-PEV";
+print(gcf,'-vector','-dsvg', fname +".svg");
+
+%% Fig.2 A*:
+%  Baseline scatter PEV(oxm) | PEV(stim)
+
+figure("Position", [0 0 1500 1500]);
+
+xrks = cell(2, 11);
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = sPEV(areaIDs == iA) + 1e-1;
+    ye1 = xPEV(areaIDs == iA) + 1e-1;
+    ze1 = bAFR(areaIDs == iA) + 1e-1;
+    idxs = ze1 > .1;
+    idxs2 = ye1 > 1.0;
+    idxs3 = idxs2;
+    pointsizes = 4*ones(size(generalIDs));
+    pointsizes(idxs3) = 12;
 
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
@@ -414,7 +469,7 @@ title("2.a: Omission|Stim PEV");
 xlabel("Stim-PEV");ylabel("Oxm-PEV");
 legend;
 
-fname = "2A-Scatter-Ox-St-PEV";
+fname = "2AX-Scatter-Ox-St-CRR";
 print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Fig.2 b:
@@ -494,9 +549,9 @@ for iA = 1:11
     xe1 = sPEV(areaIDs == iA);
     ye1 = xPEV(areaIDs == iA);
     ze1 = bAFR(areaIDs == iA);
-    we1 = 10*(ye1 > 3*xe1) - 5.0;
+    we1 = 10*(ye1 > 2*xe1) - 5.0;
     idxs = ze1 > .1;
-    idxs2 = ye1 ./ xe1 > 3.0 & ye1 > 5.0;
+    idxs2 = ye1 ./ xe1 > 1.5 & ye1 > 1.0;
     pointsizes = 2*ones(size(generalIDs));
     pointsizes(idxs2) = 4;
 

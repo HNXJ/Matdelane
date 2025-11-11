@@ -179,6 +179,45 @@ gkernel = zeros(1, 1, kW);
 gkernel(1, 1, :) = gausswin(kW);
 pThresh = 0.01;
 
+%% Grand matrix concatenation (IFR)
+
+tOi1 = 1:4750;
+
+tN = length(tOi1);
+
+nTrials = 200;
+gmatrixFR1 = zeros(12, neuronCnt, tN);
+
+for ik = 1:Nfiles
+
+    ncnt = length(areaIDset{ik});
+    tempSig1 = zeros(nTrials, ncnt, tN);
+
+    for icond = 1:12
+
+        for jk = 1:ncnt
+    
+            ltrials1 = find(sspkDataCleanTrials{ik, icond}(:, jk) == 1);
+    
+            tcnt1 = length(ltrials1);
+    
+            if tcnt1 > 10
+    
+                iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
+                tempSig1(:, jk, :) = sspkData{ik, icond}(iTrials, jk, tOi1);
+    
+            end
+    
+        end
+    
+        gmatrixFR1(icond, areaIDset{ik}, :) = squeeze(mean(tempSig1, 1));
+
+    end
+
+    disp(ik);
+
+end
+
 %% Grand matrix concatenation (PEV) Stim Identity (A?B)
 
 tOi1 = 1:4750;
@@ -821,7 +860,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)) + " > smoot
 
 %% Single neuron rastrogram (N)
 
-nID = 159; % Grand neuron ID % 1004/1269
+nID = 34; % Grand neuron ID % 1004/1269
 
 icond1 = 1;
 icond2 = 2;
@@ -864,7 +903,7 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Single neuron PEV in time (N) with iFR
 
-nID = 3446; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
+nID = 34; % Grand neuron ID 4099(FST) | 3461(FEF) | 1106//4094 | 3602 | MST 3007
 
 kW = 400;
 kX = 2;

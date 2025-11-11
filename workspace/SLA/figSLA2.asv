@@ -42,27 +42,80 @@ for iN = 1:size(gmatrix1, 1)
     tW = size(gmatrix5, 2) / 1000;
     bAFR(iN) = sum(gmatrix5(iN, :)) / tW;
     bVFR(iN) = var(gmatrix5(iN, :)) / tW;
+
 end
 
 colmap = ones(neuronCnt, 1);
 
 %%
 
-xr = gmatrixN2;
-xt = zeros(1, 4750);
+tOi1 = 1531:2530; % m2
+tOi2 = 501:1500; % m1
+
+%%
+
+thetaPeak = zeros(2, size(gmatrix1, 1));
+alphaPeak = zeros(2, size(gmatrix1, 1));
+betaPeak = zeros(2, size(gmatrix1, 1));
+gammaPeak = zeros(2, size(gmatrix1, 1));
+
+kW = 100;
+
+for iN = 1:size(gmatrix1, 1)
+
+    % Get signal
+    temp_sigxc = find(squeeze(sspkDataCleanTrials{fileIDs(iN), rxrr}(:, infileIDs(iN))) == 1);
+    temp_sigx = squeeze(sspkData{fileIDs(iN), rxrr}(temp_sigxc, infileIDs(iN), :));
+    temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
+
+    if length(temp_sigxc) > 1
+        [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [.1 100]);
+        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
+    else
+
+        % [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(tOi1), [.1 100]);
+        % [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(tOi2), [.1 100]);
+
+    end
+
+    temp_relpow = temp_sig_tfr2 ./ temp_sig_tfr1;
+
+    % Get spectra peak
+    thetaP = 2.0 + fs(temp_relpow(fs < 7.5 & fs > 2.0) == max(temp_relpow(fs < 7.5 & fs > 2.0)));
+    thetaPeak(1, iN) = thetaP(1);
+    alphaP = 8.0 + fs(temp_relpow(fs < 12.0 & fs > 8.0) == max(temp_relpow(fs < 12.0 & fs > 8.0)));
+    alphaPeak(1, iN) = alphaP(1);
+    betaP = 12.0 + fs(temp_relpow(fs < 30.0 & fs > 12.0) == max(temp_relpow(fs < 30.0 & fs > 12.0)));
+    betaPeak(1, iN) = betaP(1);
+    gammaP = 35.0 + fs(temp_relpow(fs > 35.0) == max(temp_relpow(fs > 35.0)));
+    gammaPeak(1, iN) = gammaP(1);
+
+    % Get bandPow
+
+    if mod(iN, 100) == 1
+   
+        disp(iN);
+
+    end
+
+end
+
+%%
+
+xt = ones(1, 4750)*-1;
 xt(1, 1531:2500) = 1;
-% xt(1, 2561:3500) = 1;
-% xt(1, 3591:4500) = 1;
+xr = squeeze(gmatrixFR1(10, :, :))';
+xr2 = corr(xt', xr);
 
-xr2 = corr(xt', gmat, "Type", "Spearman");
-% 
-% xr = gmatrixN2;
-% rr2 = corr(xr');
-% 
-% idxs3 = mean(rr, "omitnan") > .0;
-% figure;
-% imagesc(rr2(idxs3, idxs3) - rr(idxs3, idxs3));
+xt = ones(1, 4750)*-1;
+xt(1, 2561:3500) = 1;
+xr = squeeze(gmatrixFR1(11, :, :))';
+xr3 = corr(xt', xr);
 
+xt = ones(1, 4750)*-1;
+xt(1, 3591:4500) = 1;
+xr = squeeze(gmatrixFR1(12, :, :))';
+xr4 = corr(xt', xr);
 
 %% Stim prime neurons
 
@@ -73,12 +126,12 @@ g4_ssprime = find(sPEV > 25);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xPEV > .1);
+g1_oxprime = find(xPEV > .0);
 g2_oxprime2 = find(xPEV > sPEV*2);
 g3_oxprime = find(xAFR > 2*bAFR);
 g4_gxprime = find(xAFR > sAFR*2);
 
-g5_oxcorr = find(rr1)
+g5_oxcorr = find(abs(xr2) > 0.12 & xAFR > 1.5*bAFR);
 
 %% Group PEVs in time (N) with iFRs
 
@@ -87,12 +140,16 @@ g5_oxcorr = find(rr1)
 % nIDgroup = g3_inv_sprime;
 % nIDgroup = g4_ssprime;
 
-% nIDgroup = g1_oxprime;
+nIDgroup = g1_oxprime;
 % nIDgroup = g2_oxprime2;
 % nIDgroup = g3_oxprime;
-nIDgroup = g4_gxprime;
+% nIDgroup = g4_gxprime;
 
-kW = 400;
+% nIDgroup = g5_oxcorr;
+
+fname = "3C-BarGroup-iLXprime";
+
+kW = 500;
 kX = 1;
 tN = 1000; % length(temp_sig1);
 timevec = linspace(-500, 4250, 4750);
@@ -233,7 +290,6 @@ ax.YAxis(2).Color = 'k';
 ylabel("PEV(%)", "Color", [1 0 0]);
 sgtitle("N = " + num2str(length(nIDgroup)));
 
-fname = "3B-BarGroup-OX";
 print(gcf,'-vector','-dsvg', fname +".svg");
 
 %% Single neuron TFR in time (N) with iFR
@@ -298,7 +354,7 @@ for jk = nIDs
 
 end
 
-%%
+%% 
 
 figure("Position", [0 0 1500 1500]);
 
@@ -350,6 +406,68 @@ ylabel("Ratio (a.u)");
 xlim([0 90]);
 legend;
 
+%%
+
+
+
+%% Fig.3 A: Scatter Bands
+%  theta(Oxm) | theta(Stim)
+
+figure("Position", [0 0 1500 1500]);
+
+for iA = 1:11
+
+    generalIDs = find(areaIDs == iA);
+    xe1 = alphaPeak(1, areaIDs == iA);
+    ye1 = betaPeak(1, areaIDs == iA);
+    be1 = bAFR(areaIDs == iA);
+    idxs = be1 > 0.1;
+    idxs2 = ye1 > xe1*2.0;
+    idxs3 = ye1./xe1 > 0.9 & ye1./xe1 < 1.1;
+
+    pointsizes = 4*ones(size(generalIDs));
+    pointsizes(idxs2) = 8;
+    pointsizes(idxs3) = 8;
+
+    scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
+    view(0, 90)
+    hold("on");
+    
+    ze = mean(generalIDs);
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .9, 'std');
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+
+    xetext = max(xe);
+    yetext = max(ye);
+    text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
+
+    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .7, 'std');
+    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+   
+    line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
+    
+end
+
+set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
+% xlim([0.45 100]);
+% ylim([0.45 100]);
+% xlim([0.1 20]);
+% ylim([0.1 20]);
+grid("on");
+% zlim([0.2 5000]);
+set(gca, 'XTick', [0.5 1 3 10 30 100]);
+set(gca, 'XTickLabel', [0.5 1 3 10 30 100]);
+set(gca, 'YTick', [0.5 1 3 10 30 100]);
+set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
+
+title("1.a: Omission|Stimulus avg. FR");
+xlabel("Stim-Theta");ylabel("Oxm-Theta");
+legend;
+
+fname = "1A-Scatter-Ox-St";
+print(gcf,'-vector','-dsvg', fname +".svg");
+
 %% Spectral
 
 temp_sig1 = rand(1, 1000);
@@ -392,6 +510,99 @@ function [ps, fs, ts] = jPowerSpectrumDensity(x, flims)
     end
 
     ps = ps / (size(x, 1));
+
+end
+
+%%
+
+function [X, Y] = generateEllipse(x, y, a, b, theta, N)
+    N = max(3, round(N));
+
+    t = linspace(0, 2*pi, N);
+
+    x_prime = a * cos(t);
+    y_prime = b * sin(t);
+    
+    cos_t = cos(theta);
+    sin_t = sin(theta);
+
+    x_rotated = x_prime .* cos_t - y_prime .* sin_t;
+    y_rotated = x_prime .* sin_t + y_prime .* cos_t;
+
+    X = x_rotated + x;
+    Y = y_rotated + y;
+
+end
+
+function [X_ellipse, Y_ellipse] = fitConfidenceEllipse(X_data, Y_data, N, CI, mode, rect)
+    
+    if ~exist('mode', 'var')
+
+        mode = 'sem';
+
+    end
+
+    if ~exist('rect', 'var')
+
+        rect = 0;
+
+    end
+
+    % wx = sum(X_data(:));wy = sum(Y_data(:));
+    % dataMatrix = [X_data(:).^2/wx, Y_data(:).^2/wy];
+    dataMatrix = [X_data(:), Y_data(:)];
+    
+    mu = mean(dataMatrix);
+    center_x = mu(1);
+    center_y = mu(2);
+    
+    C = cov(dataMatrix);
+    
+    [V, D] = eig(C);
+    
+    eigenvalues = diag(D);
+    
+    [lambda_sorted, idx] = sort(eigenvalues, 'descend');
+    
+    lambda_a = lambda_sorted(1);
+    lambda_b = lambda_sorted(2);
+    
+    V_major = V(:, idx(1));
+    theta = atan2(V_major(2), V_major(1));
+
+    if strcmpi(mode, 'chi2')
+
+        DEGREES_OF_FREEDOM = 2;
+        chi2_critical_value = chi2inv(CI, DEGREES_OF_FREEDOM);
+        k = sqrt(chi2_critical_value); 
+
+    elseif strcmpi(mode, 'std')
+
+        k = CI; 
+
+    elseif strcmpi(mode, 'sem')
+        
+        k = CI / sqrt(length(X_data));
+
+    else
+
+        k = 1.0;
+
+    end
+
+    radius_a = k * sqrt(lambda_a);
+    radius_b = k * sqrt(lambda_b);
+    
+    [X_ellipse, Y_ellipse] = generateEllipse(center_x, center_y, radius_a, radius_b, theta, N);
+
+    if rect
+
+        indxtemp1 = find(X_ellipse < 1);
+        X_ellipse(indxtemp1) = 0.5 + 0.5*exp(X_ellipse(indxtemp1) - 1);
+        indxtemp1 = find(Y_ellipse < 1);
+        Y_ellipse(indxtemp1) = 0.5 + 0.5*exp(Y_ellipse(indxtemp1) - 1);
+        
+    end
 
 end
 
