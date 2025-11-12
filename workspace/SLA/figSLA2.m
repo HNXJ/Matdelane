@@ -49,8 +49,8 @@ colmap = ones(neuronCnt, 1);
 
 %%
 
-tOi1 = [1:500, 1101:1400, 2131:2430, 3161:3460]; % m2
-tOi2 = 501:1500; % m1
+tOi1 = [1:500, 4001:4500]; % m2
+tOi2 = 1001:2500; % m1
 
 %%
 
@@ -59,7 +59,7 @@ alphaPeak = zeros(2, size(gmatrix1, 1));
 betaPeak = zeros(2, size(gmatrix1, 1));
 gammaPeak = zeros(2, size(gmatrix1, 1));
 
-kW = 100;
+kW = 50;
 
 for iN = 1:size(gmatrix1, 1)
 
@@ -69,26 +69,21 @@ for iN = 1:size(gmatrix1, 1)
     temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
 
     if length(temp_sigxc) > 1
-        [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [.1 100]);
-        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
-    else
-
-        % [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(tOi1), [.1 100]);
-        % [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(tOi2), [.1 100]);
+        [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [1 100]);
+        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [1 100]);
+        temp_relpow = temp_sig_tfr2 ./ temp_sig_tfr1;
+    
+        % Get spectra peak
+        thetaP = mean(temp_relpow(fs < 7.5 & fs > 2.0));
+        thetaPeak(1, iN) = thetaP(1);
+        alphaP = mean(temp_relpow(fs < 12.0 & fs > 8.0));
+        alphaPeak(1, iN) = alphaP(1);
+        betaP = mean(temp_relpow(fs < 30.0 & fs > 12.0));
+        betaPeak(1, iN) = betaP(1);
+        gammaP = mean(temp_relpow(fs > 35.0));
+        gammaPeak(1, iN) = gammaP(1);
 
     end
-
-    temp_relpow = temp_sig_tfr2 ./ temp_sig_tfr1;
-
-    % Get spectra peak
-    thetaP = max(temp_relpow(fs < 7.5 & fs > 2.0));
-    thetaPeak(1, iN) = thetaP(1);
-    alphaP = max(temp_relpow(fs < 12.0 & fs > 8.0));
-    alphaPeak(1, iN) = alphaP(1);
-    betaP = max(temp_relpow(fs < 30.0 & fs > 12.0));
-    betaPeak(1, iN) = betaP(1);
-    gammaP = max(temp_relpow(fs > 35.0));
-    gammaPeak(1, iN) = gammaP(1);
 
     % Get bandPow
 
@@ -131,8 +126,8 @@ g5_idl = find(xPEV < 1.0 & sPEV < 25);
 
 %% Oxm prime neurons
 
-g1_oxprime = find(xPEV > 0 | xAFR > bAFR*2);
-g2_oxprime2 = find(xPEV > sPEV*2);
+g1_oxprime = find(xPEV > 1 | xAFR > bAFR*3);
+g2_oxprime2 = find(xPEV > 1);
 g3_oxprime = find(xAFR > 2*bAFR);
 g4_gxprime = find(xAFR > sAFR*2);
 
@@ -157,7 +152,7 @@ for iA = 1:11
 
 end
 
-fname = "4B-PieGroup";
+fname = "4C-PieGroup";
 figure("Position", [0 0 1500 1500]);
 
 areaList_temp = areaList;
@@ -231,10 +226,10 @@ print(gcf,'-vector','-dsvg', fname +".svg");
 % nIDgroup = g3_oxprime;
 % nIDgroup = g4_gxprime;
 
-% nIDgroup = g5_oxcorr;
-nIDgroup = g5_idl;
+nIDgroup = g5_oxcorr;
+% nIDgroup = g5_idl;
 
-fname = "3D-BarGroup-idL";
+fname = "3D-BarGroup-oxcor";
 
 kW = 500;
 kX = 1;
@@ -495,33 +490,61 @@ legend;
 
 %%
 
+%% Stim prime neurons
 
+g1_fprime = find(abs(sAFR - xAFR)./sAFR > 0.1 | sPEV > 0 | xPEV > 0);
+g1_ifprime = find(sPEV < .1 & xPEV < .1 & sAFR < .1 & bAFR < .1 & xAFR < 0.1);
+
+g2_sprime = find(sAFR > xAFR | sAFR > bAFR);
+g2_invsprime = find(xAFR > sAFR | xAFR > bAFR);
+
+g3_sprime = find(sPEV > 1);
+g4_ssprime = find(sPEV > 20);
+g5_idl = find(xPEV < 1.0 & sPEV < 25);
+
+%% Oxm prime neurons
+
+g1_oxprime = find(xPEV > 1 | xAFR > bAFR*3);
+g2_oxprime2 = find(xPEV > 1);
+g3_oxprime = find(xAFR > 2*bAFR);
+g4_gxprime = find(xAFR > sAFR*2);
+
+g5_oxcorr = find((xr2 > 0.1 | xr3 > 0.1 | xr4 > 0.1) & (xAFR > 2) & (xAFR > 1.4*bAFR));
+g6_oxpos = find(xOPEV > 10);
 
 %% Fig.3 A: Scatter Bands
 %  theta(Oxm) | theta(Stim)
 
 figure("Position", [0 0 1500 1500]);
 
+xlabel_temp = "theta";
+ylabel_temp = "beta";
+
 for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
-    xe1 = alphaPeak(1, areaIDs == iA);
-    ye1 = betaPeak(1, areaIDs == iA);
-    be1 = bAFR(areaIDs == iA);
-    idxs = be1 > 0.1;
-    idxs2 = ye1 > xe1*2.0;
+    xe1 = thetaPeak(1, areaIDs == iA);
+    ye1 = alphaPeak(1, areaIDs == iA);%./gammaPeak(1, areaIDs == iA);
+
+    be1 = xAFR(areaIDs == iA);
+    ce1 = sAFR(areaIDs == iA);
+    de1 = xPEV(areaIDs == iA);
+    ee1 = sPEV(areaIDs == iA);
+
+    idxs = be1 > 1 & ce1 > 1;
+    idxs2 = de1 > 1 & be1 > 2*ce1;
     idxs3 = ye1./xe1 > 0.9 & ye1./xe1 < 1.1;
 
-    pointsizes = 4*ones(size(generalIDs));
-    pointsizes(idxs2) = 8;
-    pointsizes(idxs3) = 8;
+    pointsizes = 5*ones(size(generalIDs));
+    pointsizes(idxs2) = 20;
+    pointsizes(idxs3) = 1;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
     hold("on");
     
     ze = mean(generalIDs);
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .9, 'std');
+    % [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .9, 'std');
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.1, "HandleVisibility", "off", "EdgeColor", "none");
     % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
@@ -529,16 +552,17 @@ for iA = 1:11
     yetext = max(ye);
     text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
-    [xe, ye] = fitConfidenceEllipse(xe1(idxs), ye1(idxs), 1000, .7, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
-   
+    if sum(idxs2) > 2
+        [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, 1.0, 'std');
+        patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+    end
     line([0.1 100], [0.1 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
-xlim([0.45 100]);
-ylim([0.45 100]);
+% xlim([0.45 100]);
+% ylim([0.45 100]);
 % xlim([0.1 20]);
 % ylim([0.1 20]);
 grid("on");
@@ -549,7 +573,7 @@ set(gca, 'YTick', [0.5 1 3 10 30 100]);
 set(gca, 'YTickLabel', [0.5 1 3 10 30 100]);
 
 title("1.a: Omission|Stimulus avg. FR");
-xlabel("Stim-Theta");ylabel("Oxm-Theta");
+xlabel(xlabel_temp);ylabel(ylabel_temp);
 legend;
 
 fname = "1A-Scatter-Ox-St";

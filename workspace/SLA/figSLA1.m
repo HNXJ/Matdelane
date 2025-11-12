@@ -364,7 +364,7 @@ for iA = 1:11
     xe1 = sPEV(areaIDs == iA) + 1e-1;
     ye1 = xPEV(areaIDs == iA) + 1e-1 + 1e-2*rand(1, length(xPEV(areaIDs == iA)));
     ze1 = bAFR(areaIDs == iA) + 1e-1;
-    idxs = ze1 > -1;
+    idxs = ze1 > 1;
     idxs2 = ye1 > 1.0;
     idxs3 = xr2(areaIDs == iA) > 0.1;
     pointsizes = 10*ones(size(generalIDs));
