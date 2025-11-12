@@ -42,6 +42,7 @@ for iN = 1:size(gmatrix1, 1)
     tW = size(gmatrix5, 2) / 1000;
     bAFR(iN) = sum(gmatrix5(iN, :)) / tW;
     bVFR(iN) = var(gmatrix5(iN, :)) / tW;
+
 end
 
 colmap = ones(neuronCnt, 1);
@@ -61,9 +62,9 @@ for iA = 1:11
     idxs2 = ye1 > xe1*2.0;
     idxs3 = ye1./xe1 > 0.9 & ye1./xe1 < 1.1;
 
-    pointsizes = 4*ones(size(generalIDs));
-    pointsizes(idxs2) = 8;
-    pointsizes(idxs3) = 8;
+    pointsizes = 10*ones(size(generalIDs));
+    pointsizes(idxs2) = 16;
+    pointsizes(idxs3) = 16;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -361,13 +362,13 @@ for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = sPEV(areaIDs == iA) + 1e-1;
-    ye1 = xPEV(areaIDs == iA) + 1e-1;
+    ye1 = xPEV(areaIDs == iA) + 1e-1 + 1e-2*rand(1, length(xPEV(areaIDs == iA)));
     ze1 = bAFR(areaIDs == iA) + 1e-1;
-    idxs = ze1 > .1;
+    idxs = ze1 > -1;
     idxs2 = ye1 > 1.0;
     idxs3 = xr2(areaIDs == iA) > 0.1;
-    pointsizes = 4*ones(size(generalIDs));
-    pointsizes(idxs3) = 12;
+    pointsizes = 10*ones(size(generalIDs));
+    pointsizes(idxs3) = 20;
 
     xrks{1, iA} = xe1(idxs);
     xrks{2, iA} = ye1(idxs);
@@ -380,10 +381,10 @@ for iA = 1:11
 
     xetext = max(xe);
     yetext = max(ye);
-    text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
+    % text(xetext, yetext, [areaList{iA}, ''], "Color", color_t(iA, :), "FontWeight", "bold");
 
     [xe, ye] = fitConfidenceEllipse(xe1(idxs2), ye1(idxs2), 1000, .8, 'std');
-    patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
+    % patch(xe, ye, ze*ones(size(xe)), color_t(iA, :), "FaceAlpha", 0.0, "HandleVisibility", "off", "EdgeColor", color_t(iA, :), "LineStyle", ":", "LineWidth", 2);
 
     line([0.01 100], [0.01 100], "color", [0 0 0], "HandleVisibility", "off", "LineStyle", "--");
     

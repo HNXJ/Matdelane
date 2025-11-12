@@ -524,7 +524,7 @@ for ik = 1:Nfiles
         tcnt5 = length(ltrials5);
         tcnt6 = length(ltrials6);
 
-        if tcnt1 > 10 & tcnt2 > 10 & tcnt3 > 10 & tcnt4 > 10 & tcnt5 > 10 & tcnt6 > 10
+        if tcnt1 > 5 & tcnt2 > 5 & tcnt3 > 5 & tcnt4 > 5 & tcnt5 > 5 & tcnt6 > 5
 
             iTrials = ltrials1(mod(1:nTrials, tcnt1) + 1);
             tempSig1(1:nTrials, jk, :) = sspkData{ik, axab}(iTrials, jk, tOi2);

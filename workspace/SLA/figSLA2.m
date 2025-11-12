@@ -49,7 +49,7 @@ colmap = ones(neuronCnt, 1);
 
 %%
 
-tOi1 = 1531:2530; % m2
+tOi1 = [1:500, 1101:1400, 2131:2430, 3161:3460]; % m2
 tOi2 = 501:1500; % m1
 
 %%
@@ -537,8 +537,8 @@ for iA = 1:11
 end
 
 set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
-% xlim([0.45 100]);
-% ylim([0.45 100]);
+xlim([0.45 100]);
+ylim([0.45 100]);
 % xlim([0.1 20]);
 % ylim([0.1 20]);
 grid("on");
