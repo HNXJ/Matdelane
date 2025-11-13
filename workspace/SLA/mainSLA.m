@@ -983,13 +983,13 @@ sgtitle("Neuron no." + num2str(nID) + " > " + areaList(areaIDs(nID)));
 
 %% Clustering (Kmeans)
 
-mspkx = sspkData{35, 10};
+mspkx = sspkData{7, 2};
 mspkx = squeeze(mean(mspkx, 1));
 mspkxo = mspkx;
 mspkxo = smoothdata2(mspkxo, "gaussian", {1, 20});
 mspkx = smoothdata2(mspkx, "gaussian", {1, 40});
 
-kg = 12;
+kg = 6;
 [idxs3, c1, sm1, d1] = kmeans(mspkx, kg, "Distance", "sqeuclidean");
 
 figure;

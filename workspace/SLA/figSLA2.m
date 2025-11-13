@@ -118,9 +118,9 @@ g1_fprime = find(abs(sAFR - xAFR)./sAFR > 0.1 | sPEV > 0 | xPEV > 0);
 g1_ifprime = find(sPEV < .1 & xPEV < .1 & sAFR < .1 & bAFR < .1 & xAFR < 0.1);
 
 g2_sprime = find(sAFR > xAFR | sAFR > bAFR);
-g2_invsprime = find(xAFR > sAFR | xAFR > bAFR);
+g2_invsprime = find(xAFR > 1.5*sAFR | xAFR > 1.5*bAFR);
 
-g3_sprime = find(sPEV > 1);
+g3_sprime = find(sPEV > 10);
 g4_ssprime = find(sPEV > 20);
 g5_idl = find(xPEV < 1.0 & sPEV < 25);
 
@@ -214,22 +214,30 @@ title("Omission-specific correlated activity (r > .1) N=" + num2str(sum(gvec1(6,
 
 print(gcf,'-vector','-dsvg', fname +".svg");
 
+%% TODO autocorrrrr
+
+% Autocorr gmatrixN1/N4; show / scatter / cluster
+
 %% Group PEVs in time (N) with iFRs
 
 % nIDgroup = g1_sprime;
 % nIDgroup = g2_invsprime;
 % nIDgroup = g3_inv_sprime;
-% nIDgroup = g4_ssprime;
+% nIDgroup = g3_sprime;
 
 % nIDgroup = g1_oxprime;
 % nIDgroup = g2_oxprime2;
 % nIDgroup = g3_oxprime;
 % nIDgroup = g4_gxprime;
 
-nIDgroup = g5_oxcorr;
+% nIDgroup = g5_oxcorr;
 % nIDgroup = g5_idl;
+nIDgroup = g3_sprime;
 
-fname = "3D-BarGroup-oxcor";
+
+fname = "3A-BarGroup-Sprime";
+% fname = "3B-BarGroup-xcorrsprime";
+% fname = "3C-BarGroup-invsprime";
 
 kW = 500;
 kX = 1;
@@ -242,15 +250,15 @@ areaNcountx = zeros(1, 11);
 
 for iA = 1:11
 
-    cntxtemp = sum(areaIDs(nIDgroup) == iA);
-    areaNcountx(iA) = cntxtemp;
+    cntxtemp = sum(areaIDs(nIDgroup) == iA) / sum(areaIDs == iA);
+    areaNcountx(iA) = 100*cntxtemp;
 
 end
 subplot(2, 1, 1);
 bar(areaNcountx);
 xticks(1:11);
 xticklabels(areaList(1:11));
-
+ylabel("%Neurons");
 condOi =  1:12;
 ncondOi = length(condOi);
 
@@ -294,7 +302,7 @@ xline(2060, "HandleVisibility", "off");
 xline(3090, "HandleVisibility", "off");
 
 xlim([-750, 4500]);
-legend();
+% legend();
 
 %
 xlabel("Time(ms)");ylabel("FR(Spk/s)");
@@ -518,13 +526,13 @@ g6_oxpos = find(xOPEV > 10);
 figure("Position", [0 0 1500 1500]);
 
 xlabel_temp = "theta";
-ylabel_temp = "beta";
+ylabel_temp = "gamma";
 
 for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = thetaPeak(1, areaIDs == iA);
-    ye1 = alphaPeak(1, areaIDs == iA);%./gammaPeak(1, areaIDs == iA);
+    ye1 = gammaPeak(1, areaIDs == iA);%./gammaPeak(1, areaIDs == iA);
 
     be1 = xAFR(areaIDs == iA);
     ce1 = sAFR(areaIDs == iA);

@@ -49,7 +49,7 @@ colmap = ones(neuronCnt, 1);
 
 %%
 
-tOi1 = [1:500, 1001:1500, 2001:2500]; % m2
+tOi1 = [1:500, 4001:4500]; % m2
 tOi2 = 1001:2500; % m1
 
 %%
@@ -59,7 +59,7 @@ alphaPeak = zeros(2, size(gmatrix1, 1));
 betaPeak = zeros(2, size(gmatrix1, 1));
 gammaPeak = zeros(2, size(gmatrix1, 1));
 
-kW = 100;
+kW = 50;
 
 for iN = 1:size(gmatrix1, 1)
 
@@ -69,8 +69,8 @@ for iN = 1:size(gmatrix1, 1)
     temp_sigx = tN*smoothdata2(temp_sigx, "gaussian", {1, kW});
 
     if length(temp_sigxc) > 1
-        [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [.1 100]);
-        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [.1 100]);
+        [temp_sig_tfr1, ~, ~] = jPowerSpectrumDensity(temp_sigx(:, tOi1), [1 100]);
+        [temp_sig_tfr2, fs, ts] = jPowerSpectrumDensity(temp_sigx(:, tOi2), [1 100]);
         temp_relpow = temp_sig_tfr2 ./ temp_sig_tfr1;
     
         % Get spectra peak
@@ -80,7 +80,7 @@ for iN = 1:size(gmatrix1, 1)
         alphaPeak(1, iN) = alphaP(1);
         betaP = mean(temp_relpow(fs < 30.0 & fs > 12.0));
         betaPeak(1, iN) = betaP(1);
-        gammaP = max(temp_relpow(fs > 35.0));
+        gammaP = mean(temp_relpow(fs > 35.0));
         gammaPeak(1, iN) = gammaP(1);
 
     end
@@ -120,7 +120,7 @@ g1_ifprime = find(sPEV < .1 & xPEV < .1 & sAFR < .1 & bAFR < .1 & xAFR < 0.1);
 g2_sprime = find(sAFR > xAFR | sAFR > bAFR);
 g2_invsprime = find(xAFR > sAFR | xAFR > bAFR);
 
-g3_sprime = find(sPEV > 1);
+g3_sprime = find(sPEV > 10);
 g4_ssprime = find(sPEV > 20);
 g5_idl = find(xPEV < 1.0 & sPEV < 25);
 
@@ -219,7 +219,7 @@ print(gcf,'-vector','-dsvg', fname +".svg");
 % nIDgroup = g1_sprime;
 % nIDgroup = g2_invsprime;
 % nIDgroup = g3_inv_sprime;
-% nIDgroup = g4_ssprime;
+nIDgroup = g4_sprime;
 
 % nIDgroup = g1_oxprime;
 % nIDgroup = g2_oxprime2;
@@ -227,9 +227,10 @@ print(gcf,'-vector','-dsvg', fname +".svg");
 % nIDgroup = g4_gxprime;
 
 % nIDgroup = g5_oxcorr;
-nIDgroup = g5_idl;
+% nIDgroup = g5_idl;
+% nIDgroup = g3_sprime;
 
-fname = "3D-BarGroup-idL";
+fname = "3B-BarGroup-ssprime";
 
 kW = 500;
 kX = 1;
@@ -242,15 +243,15 @@ areaNcountx = zeros(1, 11);
 
 for iA = 1:11
 
-    cntxtemp = sum(areaIDs(nIDgroup) == iA);
-    areaNcountx(iA) = cntxtemp;
+    cntxtemp = sum(areaIDs(nIDgroup) == iA) / sum(areaIDs == iA);
+    areaNcountx(iA) = 100*cntxtemp;
 
 end
 subplot(2, 1, 1);
 bar(areaNcountx);
 xticks(1:11);
 xticklabels(areaList(1:11));
-
+%%
 condOi =  1:12;
 ncondOi = length(condOi);
 
@@ -490,7 +491,27 @@ legend;
 
 %%
 
+%% Stim prime neurons
 
+g1_fprime = find(abs(sAFR - xAFR)./sAFR > 0.1 | sPEV > 0 | xPEV > 0);
+g1_ifprime = find(sPEV < .1 & xPEV < .1 & sAFR < .1 & bAFR < .1 & xAFR < 0.1);
+
+g2_sprime = find(sAFR > xAFR | sAFR > bAFR);
+g2_invsprime = find(xAFR > sAFR | xAFR > bAFR);
+
+g3_sprime = find(sPEV > 1);
+g4_ssprime = find(sPEV > 20);
+g5_idl = find(xPEV < 1.0 & sPEV < 25);
+
+%% Oxm prime neurons
+
+g1_oxprime = find(xPEV > 1 | xAFR > bAFR*3);
+g2_oxprime2 = find(xPEV > 1);
+g3_oxprime = find(xAFR > 2*bAFR);
+g4_gxprime = find(xAFR > sAFR*2);
+
+g5_oxcorr = find((xr2 > 0.1 | xr3 > 0.1 | xr4 > 0.1) & (xAFR > 2) & (xAFR > 1.4*bAFR));
+g6_oxpos = find(xOPEV > 10);
 
 %% Fig.3 A: Scatter Bands
 %  theta(Oxm) | theta(Stim)
@@ -504,16 +525,20 @@ for iA = 1:11
 
     generalIDs = find(areaIDs == iA);
     xe1 = thetaPeak(1, areaIDs == iA);
-    ye1 = betaPeak(1, areaIDs == iA)./gammaPeak(1, areaIDs == iA);
+    ye1 = alphaPeak(1, areaIDs == iA);%./gammaPeak(1, areaIDs == iA);
+
     be1 = xAFR(areaIDs == iA);
     ce1 = sAFR(areaIDs == iA);
-    idxs = xe1 < 100 & ye1 < 100;
-    idxs2 = be1 > 1;
+    de1 = xPEV(areaIDs == iA);
+    ee1 = sPEV(areaIDs == iA);
+
+    idxs = be1 > 1 & ce1 > 1;
+    idxs2 = de1 > 1 & be1 > 2*ce1;
     idxs3 = ye1./xe1 > 0.9 & ye1./xe1 < 1.1;
 
-    pointsizes = 4*ones(size(generalIDs));
+    pointsizes = 5*ones(size(generalIDs));
     pointsizes(idxs2) = 20;
-    pointsizes(idxs3) = 8;
+    pointsizes(idxs3) = 1;
 
     scatter3(xe1(idxs), ye1(idxs), generalIDs(idxs), pointsizes(idxs), color_t(iA, :), "filled", DisplayName=areaList(iA));
     view(0, 90)
@@ -536,7 +561,7 @@ for iA = 1:11
     
 end
 
-% set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
+set(gca, 'XScale', 'log', 'YScale', 'log', 'ZScale', 'linear');
 % xlim([0.45 100]);
 % ylim([0.45 100]);
 % xlim([0.1 20]);
